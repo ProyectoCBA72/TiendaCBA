@@ -6,7 +6,6 @@ import 'package:tienda_app/cardProducts.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class TiendaScreen extends StatefulWidget {
   const TiendaScreen({super.key});
@@ -97,6 +96,18 @@ class _TiendaScreenState extends State<TiendaScreen> {
                     )
                   ],
                 ),
+                const SizedBox(width: 20),
+                ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(50)),
+                    child: Container(
+                        // Contenedor que envuelve un botón de búsqueda.
+                        color: primaryColor,
+                        child: IconButton(
+                            onPressed: () {},
+                            icon: const Icon(
+                              Icons.message,
+                              color: Colors.white,
+                            )))),
                 const SizedBox(width: 20),
                 GestureDetector(onTap: () {}, child: const ProfileCard()),
               ],
