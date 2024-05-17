@@ -1,7 +1,8 @@
 // ignore_for_file: file_names
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:tienda_app/responsive.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:open_street_map_search_and_pick/open_street_map_search_and_pick.dart';
 import 'package:flutter/material.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
@@ -278,19 +279,15 @@ class _SedeScreenState extends State<SedeScreen> {
                               ),
                               // Mapa con la ubicación de la sede
                               Padding(
-                                padding: const EdgeInsets.only(left: 20, right: 20),
+                                padding:
+                                    const EdgeInsets.only(left: 20, right: 20),
                                 child: SizedBox(
                                   width: MediaQuery.of(context).size.width,
                                   height: 400,
-                                  child: OpenStreetMapSearchAndPick(
-                                      //center: LatLong(longitud, latitud),
-                                      buttonColor: primaryColor,
-                                      buttonText: "Buscar",
-                                      locationPinIconColor: primaryColor,
-                                      locationPinText: "Aquí",
-                                      locationPinTextStyle:
-                                          TextStyle(color: primaryColor),
-                                      onPicked: (pickedData) {}),
+                                  child: FlutterMap(options: MapOptions(initialCenter: LatLng(latitud, longitud), initialZoom: 14, interactionOptions: const InteractionOptions(flags: InteractiveFlag.doubleTapZoom)), children: [
+                                    openStreetMapTileLayer,
+                                    MarkerLayer(markers: [Marker(point: LatLng(latitud, longitud),width: 30, height: 30, alignment: Alignment.center, child: Icon(Icons.location_pin, size: 30, color: primaryColor,))]),
+                                  ]),
                                 ),
                               ),
                               const SizedBox(
@@ -489,7 +486,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                       ),
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius: BorderRadius.circular(10.0),
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
                                         boxShadow: [
                                           BoxShadow(
                                             color: Colors.grey.withOpacity(0.5),
@@ -505,15 +503,19 @@ class _SedeScreenState extends State<SedeScreen> {
                                         child: SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
                                           child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Padding(
-                                                padding: const EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
-                                                      Icons.location_city_outlined,
+                                                      Icons
+                                                          .location_city_outlined,
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
@@ -524,7 +526,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       "Ciudad: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontFamily: 'BakbakOne',
                                                       ),
                                                     ),
@@ -540,7 +543,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 ),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -555,7 +559,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       "Departamento: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontFamily: 'BakbakOne',
                                                       ),
                                                     ),
@@ -571,7 +576,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 ),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -586,7 +592,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       "Regional: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontFamily: 'BakbakOne',
                                                       ),
                                                     ),
@@ -602,7 +609,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 ),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -617,7 +625,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       "Dirección: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontFamily: 'BakbakOne',
                                                       ),
                                                     ),
@@ -633,7 +642,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 ),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -648,7 +658,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       "Telefono 1: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontFamily: 'BakbakOne',
                                                       ),
                                                     ),
@@ -664,7 +675,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 ),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -679,7 +691,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       "Telefono 2: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontFamily: 'BakbakOne',
                                                       ),
                                                     ),
@@ -695,7 +708,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 ),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -710,7 +724,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       "Correo electronico: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontFamily: 'BakbakOne',
                                                       ),
                                                     ),
@@ -984,19 +999,15 @@ class _SedeScreenState extends State<SedeScreen> {
                               ),
                               // Mapa con la ubicación de la sede
                               Padding(
-                                padding: const EdgeInsets.only(left: 20, right: 20),
+                                padding:
+                                    const EdgeInsets.only(left: 20, right: 20),
                                 child: SizedBox(
                                   width: MediaQuery.of(context).size.width,
                                   height: 400,
-                                  child: OpenStreetMapSearchAndPick(
-                                      //center: LatLong(longitud, latitud),
-                                      buttonColor: primaryColor,
-                                      buttonText: "Buscar",
-                                      locationPinIconColor: primaryColor,
-                                      locationPinText: "Aquí",
-                                      locationPinTextStyle:
-                                          TextStyle(color: primaryColor),
-                                      onPicked: (pickedData) {}),
+                                  child: FlutterMap(options: MapOptions(initialCenter: LatLng(latitud, longitud), initialZoom: 14, interactionOptions: const InteractionOptions(flags: InteractiveFlag.doubleTapZoom)), children: [
+                                    openStreetMapTileLayer,
+                                    MarkerLayer(markers: [Marker(point: LatLng(latitud, longitud),width: 30, height: 30, alignment: Alignment.center, child: Icon(Icons.location_pin, size: 30, color: primaryColor,))]),
+                                  ]),
                                 ),
                               ),
                               const SizedBox(
@@ -1195,7 +1206,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                       ),
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius: BorderRadius.circular(10.0),
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
                                         boxShadow: [
                                           BoxShadow(
                                             color: Colors.grey.withOpacity(0.5),
@@ -1211,15 +1223,19 @@ class _SedeScreenState extends State<SedeScreen> {
                                         child: SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
                                             children: [
                                               Padding(
-                                                padding: const EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
-                                                      Icons.location_city_outlined,
+                                                      Icons
+                                                          .location_city_outlined,
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
@@ -1230,7 +1246,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       "Ciudad: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontFamily: 'BakbakOne',
                                                       ),
                                                     ),
@@ -1246,7 +1263,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 ),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -1261,7 +1279,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       "Departamento: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontFamily: 'BakbakOne',
                                                       ),
                                                     ),
@@ -1277,7 +1296,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 ),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -1292,7 +1312,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       "Regional: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontFamily: 'BakbakOne',
                                                       ),
                                                     ),
@@ -1308,7 +1329,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 ),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -1323,7 +1345,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       "Dirección: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontFamily: 'BakbakOne',
                                                       ),
                                                     ),
@@ -1339,7 +1362,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 ),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -1354,7 +1378,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       "Telefono 1: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontFamily: 'BakbakOne',
                                                       ),
                                                     ),
@@ -1370,7 +1395,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 ),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -1385,7 +1411,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       "Telefono 2: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontFamily: 'BakbakOne',
                                                       ),
                                                     ),
@@ -1401,7 +1428,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 ),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -1416,7 +1444,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       "Correo electronico: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontFamily: 'BakbakOne',
                                                       ),
                                                     ),
@@ -1473,3 +1502,5 @@ void _modalAmpliacion(BuildContext context, String src) {
     },
   );
 }
+
+TileLayer get openStreetMapTileLayer => TileLayer(urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", userAgentPackageName: "dev.fleaflet.flutter_map.example",);

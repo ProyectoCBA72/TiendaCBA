@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import '../source.dart';
 import 'categoriaModel.dart';
 import 'puntoVentaModel.dart';

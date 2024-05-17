@@ -37,10 +37,11 @@ dependencies:
   cupertino_icons: ^1.0.6
   http: ^1.2.1
   google_fonts: ^4.0.4
-  open_street_map_search_and_pick: ^0.1.1
   lottie: 
   universal_platform: ^1.0.0+1
-
+  flutter_map: 
+  latlong2: 
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
