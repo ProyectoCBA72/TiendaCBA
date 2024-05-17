@@ -16,9 +16,9 @@ class _AnuncioCardState extends State<AnuncioCard> {
   int _currentImageIndex = 0;
   Timer? _timer;
   final List<String> _images = [
-    'https://scontent-bog2-2.xx.fbcdn.net/v/t39.30808-6/291054585_608787604116674_5459347250647540917_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeH_EaJiLzjHCtCKc-3kz8v8BThRk_DJMm4FOFGT8Mkybr0xkliPnsxlu9NY84c4YeleRpj3_4nawfzpz7JZFi-1&_nc_ohc=nkXMMaKtV_EQ7kNvgEeXiaY&_nc_ht=scontent-bog2-2.xx&oh=00_AYA92tgWRsYU18YiwNHtN-EQGBRCkLc47fGj3pWkQdwDrw&oe=6643F5F4',
-    'https://scontent-bog2-2.xx.fbcdn.net/v/t39.30808-6/290347158_608787637450004_7021336845368539183_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeE4hpIJy5wn0A87ek-7_Hm3YTZGF1pNLzlhNkYXWk0vOaEJpIkzmg3mqkQHqhz_bV3CFSgkBD52bgmceNIO3-Sj&_nc_ohc=bq225GahLXMQ7kNvgFax10O&_nc_ht=scontent-bog2-2.xx&oh=00_AYAy2VZ8cXYfXdtnGveHvOq-CnoTOV8PniJB5HKHam7vFg&oe=6643F628',
-    'https://scontent-bog2-2.xx.fbcdn.net/v/t39.30808-6/290313642_608787627450005_4351049694493049378_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeGJUV0nds0yuPHVdal6d5DKOQB2pjGWPcA5AHamMZY9wLMarTKjycgFjye-75ujgdL--kBEM3DNTn3UzjVSdGzM&_nc_ohc=5vFWPvNafFwQ7kNvgHPKLjj&_nc_ht=scontent-bog2-2.xx&oh=00_AYBQtllW7hDIce9YzZBqX0mbItNsbV7bdk0TJukRZ_ivRw&oe=6643C72A',
+    'https://scontent-bog2-2.xx.fbcdn.net/v/t39.30808-6/291054585_608787604116674_5459347250647540917_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=5f2048&_nc_ohc=9CpZgunGxXgQ7kNvgEsEiU8&_nc_ht=scontent-bog2-2.xx&oh=00_AYC08wPJP49Mm_7MKrVz5tCUY62v2BBlx9llMRjS0sEGTg&oe=664C87B4',
+    'https://scontent-bog2-2.xx.fbcdn.net/v/t39.30808-6/290347158_608787637450004_7021336845368539183_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=5f2048&_nc_ohc=DI5OZ4T9EnIQ7kNvgHzWZvD&_nc_ht=scontent-bog2-2.xx&oh=00_AYASPCVujt3prdtWPIdV7XDC3YK7hrW1YlPst2QkhGNC1g&oe=664C87E8',
+    'https://scontent-bog2-2.xx.fbcdn.net/v/t39.30808-6/290313642_608787627450005_4351049694493049378_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=5f2048&_nc_ohc=UI9LTAh0uckQ7kNvgFLY6eU&_nc_ht=scontent-bog2-2.xx&oh=00_AYBruzjs-541wag9nOqYyxkJkBtTmNPie2P3DapSWoZAJA&oe=664C912A',
   ];
 
   @override

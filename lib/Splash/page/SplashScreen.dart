@@ -49,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 children: [
                   // Comprobación y representación condicional del fondo.
                   if (listaComponents[currentIndex].backgroundColor != null)
-                    listaComponents[currentIndex].backgroundColor,
+                    listaComponents[currentIndex].backgroundColor!,
                   Row(
                     children: [
                       // Contenido principal.
@@ -305,7 +305,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 children: [
                   // Comprobación y representación condicional del fondo.
                   if (listaComponents[currentIndex].backgroundColor != null)
-                    listaComponents[currentIndex].backgroundColor,
+                    listaComponents[currentIndex].backgroundColor!,
                   // Contenido principal.
                   Row(
                     children: [
@@ -397,7 +397,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                                     .backgroundColor !=
                                                 null)
                                               listaComponents[currentIndex]
-                                                  .backgroundColor,
+                                                  .backgroundColor!,
                                             Center(
                                               child: Text(
                                                 listaComponents[index]
@@ -624,7 +624,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 children: [
                   // Comprobación y representación condicional del fondo.
                   if (listaComponents[currentIndex].backgroundColor != null)
-                    listaComponents[currentIndex].backgroundColor,
+                    listaComponents[currentIndex].backgroundColor!,
                   // Contenido principal.
                   Row(
                     children: [

@@ -365,6 +365,18 @@ class _HomePageState extends State<HomePage>
                               color: Colors.white,
                             )))),
                 const SizedBox(width: 20),
+                ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(50)),
+                    child: Container(
+                        // Contenedor que envuelve un botón de búsqueda.
+                        color: primaryColor,
+                        child: IconButton(
+                            onPressed: () {},
+                            icon: const Icon(
+                              Icons.chat,
+                              color: Colors.white,
+                            )))),
+                const SizedBox(width: 20),
                 GestureDetector(onTap: () {}, child: const ProfileCard()),
               ],
             ),
