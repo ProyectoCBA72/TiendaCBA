@@ -1,19 +1,21 @@
 // ignore_for_file: use_full_hex_values_for_flutter_colors, file_names
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
-var primaryColor = Colors.green;
+const primaryColor = Colors.green;
 
-var background1 = const Color(0xFFFF2F0F2);
+const background1 = Color(0xFFFF2F0F2);
 
-var botonClaro = const Color(0xFF00FF00);
+const botonClaro = Color(0xFF00FF00);
 
-var botonOscuro = const Color(0xFF008000);
+const botonOscuro = Color(0xFF008000);
 
-var botonSombra = const Color(0xFF32CD32);
+const botonSombra = Color(0xFF32CD32);
 
 const secondaryColor = Color(0xFF000000);
+
+const defaultPadding = 16.0;
 
 ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
@@ -21,20 +23,109 @@ ThemeData lightTheme = ThemeData(
   canvasColor: secondaryColor,
   // Ignorar el uso de miembros obsoletos, ya que se ha migrado a un nuevo enfoque.
   // ignore: deprecated_member_use
-  backgroundColor: Colors.white,
   scaffoldBackgroundColor: Colors.white,
   // Definición del tema para el cajón de navegación.
   drawerTheme: const DrawerThemeData(backgroundColor: Color(0xFFFF2F0F2)),
   // Configuración del tema de texto utilizando Google Fonts con el color principal.
-  textTheme: GoogleFonts.poppinsTextTheme().apply(bodyColor: primaryColor),
+  textTheme: const TextTheme(
+    displayLarge: TextStyle(
+        fontFamily: 'Calibri',
+        fontWeight: FontWeight.normal,
+        color: primaryColor),
+    displayMedium: TextStyle(
+        fontFamily: 'Calibri',
+        fontWeight: FontWeight.normal,
+        color: primaryColor),
+    displaySmall: TextStyle(
+        fontFamily: 'Calibri',
+        fontWeight: FontWeight.normal,
+        color: primaryColor),
+    headlineLarge: TextStyle(
+        fontFamily: 'Calibri-Bold',
+        fontWeight: FontWeight.bold,
+        color: primaryColor),
+    headlineMedium: TextStyle(
+        fontFamily: 'Calibri-Bold',
+        fontWeight: FontWeight.bold,
+        color: primaryColor),
+    headlineSmall: TextStyle(
+        fontFamily: 'Calibri-Bold',
+        fontWeight: FontWeight.bold,
+        color: primaryColor),
+    titleLarge: TextStyle(
+        fontFamily: 'Calibri',
+        fontWeight: FontWeight.normal,
+        color: primaryColor),
+    titleMedium: TextStyle(
+        fontFamily: 'Calibri',
+        fontWeight: FontWeight.normal,
+        color: primaryColor),
+    titleSmall: TextStyle(
+        fontFamily: 'Calibri-Italic',
+        fontStyle: FontStyle.italic,
+        color: Colors.grey),
+    bodyLarge: TextStyle(
+        fontFamily: 'Calibri',
+        fontWeight: FontWeight.normal,
+        color: primaryColor),
+    bodyMedium: TextStyle(
+        fontFamily: 'Calibri',
+        fontWeight: FontWeight.normal,
+        color: primaryColor),
+    bodySmall: TextStyle(
+        fontFamily: 'Calibri',
+        fontWeight: FontWeight.normal,
+        color: primaryColor),
+    labelLarge: TextStyle(
+        fontFamily: 'Calibri',
+        fontWeight: FontWeight.normal,
+        color: primaryColor),
+    labelMedium: TextStyle(
+        fontFamily: 'Calibri',
+        fontWeight: FontWeight.normal,
+        color: primaryColor),
+    labelSmall: TextStyle(
+        fontFamily: 'Calibri-Light',
+        fontWeight: FontWeight.w300,
+        color: primaryColor),
+  ),
   // Configuración del tema de botón elevado con el color principal.
-  elevatedButtonTheme: ElevatedButtonThemeData(
+  elevatedButtonTheme: const ElevatedButtonThemeData(
     style: ButtonStyle(
-      backgroundColor: MaterialStatePropertyAll(primaryColor),
-      foregroundColor: const MaterialStatePropertyAll(Colors.white),
+      backgroundColor: WidgetStatePropertyAll(primaryColor),
+      foregroundColor: WidgetStatePropertyAll(Colors.white),
     ),
   ),
+  checkboxTheme: CheckboxThemeData(
+    fillColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return primaryColor; // Color de fondo cuando está seleccionado
+      }
+      return Colors.transparent; // Color de fondo cuando no está seleccionado
+    }),
+  ),
   // Configuración del tema del botón flotante de acción con colores específicos.
-  floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: const Color(0xFFFF2F0F2), foregroundColor: primaryColor),
+  floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      backgroundColor: Color(0xFFFF2F0F2), foregroundColor: primaryColor),
+  progressIndicatorTheme: const ProgressIndicatorThemeData(color: primaryColor),
+  textSelectionTheme: const TextSelectionThemeData(
+    cursorColor: primaryColor,
+  ),
+  inputDecorationTheme: const InputDecorationTheme(
+    enabledBorder: OutlineInputBorder(
+      borderSide: BorderSide(
+          color: primaryColor), // Color del borde cuando no está enfocado
+    ),
+    focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: primaryColor), // Color del borde cuando está enfocado
+        ),
+  ),
 );
+
+NumberFormat formatter = NumberFormat.currency(
+  locale: 'es_CO', // Español Colombia
+  symbol: '', // Símbolo de pesos colombianos
+  decimalDigits: 2, // Número de decimales
+);
+
+String twoDigits(int n) => n.toString().padLeft(2, '0');

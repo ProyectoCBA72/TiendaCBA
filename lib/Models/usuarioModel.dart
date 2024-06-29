@@ -15,7 +15,6 @@ class UsuarioModel {
   final String direccion;
   final String telefono;
   final String telefonoCelular;
-  final String foto;
   final String rol1;
   final String rol2;
   final String rol3;
@@ -25,6 +24,8 @@ class UsuarioModel {
   final bool vocero;
   final String fechaRegistro;
   final int sede;
+  final int puntoVenta;
+  final int unidadProduccion;
 
   UsuarioModel({
     required this.id,
@@ -37,7 +38,6 @@ class UsuarioModel {
     required this.direccion,
     required this.telefono,
     required this.telefonoCelular,
-    required this.foto,
     required this.rol1,
     required this.rol2,
     required this.rol3,
@@ -47,6 +47,8 @@ class UsuarioModel {
     required this.vocero,
     required this.fechaRegistro,
     required this.sede,
+    required this.puntoVenta,
+    required this.unidadProduccion,
   });
 }
 
@@ -82,7 +84,6 @@ Future<List<UsuarioModel>> getUsuarios() async {
           direccion: usuariodata['direccion'] ?? "",
           telefono: usuariodata['telefono'] ?? "",
           telefonoCelular: usuariodata['telefonoCelular'] ?? "",
-          foto: usuariodata['foto'] ?? "",
           rol1: usuariodata['rol1'] ?? "",
           rol2: usuariodata['rol2'] ?? "",
           rol3: usuariodata['rol3'] ?? "",
@@ -92,6 +93,8 @@ Future<List<UsuarioModel>> getUsuarios() async {
           vocero: usuariodata['vocero'] ?? false,
           fechaRegistro: usuariodata['fechaRegistro'] ?? "",
           sede: usuariodata['sede'] ?? 0,
+          puntoVenta: usuariodata['puntoVenta'] ?? 0,
+          unidadProduccion: usuariodata['unidadProduccion'] ?? 0,
         ),
       );
     }

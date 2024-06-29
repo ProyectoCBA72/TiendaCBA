@@ -49,6 +49,13 @@ Future<List<BoletaModel>> getBoletas() async {
             titulo: boletaData['anuncio']['titulo'] ?? "",
             fecha: boletaData['anuncio']['fecha'] ?? "",
             descripcion: boletaData['anuncio']['descripcion'] ?? "",
+            evento: boletaData['anuncio']['evento'] ?? false,
+            eventoIncripcionInicio:
+                boletaData['anuncio']['eventoIncripcionInicio'] ?? "",
+            eventoIncripcionFin:
+                boletaData['anuncio']['eventoIncripcionFin'] ?? "",
+            maxCupos: boletaData['anuncio']['maxcupos'] ?? 0,
+            anexo: boletaData['anuncio']['anexo'] ?? "",
             usuario: UsuarioModel(
               id: boletaData['anuncio']['usuario']['id'] ?? 0,
               nombres: boletaData['anuncio']['usuario']['nombres'] ?? "",
@@ -64,7 +71,6 @@ Future<List<BoletaModel>> getBoletas() async {
               telefono: boletaData['anuncio']['usuario']['telefono'] ?? "",
               telefonoCelular:
                   boletaData['anuncio']['usuario']['telefonoCelular'] ?? "",
-              foto: boletaData['anuncio']['usuario']['foto'] ?? "",
               rol1: boletaData['anuncio']['usuario']['rol1'] ?? "",
               rol2: boletaData['anuncio']['usuario']['rol2'] ?? "",
               rol3: boletaData['anuncio']['usuario']['rol3'] ?? "",
@@ -75,7 +81,11 @@ Future<List<BoletaModel>> getBoletas() async {
               fechaRegistro:
                   boletaData['anuncio']['usuario']['fechaRegistro'] ?? "",
               sede: boletaData['anuncio']['usuario']['sede'] ?? 0,
+              puntoVenta: boletaData['anuncio']['usuario']['puntoVenta'] ?? 0,
+              unidadProduccion:
+                  boletaData['anuncio']['usuario']['unidadProduccion'] ?? 0,
             ),
+            fechaEvento: boletaData['anuncio']['fechaEvento'] ?? "",
           ),
         ),
       );

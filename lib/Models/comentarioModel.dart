@@ -54,19 +54,31 @@ Future<List<ComentarioModel>> getComentarios() async {
             titulo: comentarioData['anuncio']['titulo'] ?? "",
             fecha: comentarioData['anuncio']['fecha'] ?? "",
             descripcion: comentarioData['anuncio']['descripcion'] ?? "",
+            evento: comentarioData['anuncio']['evento'] ?? false,
+            eventoIncripcionInicio:
+                comentarioData['anuncio']['eventoIncripcionInicio'] ?? "",
+            eventoIncripcionFin:
+                comentarioData['anuncio']['eventoIncripcionFin'] ?? "",
+            maxCupos: comentarioData['anuncio']['maxcupos'] ?? 0,
+            anexo: comentarioData['anuncio']['anexo'] ?? "",
             usuario: UsuarioModel(
               id: comentarioData['anuncio']['usuario']['id'] ?? 0,
               nombres: comentarioData['anuncio']['usuario']['nombres'] ?? "",
-              apellidos: comentarioData['anuncio']['usuario']['apellidos'] ?? "",
-              tipoDocumento: comentarioData['anuncio']['usuario']['tipoDocumento'] ?? "",
-              numeroDocumento: comentarioData['anuncio']['usuario']['numeroDocumento'] ?? "",
-              correoElectronico:
-                  comentarioData['anuncio']['usuario']['correoElectronico'] ?? "",
+              apellidos:
+                  comentarioData['anuncio']['usuario']['apellidos'] ?? "",
+              tipoDocumento:
+                  comentarioData['anuncio']['usuario']['tipoDocumento'] ?? "",
+              numeroDocumento:
+                  comentarioData['anuncio']['usuario']['numeroDocumento'] ?? "",
+              correoElectronico: comentarioData['anuncio']['usuario']
+                      ['correoElectronico'] ??
+                  "",
               ciudad: comentarioData['anuncio']['usuario']['ciudad'] ?? "",
-              direccion: comentarioData['anuncio']['usuario']['direccion'] ?? "",
+              direccion:
+                  comentarioData['anuncio']['usuario']['direccion'] ?? "",
               telefono: comentarioData['anuncio']['usuario']['telefono'] ?? "",
-              telefonoCelular: comentarioData['anuncio']['usuario']['telefonoCelular'] ?? "",
-              foto: comentarioData['anuncio']['usuario']['foto'] ?? "",
+              telefonoCelular:
+                  comentarioData['anuncio']['usuario']['telefonoCelular'] ?? "",
               rol1: comentarioData['anuncio']['usuario']['rol1'] ?? "",
               rol2: comentarioData['anuncio']['usuario']['rol2'] ?? "",
               rol3: comentarioData['anuncio']['usuario']['rol3'] ?? "",
@@ -74,9 +86,15 @@ Future<List<ComentarioModel>> getComentarios() async {
               cargo: comentarioData['anuncio']['usuario']['cargo'] ?? "",
               ficha: comentarioData['anuncio']['usuario']['ficha'] ?? "",
               vocero: comentarioData['anuncio']['usuario']['vocero'] ?? false,
-              fechaRegistro: comentarioData['anuncio']['usuario']['fechaRegistro'] ?? "",
+              fechaRegistro:
+                  comentarioData['anuncio']['usuario']['fechaRegistro'] ?? "",
               sede: comentarioData['anuncio']['usuario']['sede'] ?? 0,
+              puntoVenta:
+                  comentarioData['anuncio']['usuario']['puntoVenta'] ?? 0,
+              unidadProduccion:
+                  comentarioData['anuncio']['usuario']['unidadProduccion'] ?? 0,
             ),
+            fechaEvento: comentarioData['anuncio']['fechaEvento'] ?? "",
           ),
         ),
       );

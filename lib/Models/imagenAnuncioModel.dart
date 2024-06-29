@@ -47,6 +47,13 @@ Future<List<ImagenAnuncioModel>> getImagenesAnuncio() async {
             titulo: imagenanuncioData['anuncio']['titulo'] ?? "",
             fecha: imagenanuncioData['anuncio']['fecha'] ?? "",
             descripcion: imagenanuncioData['anuncio']['descripcion'] ?? "",
+            evento: imagenanuncioData['anuncio']['evento'] ?? false,
+            eventoIncripcionInicio:
+                imagenanuncioData['anuncio']['eventoIncripcionInicio'] ?? "",
+            eventoIncripcionFin:
+                imagenanuncioData['anuncio']['eventoIncripcionFin'] ?? "",
+            maxCupos: imagenanuncioData['anuncio']['maxcupos'] ?? 0,
+            anexo: imagenanuncioData['anuncio']['anexo'] ?? "",
             usuario: UsuarioModel(
               id: imagenanuncioData['anuncio']['usuario']['id'] ?? 0,
               nombres: imagenanuncioData['anuncio']['usuario']['nombres'] ?? "",
@@ -69,7 +76,6 @@ Future<List<ImagenAnuncioModel>> getImagenesAnuncio() async {
               telefonoCelular: imagenanuncioData['anuncio']['usuario']
                       ['telefonoCelular'] ??
                   "",
-              foto: imagenanuncioData['anuncio']['usuario']['foto'] ?? "",
               rol1: imagenanuncioData['anuncio']['usuario']['rol1'] ?? "",
               rol2: imagenanuncioData['anuncio']['usuario']['rol2'] ?? "",
               rol3: imagenanuncioData['anuncio']['usuario']['rol3'] ?? "",
@@ -82,7 +88,13 @@ Future<List<ImagenAnuncioModel>> getImagenesAnuncio() async {
                       ['fechaRegistro'] ??
                   "",
               sede: imagenanuncioData['anuncio']['usuario']['sede'] ?? 0,
+              puntoVenta:
+                  imagenanuncioData['anuncio']['usuario']['puntoVenta'] ?? 0,
+              unidadProduccion: imagenanuncioData['anuncio']['usuario']
+                      ['unidadProduccion'] ??
+                  0,
             ),
+            fechaEvento: imagenanuncioData['anuncio']['fechaEvento'] ?? "",
           ),
         ),
       );

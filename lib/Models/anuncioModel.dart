@@ -11,6 +11,12 @@ class AnuncioModel {
   final String titulo;
   final String fecha;
   final String descripcion;
+  final bool evento;
+  final String fechaEvento;
+  final String eventoIncripcionInicio;
+  final String eventoIncripcionFin;
+  final int maxCupos;
+  final String anexo;
   final UsuarioModel usuario;
 
   AnuncioModel({
@@ -19,6 +25,12 @@ class AnuncioModel {
     required this.fecha,
     required this.descripcion,
     required this.usuario,
+    required this.fechaEvento,
+    required this.evento,
+    required this.eventoIncripcionInicio,
+    required this.eventoIncripcionFin,
+    required this.maxCupos,
+    required this.anexo,
   });
 }
 
@@ -48,6 +60,11 @@ Future<List<AnuncioModel>> getAnuncios() async {
           titulo: anuncioData['titulo'] ?? "",
           fecha: anuncioData['fecha'] ?? "",
           descripcion: anuncioData['descripcion'] ?? "",
+          evento: anuncioData['evento'] ?? false,
+          eventoIncripcionInicio: anuncioData['eventoIncripcionInicio'] ?? "",
+          eventoIncripcionFin: anuncioData['eventoIncripcionFin'] ?? "",
+          maxCupos: anuncioData['maxcupos'] ?? 0,
+          anexo: anuncioData['anexo'] ?? "",
           usuario: UsuarioModel(
             id: anuncioData['usuario']['id'] ?? 0,
             nombres: anuncioData['usuario']['nombres'] ?? "",
@@ -60,7 +77,6 @@ Future<List<AnuncioModel>> getAnuncios() async {
             direccion: anuncioData['usuario']['direccion'] ?? "",
             telefono: anuncioData['usuario']['telefono'] ?? "",
             telefonoCelular: anuncioData['usuario']['telefonoCelular'] ?? "",
-            foto: anuncioData['usuario']['foto'] ?? "",
             rol1: anuncioData['usuario']['rol1'] ?? "",
             rol2: anuncioData['usuario']['rol2'] ?? "",
             rol3: anuncioData['usuario']['rol3'] ?? "",
@@ -70,7 +86,10 @@ Future<List<AnuncioModel>> getAnuncios() async {
             vocero: anuncioData['usuario']['vocero'] ?? false,
             fechaRegistro: anuncioData['usuario']['fechaRegistro'] ?? "",
             sede: anuncioData['usuario']['sede'] ?? 0,
+            puntoVenta: anuncioData['usuario']['puntoVenta'] ?? 0,
+            unidadProduccion: anuncioData['usuario']['unidadProduccion'] ?? 0,
           ),
+          fechaEvento: anuncioData['fechaEvento'] ?? "",
         ),
       );
     }

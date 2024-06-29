@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../source.dart';
@@ -9,6 +7,7 @@ import 'usuarioModel.dart';
 
 class FacturaModel {
   final int id;
+  final int numero;
   final String fecha;
   final MedioPagoModel medioPago;
   final PedidoModel pedido;
@@ -18,6 +17,7 @@ class FacturaModel {
     required this.fecha,
     required this.medioPago,
     required this.pedido,
+    required this.numero,
   });
 }
 
@@ -44,6 +44,7 @@ Future<List<FacturaModel>> getFacturas() async {
       facturas.add(
         FacturaModel(
           id: facturaData['id'] ?? 0,
+          numero: facturaData['numero'] ?? 0,
           fecha: facturaData['fecha'] ?? "",
           medioPago: MedioPagoModel(
             id: facturaData['medioPago']['id'] ?? 0,
@@ -75,7 +76,6 @@ Future<List<FacturaModel>> getFacturas() async {
               telefono: facturaData['pedido']['usuario']['telefono'] ?? "",
               telefonoCelular:
                   facturaData['pedido']['usuario']['telefonoCelular'] ?? "",
-              foto: facturaData['pedido']['usuario']['foto'] ?? "",
               rol1: facturaData['pedido']['usuario']['rol1'] ?? "",
               rol2: facturaData['pedido']['usuario']['rol2'] ?? "",
               rol3: facturaData['pedido']['usuario']['rol3'] ?? "",
@@ -86,6 +86,9 @@ Future<List<FacturaModel>> getFacturas() async {
               fechaRegistro:
                   facturaData['pedido']['usuario']['fechaRegistro'] ?? "",
               sede: facturaData['pedido']['usuario']['sede'] ?? 0,
+              puntoVenta: facturaData['pedido']['usuario']['puntoVenta'] ?? 0,
+              unidadProduccion:
+                  facturaData['pedido']['usuario']['unidadProduccion'] ?? 0,
             ),
           ),
         ),

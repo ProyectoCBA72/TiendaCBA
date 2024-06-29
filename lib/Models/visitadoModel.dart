@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'categoriaModel.dart';
@@ -62,12 +60,6 @@ Future<List<VisitadoModel>> getVisitados() async {
             precioFuncionario:
                 visitadoData['producto']['precioFuncionario'] ?? 0,
             precioOferta: visitadoData['producto']['precioOferta'] ?? 0,
-            precioOfertaAprendiz:
-                visitadoData['producto']['precioOfertaAprendiz'] ?? 0,
-            precioOfertaFuncionario:
-                visitadoData['producto']['precioOfertaFuncionario'] ?? 0,
-            precioOfertaInstructor:
-                visitadoData['producto']['precioOfertaInstructor'] ?? 0,
             exclusivo: visitadoData['exclusivo'] ?? false,
             categoria: CategoriaModel(
               id: visitadoData['producto']['categoria']['id'] ?? 0,
@@ -137,7 +129,6 @@ Future<List<VisitadoModel>> getVisitados() async {
               telefono: visitadoData['producto']['usuario']['telefono'] ?? "",
               telefonoCelular:
                   visitadoData['producto']['usuario']['telefonoCelular'] ?? "",
-              foto: visitadoData['producto']['usuario']['foto'] ?? "",
               rol1: visitadoData['producto']['usuario']['rol1'] ?? "",
               rol2: visitadoData['producto']['usuario']['rol2'] ?? "",
               rol3: visitadoData['producto']['usuario']['rol3'] ?? "",
@@ -148,6 +139,10 @@ Future<List<VisitadoModel>> getVisitados() async {
               fechaRegistro:
                   visitadoData['producto']['usuario']['fechaRegistro'] ?? "",
               sede: visitadoData['producto']['usuario']['sede'] ?? 0,
+              puntoVenta:
+                  visitadoData['producto']['usuario']['puntoVenta'] ?? 0,
+              unidadProduccion:
+                  visitadoData['producto']['usuario']['unidadProduccion'] ?? 0,
             ),
           ),
         ),

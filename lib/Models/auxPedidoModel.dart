@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'dart:convert';
 import '../source.dart';
 import 'pedidoModel.dart';
@@ -8,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 class AuxPedidoModel {
   final int id;
-  final int cantidad;
+  int cantidad;
   final int precio;
   final int producto;
   final PedidoModel pedido;
@@ -50,14 +48,15 @@ Future<List<AuxPedidoModel>> getAuxPedidos() async {
           producto: auxPedidoData['producto'],
           pedido: PedidoModel(
             id: auxPedidoData['pedido']['id'] ?? 0,
-            numeroPedido: auxPedidoData['pedido']['cantidad'] ?? 0,
+            numeroPedido: auxPedidoData['pedido']['numeroPedido'] ?? 0,
             fechaEncargo: auxPedidoData['pedido']['fechaEncargo'] ?? "",
             fechaEntrega: auxPedidoData['pedido']['fechaEntrega'] ?? "",
             grupal: auxPedidoData['pedido']['grupal'] ?? false,
             estado: auxPedidoData['pedido']['estado'] ?? "",
             entregado: auxPedidoData['pedido']['entregado'] ?? false,
             puntoVenta: auxPedidoData['pedido']['puntoVenta'] ?? 0,
-            pedidoConfirmado: auxPedidoData['pedido']['pedidoConfirmado'],
+            pedidoConfirmado:
+                auxPedidoData['pedido']['pedidoConfirmado'] ?? false,
             usuario: UsuarioModel(
               id: auxPedidoData['pedido']['usuario']['id'] ?? 0,
               nombres: auxPedidoData['pedido']['usuario']['nombres'] ?? "",
@@ -73,7 +72,6 @@ Future<List<AuxPedidoModel>> getAuxPedidos() async {
               telefono: auxPedidoData['pedido']['usuario']['telefono'] ?? "",
               telefonoCelular:
                   auxPedidoData['pedido']['usuario']['telefonoCelular'] ?? "",
-              foto: auxPedidoData['pedido']['usuario']['foto'] ?? "",
               rol1: auxPedidoData['pedido']['usuario']['rol1'] ?? "",
               rol2: auxPedidoData['pedido']['usuario']['rol2'] ?? "",
               rol3: auxPedidoData['pedido']['usuario']['rol3'] ?? "",
@@ -84,6 +82,9 @@ Future<List<AuxPedidoModel>> getAuxPedidos() async {
               fechaRegistro:
                   auxPedidoData['pedido']['usuario']['fechaRegistro'] ?? "",
               sede: auxPedidoData['pedido']['usuario']['sede'] ?? 0,
+              puntoVenta: auxPedidoData['pedido']['usuario']['puntoVenta'] ?? 0,
+              unidadProduccion:
+                  auxPedidoData['pedido']['usuario']['unidadProduccion'] ?? 0,
             ),
           ),
         ),

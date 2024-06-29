@@ -1,11 +1,13 @@
 // ignore_for_file: file_names
 
-import 'package:tienda_app/responsive.dart';
 import 'package:flutter/material.dart';
+import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+import '../Models/imagenProductoModel.dart';
 
 class DetailsScreen extends StatefulWidget {
-  const DetailsScreen({super.key});
+  final ProductoModel producto;
+  const DetailsScreen({super.key, required this.producto});
 
   @override
   State<DetailsScreen> createState() => _DetailsScreenState();
@@ -13,31 +15,66 @@ class DetailsScreen extends StatefulWidget {
 
 class _DetailsScreenState extends State<DetailsScreen> {
   // URL de la imagen principal
-  String mainImageUrl =
-      'https://definicion.de/wp-content/uploads/2011/02/carne-1.jpg';
+  String mainImageUrl = '';
 
   // Lista de URL de miniaturas de imágenes
-  List<String> thumbnailUrls = [
-    'https://definicion.de/wp-content/uploads/2011/02/carne-1.jpg',
-    'https://media.gq.com.mx/photos/620bcf7243f71a078a355280/16:9/w_2560%2Cc_limit/carnes-85650597.jpg',
-    'https://www.cocinista.es/download/bancorecursos/recetas/cocinar-la-carne-de-vacuno.jpg',
-    'https://i.blogs.es/a6a88d/1366_20001/840_560.jpg',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7OG_LJtCn_w1lFXu_cbSFWX7gD3p-TroxZA&usqp=CAU',
-    'https://img.freepik.com/foto-gratis/carne-cruda-mesa_23-2150857912.jpg',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoNsd_eHsX_LQFqHAU2ktVAYClBKcKc-pKjg&usqp=CAU',
-    'https://www.elpais.com.co/resizer/xQKptdk_GdP0GFxCWQEyhUpmUtY=/1920x0/smart/filters:format(jpg):quality(80)/cloudfront-us-east-1.images.arcpublishing.com/semana/FG3YXS7KFVFCRNYHDKFFG6YYSA.jpg',
-    'https://www.alltech.com/sites/default/files/styles/16_9_large/public/2021-05/Calidad%20de%20la%20carne.png.jpg?itok=HO1-UuVI',
-    'https://cdn.forbes.com.mx/2019/04/cortes.jpg',
-    'https://carnisima.com/cdn/shop/articles/IMG_4997.jpg?v=1618997052',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxkjsoKehb_3nWUD05IO_Tsq0CMEWe54EZCQ&usqp=CAU',
-    // Agrega más URL de miniaturas según sea necesario
-  ];
+  List<String> thumbnailUrls = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadImages();
+  }
+
+  void _loadImages() async {
+    final allImagenes = await getImagenProductos();
+    setState(() {
+      // Traemos las url de las imagenes relacionadas al produco
+      thumbnailUrls = allImagenes
+          .where((imagen) => imagen.producto.id == widget.producto.id)
+          .map((imagen) => imagen.imagen)
+          .toList();
+      // Usamos la primera imagen que este dentro de la lista en caso de mezclar usar
+      // thumbnailUrls.shuffle();
+      mainImageUrl = thumbnailUrls.first;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final producto = widget.producto;
     return Scaffold(
       body: LayoutBuilder(builder: (context, responsive) {
         if (responsive.maxWidth <= 900) {
+          var row = Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "\$${formatter.format(producto.precio)}",
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                  fontFamily: 'Calibri-Bold',
+                  decoration: TextDecoration
+                      .lineThrough, // Añade una línea a través del precio original
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(width: 16), // Espacio entre los precios
+
+              Text(
+                "\$${formatter.format(producto.precioOferta)}",
+                style: const TextStyle(
+                  fontSize: 28,
+                  color: primaryColor,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Calibri-Bold',
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          );
           return Center(
             child: SizedBox(
               width: MediaQuery.of(context)
@@ -49,116 +86,136 @@ class _DetailsScreenState extends State<DetailsScreen> {
               child: Scaffold(
                 body: Column(
                   children: [
-                    // Imagen principal con miniaturas
-                    Expanded(
-                      child: Stack(
-                        children: [
-                          // Imagen principal
-                          Positioned.fill(
-                            child: GestureDetector(
-                              onTap: () {
-                                _modalAmpliacion(context, mainImageUrl);
-                              },
-                              child: Image.network(
-                                mainImageUrl,
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                          ),
-                          // Botón de retroceso
-                          Positioned(
-                            top: 20,
-                            left: 20,
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: background1,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: primaryColor.withOpacity(0.5),
-                                    spreadRadius: 3,
-                                    blurRadius: 5,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 2.0),
-                                  child: IconButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
+                    thumbnailUrls.isNotEmpty
+                        ?
+                        // Imagen principal con miniaturas
+                        Expanded(
+                            child: Stack(
+                              children: [
+                                // Imagen principal
+                                Positioned.fill(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _modalAmpliacion(context, mainImageUrl);
                                     },
-                                    icon: Icon(
-                                      Icons.arrow_back_ios,
-                                      size: 24,
-                                      color: primaryColor,
+                                    child: Image.network(
+                                      mainImageUrl,
+                                      fit: BoxFit.fill,
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ),
-
-                          // Fila de miniaturas
-                          Positioned(
-                            left: 0,
-                            bottom: 0,
-                            child: Container(
-                              width: MediaQuery.of(context)
-                                  .size
-                                  .width, // Ancho fijo para el diseño de escritorio
-                              height: 100,
-                              padding: const EdgeInsets.all(10),
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: thumbnailUrls.map((url) {
-                                    return GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          mainImageUrl = url;
-                                        });
-                                      },
-                                      child: Container(
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 5),
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          border: Border.all(
-                                            color: mainImageUrl == url
-                                                ? primaryColor
-                                                : Colors
-                                                    .transparent, // Color del borde resaltado
-                                            width: mainImageUrl == url
-                                                ? 3
-                                                : 0, // Ancho del borde resaltado
-                                          ),
+                                // Botón de retroceso
+                                Positioned(
+                                  top: 20,
+                                  left: 20,
+                                  child: Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: background1,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: primaryColor.withOpacity(0.5),
+                                          spreadRadius: 3,
+                                          blurRadius: 5,
+                                          offset: const Offset(0, 3),
                                         ),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: Image.network(
-                                            url,
-                                            width:
-                                                mainImageUrl == url ? 120 : 100,
-                                            height: 100,
-                                            fit: BoxFit.cover,
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 2.0),
+                                        child: IconButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          icon: const Icon(
+                                            Icons.arrow_back_ios,
+                                            size: 24,
+                                            color: primaryColor,
                                           ),
                                         ),
                                       ),
-                                    );
-                                  }).toList(),
+                                    ),
+                                  ),
                                 ),
-                              ),
+
+                                // Fila de miniaturas
+                                Positioned(
+                                  left: 0,
+                                  bottom: 0,
+                                  child: Container(
+                                    width: MediaQuery.of(context)
+                                        .size
+                                        .width, // Ancho fijo para el diseño de escritorio
+                                    height: 100,
+                                    padding: const EdgeInsets.all(10),
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        children: thumbnailUrls.map((url) {
+                                          return GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                mainImageUrl = url;
+                                              });
+                                            },
+                                            child: Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                border: Border.all(
+                                                  color: mainImageUrl == url
+                                                      ? primaryColor
+                                                      : Colors
+                                                          .transparent, // Color del borde resaltado
+                                                  width: mainImageUrl == url
+                                                      ? 3
+                                                      : 0, // Ancho del borde resaltado
+                                                ),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black.withOpacity(
+                                                        0.5), // Color de la sombra
+                                                    spreadRadius:
+                                                        1, // Radio de expansión de la sombra
+                                                    blurRadius:
+                                                        2, // Radio de desenfoque de la sombra
+                                                    offset: const Offset(0,
+                                                        3), // Desplazamiento de la sombra
+                                                  ),
+                                                ],
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                child: Image.network(
+                                                  url,
+                                                  width: mainImageUrl == url
+                                                      ? 120
+                                                      : 100,
+                                                  height: 100,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
+                          )
+                        : const Center(
+                            child: CircularProgressIndicator(),
                           ),
-                        ],
-                      ),
-                    ),
 
                     // Información del Producto
                     Expanded(
@@ -173,12 +230,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             children: [
                               Center(
                                 child: Text(
-                                  'Carne de res',
-                                  style: TextStyle(
+                                  producto.nombre,
+                                  style: const TextStyle(
                                     fontSize: 40,
                                     fontWeight: FontWeight.bold,
                                     color: primaryColor,
-                                    fontFamily: 'BakbakOne',
+                                    fontFamily: 'Calibri-Bold',
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -187,13 +244,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  Text(
+                                  const Text(
                                     'Precio',
                                     style: TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
                                       color: primaryColor,
-                                      fontFamily: 'BakbakOne',
+                                      fontFamily: 'Calibri-Bold',
                                       letterSpacing:
                                           1.2, // Espaciado entre letras para destacar más
                                     ),
@@ -201,49 +258,20 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                   ),
                                   const SizedBox(
                                       height: 8), // Espacio entre los textos
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Text(
-                                        '\$ 11.000 COP',
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey,
-                                          fontFamily: 'BakbakOne',
-                                          decoration: TextDecoration
-                                              .lineThrough, // Añade una línea a través del precio original
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      const SizedBox(
-                                          width:
-                                              16), // Espacio entre los precios
-                                      Text(
-                                        '\$ 8.000 COP',
-                                        style: TextStyle(
-                                          fontSize: 28,
-                                          color: primaryColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'BakbakOne',
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
+                                  row,
                                 ],
                               ),
                               const SizedBox(height: defaultPadding),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  Text(
+                                  const Text(
                                     'Precio Aprendiz',
                                     style: TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
                                       color: primaryColor,
-                                      fontFamily: 'BakbakOne',
+                                      fontFamily: 'Calibri-Bold',
                                       letterSpacing:
                                           1.2, // Espaciado entre letras para destacar más
                                     ),
@@ -251,65 +279,44 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                   ),
                                   const SizedBox(
                                       height: 8), // Espacio entre los textos
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Text(
-                                        '\$ 11.000 COP',
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey,
-                                          fontFamily: 'BakbakOne',
-                                          decoration: TextDecoration
-                                              .lineThrough, // Añade una línea a través del precio original
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      const SizedBox(
-                                          width:
-                                              16), // Espacio entre los precios
-                                      Text(
-                                        '\$ 8.000 COP',
-                                        style: TextStyle(
-                                          fontSize: 28,
-                                          color: primaryColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'BakbakOne',
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
+                                  Text(
+                                    "\$${formatter.format(producto.precioAprendiz)}",
+                                    style: const TextStyle(
+                                      fontSize: 28,
+                                      color: primaryColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Calibri-Bold',
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ],
                               ),
                               const SizedBox(height: defaultPadding),
-                              Text(
+                              const Text(
                                 'Descripción',
                                 style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
-                                  fontFamily: 'BakbakOne',
+                                  fontFamily: 'Calibri-Bold',
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-                              const Text(
-                                'La carne de res es jugosa, tierna y rica en sabor. Su color rojo intenso varía según el corte y la edad del animal. Es una excelente fuente de proteínas, hierro y vitaminas del grupo B. Se utiliza en una variedad de platos, desde filetes hasta guisos, y su sabor se ve influenciado por la alimentación y el método de crianza del animal.',
-                                style: TextStyle(
+                              Text(
+                                producto.descripcion,
+                                style: const TextStyle(
                                   fontSize: 18,
                                   color: Colors.grey,
-                                  fontFamily: 'BakbakOne',
                                 ),
                               ),
                               const SizedBox(height: defaultPadding),
-                              Text(
+                              const Text(
                                 'Caracteristicas del producto',
                                 style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
-                                  fontFamily: 'BakbakOne',
+                                  fontFamily: 'Calibri-Bold',
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -325,7 +332,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                   ),
                                   child: DataTable(
                                     columnSpacing: defaultPadding,
-                                    columns: [
+                                    columns: const [
                                       DataColumn(
                                         label: Text(
                                           'Atributo',
@@ -333,7 +340,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
                                             color: primaryColor,
-                                            fontFamily: 'BakbakOne',
+                                            fontFamily: 'Calibri-Bold',
                                           ),
                                         ),
                                       ),
@@ -344,96 +351,97 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
                                             color: primaryColor,
-                                            fontFamily: 'BakbakOne',
+                                            fontFamily: 'Calibri-Bold',
                                           ),
                                         ),
                                       ),
                                     ],
-                                    rows: const [
+                                    rows: [
                                       DataRow(cells: [
-                                        DataCell(
+                                        const DataCell(
                                           Text(
                                             'Medida',
                                             style: TextStyle(
                                               fontSize: 18,
                                               color: Colors.grey,
-                                              fontFamily: 'BakbakOne',
+                                              fontFamily: 'Calibri-Bold',
                                             ),
                                           ),
                                         ),
                                         DataCell(
                                           Text(
-                                            '1 Lb',
-                                            style: TextStyle(
+                                            producto.unidadMedida,
+                                            style: const TextStyle(
                                               fontSize: 18,
                                               color: Colors.grey,
-                                              fontFamily: 'BakbakOne',
+                                              fontFamily: 'Calibri-Bold',
                                             ),
                                           ),
                                         ),
                                       ]),
                                       DataRow(cells: [
-                                        DataCell(
+                                        const DataCell(
                                           Text(
                                             'Categoría',
                                             style: TextStyle(
                                               fontSize: 18,
                                               color: Colors.grey,
-                                              fontFamily: 'BakbakOne',
+                                              fontFamily: 'Calibri-Bold',
                                             ),
                                           ),
                                         ),
                                         DataCell(
                                           Text(
-                                            'Carnicos',
-                                            style: TextStyle(
+                                            producto.categoria.nombre,
+                                            style: const TextStyle(
                                               fontSize: 18,
                                               color: Colors.grey,
-                                              fontFamily: 'BakbakOne',
+                                              fontFamily: 'Calibri-Bold',
                                             ),
                                           ),
                                         ),
                                       ]),
                                       DataRow(cells: [
-                                        DataCell(
+                                        const DataCell(
                                           Text(
                                             'Unidad de producción',
                                             style: TextStyle(
                                               fontSize: 18,
                                               color: Colors.grey,
-                                              fontFamily: 'BakbakOne',
+                                              fontFamily: 'Calibri-Bold',
                                             ),
                                           ),
                                         ),
                                         DataCell(
                                           Text(
-                                            'Carnicos CBA',
-                                            style: TextStyle(
+                                            producto.unidadProduccion.nombre,
+                                            style: const TextStyle(
                                               fontSize: 18,
                                               color: Colors.grey,
-                                              fontFamily: 'BakbakOne',
+                                              fontFamily: 'Calibri-Bold',
                                             ),
                                           ),
                                         ),
                                       ]),
                                       DataRow(cells: [
-                                        DataCell(
+                                        const DataCell(
                                           Text(
                                             'Sede',
                                             style: TextStyle(
                                               fontSize: 18,
                                               color: Colors.grey,
-                                              fontFamily: 'BakbakOne',
+                                              fontFamily: 'Calibri-Bold',
                                             ),
                                           ),
                                         ),
                                         DataCell(
                                           Text(
-                                            'CBA SENA Mosquera',
-                                            style: TextStyle(
+                                            producto
+                                                .unidadProduccion.sede.nombre,
+                                            style: const TextStyle(
                                               fontSize: 18,
                                               color: Colors.grey,
-                                              fontFamily: 'BakbakOne',
+                                              fontFamily: 'Calibri-Bold',
                                             ),
                                           ),
                                         ),
@@ -457,7 +465,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     child: Container(
                       height: 85,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
+                        borderRadius: BorderRadius.circular(20),
                         color: Colors.black,
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -524,7 +532,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
-                                    fontFamily: 'BakbakOne',
+                                    fontFamily: 'Calibri-Bold',
                                     fontSize: 20,
                                   ),
                                   textAlign: TextAlign.center,
@@ -541,6 +549,35 @@ class _DetailsScreenState extends State<DetailsScreen> {
             ),
           );
         } else {
+          var row = Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "\$${formatter.format(producto.precio)}",
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                  fontFamily: 'Calibri-Bold',
+                  decoration: TextDecoration
+                      .lineThrough, // Añade una línea a través del precio original
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(width: 16), // Espacio entre los precios
+
+              Text(
+                "\$${formatter.format(producto.precioOferta)}",
+                style: const TextStyle(
+                  fontSize: 28,
+                  color: primaryColor,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Calibri-Bold',
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          );
           return Center(
             child: SizedBox(
               width: MediaQuery.of(context)
@@ -551,114 +588,134 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   .height, // Altura fija para el diseño de escritorio
               child: Row(
                 children: [
-                  // Imagen principal con miniaturas
-                  Expanded(
-                    flex: 3,
-                    child: Stack(
-                      children: [
-                        // Imagen principal
-                        Positioned.fill(
-                          child: GestureDetector(
-                            onTap: () {
-                              _modalAmpliacion(context, mainImageUrl);
-                            },
-                            child: Image.network(
-                              mainImageUrl,
-                              fit: BoxFit.fill,
-                            ),
-                          ),
-                        ),
-                        // Botón de retroceso
-                        Positioned(
-                          top: 20,
-                          left: 20,
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: background1,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: primaryColor.withOpacity(0.5),
-                                  spreadRadius: 3,
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 2.0),
-                                child: IconButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
+                  thumbnailUrls.isNotEmpty
+                      ?
+                      // Imagen principal con miniaturas
+                      Expanded(
+                          flex: 3,
+                          child: Stack(
+                            children: [
+                              // Imagen principal
+                              Positioned.fill(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _modalAmpliacion(context, mainImageUrl);
                                   },
-                                  icon: Icon(
-                                    Icons.arrow_back_ios,
-                                    size: 24,
-                                    color: primaryColor,
+                                  child: Image.network(
+                                    mainImageUrl,
+                                    fit: BoxFit.fill,
                                   ),
                                 ),
                               ),
-                            ),
-                          ),
-                        ),
-
-                        // Fila de miniaturas
-                        Positioned(
-                          left: 0,
-                          bottom: 0,
-                          child: Container(
-                            width:
-                                800, // Ancho fijo para el diseño de escritorio
-                            height: 100,
-                            padding: const EdgeInsets.all(10),
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: thumbnailUrls.map((url) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        mainImageUrl = url;
-                                      });
-                                    },
-                                    child: Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 5),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(
-                                          color: mainImageUrl == url
-                                              ? primaryColor
-                                              : Colors
-                                                  .transparent, // Color del borde resaltado
-                                          width: mainImageUrl == url
-                                              ? 3
-                                              : 0, // Ancho del borde resaltado
-                                        ),
+                              // Botón de retroceso
+                              Positioned(
+                                top: 20,
+                                left: 20,
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: background1,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: primaryColor.withOpacity(0.5),
+                                        spreadRadius: 3,
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 3),
                                       ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Image.network(
-                                          url,
-                                          width:
-                                              mainImageUrl == url ? 120 : 100,
-                                          height: 100,
-                                          fit: BoxFit.cover,
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 2.0),
+                                      child: IconButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        icon: const Icon(
+                                          Icons.arrow_back_ios,
+                                          size: 24,
+                                          color: primaryColor,
                                         ),
                                       ),
                                     ),
-                                  );
-                                }).toList(),
+                                  ),
+                                ),
                               ),
-                            ),
+
+                              // Fila de miniaturas
+                              Positioned(
+                                left: 0,
+                                bottom: 0,
+                                child: Container(
+                                  width:
+                                      800, // Ancho fijo para el diseño de escritorio
+                                  height: 100,
+                                  padding: const EdgeInsets.all(10),
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: thumbnailUrls.map((url) {
+                                        return GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              mainImageUrl = url;
+                                            });
+                                          },
+                                          child: Container(
+                                            margin: const EdgeInsets.symmetric(
+                                                horizontal: 5),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              border: Border.all(
+                                                color: mainImageUrl == url
+                                                    ? primaryColor
+                                                    : Colors
+                                                        .transparent, // Color del borde resaltado
+                                                width: mainImageUrl == url
+                                                    ? 3
+                                                    : 0, // Ancho del borde resaltado
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black.withOpacity(
+                                                      0.5), // Color de la sombra
+                                                  spreadRadius:
+                                                      1, // Radio de expansión de la sombra
+                                                  blurRadius:
+                                                      2, // Radio de desenfoque de la sombra
+                                                  offset: const Offset(0,
+                                                      3), // Desplazamiento de la sombra
+                                                ),
+                                              ],
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: Image.network(
+                                                url,
+                                                width: mainImageUrl == url
+                                                    ? 120
+                                                    : 100,
+                                                height: 100,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
+                        )
+                      : const Center(
+                          child: CircularProgressIndicator(),
                         ),
-                      ],
-                    ),
-                  ),
 
                   // Información del Producto
                   Expanded(
@@ -675,12 +732,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             children: [
                               Center(
                                 child: Text(
-                                  'Carne de res',
-                                  style: TextStyle(
+                                  producto.nombre,
+                                  style: const TextStyle(
                                     fontSize: 40,
                                     fontWeight: FontWeight.bold,
                                     color: primaryColor,
-                                    fontFamily: 'BakbakOne',
+                                    fontFamily: 'Calibri-Bold',
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -689,13 +746,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  Text(
+                                  const Text(
                                     'Precio',
                                     style: TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
                                       color: primaryColor,
-                                      fontFamily: 'BakbakOne',
+                                      fontFamily: 'Calibri-Bold',
                                       letterSpacing:
                                           1.2, // Espaciado entre letras para destacar más
                                     ),
@@ -703,49 +760,20 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                   ),
                                   const SizedBox(
                                       height: 8), // Espacio entre los textos
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Text(
-                                        '\$ 11.000 COP',
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey,
-                                          fontFamily: 'BakbakOne',
-                                          decoration: TextDecoration
-                                              .lineThrough, // Añade una línea a través del precio original
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      const SizedBox(
-                                          width:
-                                              16), // Espacio entre los precios
-                                      Text(
-                                        '\$ 8.000 COP',
-                                        style: TextStyle(
-                                          fontSize: 28,
-                                          color: primaryColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'BakbakOne',
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
+                                  row
                                 ],
                               ),
                               const SizedBox(height: defaultPadding),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  Text(
+                                  const Text(
                                     'Precio Aprendiz',
                                     style: TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
                                       color: primaryColor,
-                                      fontFamily: 'BakbakOne',
+                                      fontFamily: 'Calibri-Bold',
                                       letterSpacing:
                                           1.2, // Espaciado entre letras para destacar más
                                     ),
@@ -753,65 +781,44 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                   ),
                                   const SizedBox(
                                       height: 8), // Espacio entre los textos
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Text(
-                                        '\$ 11.000 COP',
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey,
-                                          fontFamily: 'BakbakOne',
-                                          decoration: TextDecoration
-                                              .lineThrough, // Añade una línea a través del precio original
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      const SizedBox(
-                                          width:
-                                              16), // Espacio entre los precios
-                                      Text(
-                                        '\$ 8.000 COP',
-                                        style: TextStyle(
-                                          fontSize: 28,
-                                          color: primaryColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'BakbakOne',
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
+                                  Text(
+                                    "\$${formatter.format(producto.precioAprendiz)}",
+                                    style: const TextStyle(
+                                      fontSize: 28,
+                                      color: primaryColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Calibri-Bold',
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ],
                               ),
                               const SizedBox(height: defaultPadding),
-                              Text(
+                              const Text(
                                 'Descripción',
                                 style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
-                                  fontFamily: 'BakbakOne',
+                                  fontFamily: 'Calibri-Bold',
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-                              const Text(
-                                'La carne de res es jugosa, tierna y rica en sabor. Su color rojo intenso varía según el corte y la edad del animal. Es una excelente fuente de proteínas, hierro y vitaminas del grupo B. Se utiliza en una variedad de platos, desde filetes hasta guisos, y su sabor se ve influenciado por la alimentación y el método de crianza del animal.',
-                                style: TextStyle(
+                              Text(
+                                producto.descripcion,
+                                style: const TextStyle(
                                   fontSize: 18,
                                   color: Colors.grey,
-                                  fontFamily: 'BakbakOne',
                                 ),
                               ),
                               const SizedBox(height: defaultPadding),
-                              Text(
+                              const Text(
                                 'Caracteristicas del producto',
                                 style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
-                                  fontFamily: 'BakbakOne',
+                                  fontFamily: 'Calibri-Bold',
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -827,7 +834,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                   ),
                                   child: DataTable(
                                     columnSpacing: defaultPadding,
-                                    columns: [
+                                    columns: const [
                                       DataColumn(
                                         label: Text(
                                           'Atributo',
@@ -835,7 +842,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
                                             color: primaryColor,
-                                            fontFamily: 'BakbakOne',
+                                            fontFamily: 'Calibri-Bold',
                                           ),
                                         ),
                                       ),
@@ -846,96 +853,97 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
                                             color: primaryColor,
-                                            fontFamily: 'BakbakOne',
+                                            fontFamily: 'Calibri-Bold',
                                           ),
                                         ),
                                       ),
                                     ],
-                                    rows: const [
+                                    rows: [
                                       DataRow(cells: [
-                                        DataCell(
+                                        const DataCell(
                                           Text(
                                             'Medida',
                                             style: TextStyle(
                                               fontSize: 18,
                                               color: Colors.grey,
-                                              fontFamily: 'BakbakOne',
+                                              fontFamily: 'Calibri-Bold',
                                             ),
                                           ),
                                         ),
                                         DataCell(
                                           Text(
-                                            '1 Lb',
-                                            style: TextStyle(
+                                            producto.unidadMedida,
+                                            style: const TextStyle(
                                               fontSize: 18,
                                               color: Colors.grey,
-                                              fontFamily: 'BakbakOne',
+                                              fontFamily: 'Calibri-Bold',
                                             ),
                                           ),
                                         ),
                                       ]),
                                       DataRow(cells: [
-                                        DataCell(
+                                        const DataCell(
                                           Text(
                                             'Categoría',
                                             style: TextStyle(
                                               fontSize: 18,
                                               color: Colors.grey,
-                                              fontFamily: 'BakbakOne',
+                                              fontFamily: 'Calibri-Bold',
                                             ),
                                           ),
                                         ),
                                         DataCell(
                                           Text(
-                                            'Carnicos',
-                                            style: TextStyle(
+                                            producto.categoria.nombre,
+                                            style: const TextStyle(
                                               fontSize: 18,
                                               color: Colors.grey,
-                                              fontFamily: 'BakbakOne',
+                                              fontFamily: 'Calibri-Bold',
                                             ),
                                           ),
                                         ),
                                       ]),
                                       DataRow(cells: [
-                                        DataCell(
+                                        const DataCell(
                                           Text(
                                             'Unidad de producción',
                                             style: TextStyle(
                                               fontSize: 18,
                                               color: Colors.grey,
-                                              fontFamily: 'BakbakOne',
+                                              fontFamily: 'Calibri-Bold',
                                             ),
                                           ),
                                         ),
                                         DataCell(
                                           Text(
-                                            'Carnicos CBA',
-                                            style: TextStyle(
+                                            producto.unidadProduccion.nombre,
+                                            style: const TextStyle(
                                               fontSize: 18,
                                               color: Colors.grey,
-                                              fontFamily: 'BakbakOne',
+                                              fontFamily: 'Calibri-Bold',
                                             ),
                                           ),
                                         ),
                                       ]),
                                       DataRow(cells: [
-                                        DataCell(
+                                        const DataCell(
                                           Text(
                                             'Sede',
                                             style: TextStyle(
                                               fontSize: 18,
                                               color: Colors.grey,
-                                              fontFamily: 'BakbakOne',
+                                              fontFamily: 'Calibri-Bold',
                                             ),
                                           ),
                                         ),
                                         DataCell(
                                           Text(
-                                            'CBA SENA Mosquera',
-                                            style: TextStyle(
+                                            producto
+                                                .unidadProduccion.sede.nombre,
+                                            style: const TextStyle(
                                               fontSize: 18,
                                               color: Colors.grey,
-                                              fontFamily: 'BakbakOne',
+                                              fontFamily: 'Calibri-Bold',
                                             ),
                                           ),
                                         ),
@@ -1027,7 +1035,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
-                                          fontFamily: 'BakbakOne',
+                                          fontFamily: 'Calibri-Bold',
                                           fontSize: 20,
                                         ),
                                         textAlign: TextAlign.center,

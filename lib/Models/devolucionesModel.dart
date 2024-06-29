@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'dart:convert';
 
 import '../source.dart';
@@ -51,6 +49,7 @@ Future<List<DevolucionesModel>> getDevoluciones() async {
           estado: devolucionData['estado'] ?? false,
           factura: FacturaModel(
             id: devolucionData['factura']['id'] ?? 0,
+            numero: devolucionData['factura']['numero'] ?? 0,
             fecha: devolucionData['factura']['fecha'] ?? "",
             medioPago: MedioPagoModel(
               id: devolucionData['factura']['medioPago']['id'] ?? 0,
@@ -102,8 +101,6 @@ Future<List<DevolucionesModel>> getDevoluciones() async {
                 telefonoCelular: devolucionData['factura']['pedido']['usuario']
                         ['telefonoCelular'] ??
                     "",
-                foto: devolucionData['factura']['pedido']['usuario']['foto'] ??
-                    "",
                 rol1: devolucionData['factura']['pedido']['usuario']['rol1'] ??
                     "",
                 rol2: devolucionData['factura']['pedido']['usuario']['rol2'] ??
@@ -127,6 +124,12 @@ Future<List<DevolucionesModel>> getDevoluciones() async {
                     "",
                 sede:
                     devolucionData['factura']['pedido']['usuario']['sede'] ?? 0,
+                puntoVenta: devolucionData['factura']['pedido']['usuario']
+                        ['puntoVenta'] ??
+                    0,
+                unidadProduccion: devolucionData['factura']['pedido']['usuario']
+                        ['unidadProduccion'] ??
+                    0,
               ),
             ),
           ),

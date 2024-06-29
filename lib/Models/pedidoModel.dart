@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'dart:convert';
 import '../source.dart';
 import 'usuarioModel.dart';
@@ -54,7 +52,7 @@ Future<List<PedidoModel>> getPedidos() async {
       pedidos.add(
         PedidoModel(
           id: pedidoData['id'] ?? 0,
-          numeroPedido: pedidoData['cantidad'] ?? 0,
+          numeroPedido: pedidoData['numeroPedido'] ?? 0,
           fechaEncargo: pedidoData['fechaEncargo'] ?? "",
           fechaEntrega: pedidoData['fechaEntrega'] ?? "",
           grupal: pedidoData['grupal'] ?? false,
@@ -73,7 +71,6 @@ Future<List<PedidoModel>> getPedidos() async {
             direccion: pedidoData['usuario']['direccion'] ?? "",
             telefono: pedidoData['usuario']['telefono'] ?? "",
             telefonoCelular: pedidoData['usuario']['telefonoCelular'] ?? "",
-            foto: pedidoData['usuario']['foto'] ?? "",
             rol1: pedidoData['usuario']['rol1'] ?? "",
             rol2: pedidoData['usuario']['rol2'] ?? "",
             rol3: pedidoData['usuario']['rol3'] ?? "",
@@ -83,6 +80,8 @@ Future<List<PedidoModel>> getPedidos() async {
             vocero: pedidoData['usuario']['vocero'] ?? false,
             fechaRegistro: pedidoData['usuario']['fechaRegistro'] ?? "",
             sede: pedidoData['usuario']['sede'] ?? 0,
+            puntoVenta: pedidoData['usuario']['puntoVenta'] ?? 0,
+            unidadProduccion: pedidoData['usuario']['unidadProduccion'] ?? 0,
           ),
         ),
       );

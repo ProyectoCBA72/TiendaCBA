@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import '../source.dart';
 import 'categoriaModel.dart';
 import 'puntoVentaModel.dart';
@@ -14,14 +12,12 @@ import 'usuarioModel.dart';
 class BodegaModel {
   final int id;
   final int cantidad;
-  final int produccion;
   final ProductoModel producto;
   final PuntoVentaModel puntoVenta;
 
   BodegaModel({
     required this.id,
     required this.cantidad,
-    required this.produccion,
     required this.producto,
     required this.puntoVenta,
   });
@@ -51,7 +47,6 @@ Future<List<BodegaModel>> getBodegas() async {
         BodegaModel(
           id: bodegaData['id'] ?? 0,
           cantidad: bodegaData['cantidad'] ?? 0,
-          produccion: bodegaData['produccion'] ?? 0,
           producto: ProductoModel(
             id: bodegaData['producto']['id'] ?? 0,
             nombre: bodegaData['producto']['nombre'] ?? "",
@@ -65,12 +60,6 @@ Future<List<BodegaModel>> getBodegas() async {
             precioInstructor: bodegaData['producto']['precioInstructor'] ?? 0,
             precioFuncionario: bodegaData['producto']['precioFuncionario'] ?? 0,
             precioOferta: bodegaData['producto']['precioOferta'] ?? 0,
-            precioOfertaAprendiz:
-                bodegaData['producto']['precioOfertaAprendiz'] ?? 0,
-            precioOfertaFuncionario:
-                bodegaData['producto']['precioOfertaFuncionario'] ?? 0,
-            precioOfertaInstructor:
-                bodegaData['producto']['precioOfertaInstructor'] ?? 0,
             exclusivo: bodegaData['exclusivo'] ?? false,
             categoria: CategoriaModel(
               id: bodegaData['producto']['categoria']['id'] ?? 0,
@@ -138,7 +127,6 @@ Future<List<BodegaModel>> getBodegas() async {
               telefono: bodegaData['producto']['usuario']['telefono'] ?? "",
               telefonoCelular:
                   bodegaData['producto']['usuario']['telefonoCelular'] ?? "",
-              foto: bodegaData['producto']['usuario']['foto'] ?? "",
               rol1: bodegaData['producto']['usuario']['rol1'] ?? "",
               rol2: bodegaData['producto']['usuario']['rol2'] ?? "",
               rol3: bodegaData['producto']['usuario']['rol3'] ?? "",
@@ -149,13 +137,15 @@ Future<List<BodegaModel>> getBodegas() async {
               fechaRegistro:
                   bodegaData['producto']['usuario']['fechaRegistro'] ?? "",
               sede: bodegaData['producto']['usuario']['sede'] ?? 0,
+              puntoVenta: bodegaData['producto']['usuario']['puntoVenta'] ?? 0,
+              unidadProduccion:
+                  bodegaData['producto']['usuario']['unidadProduccion'] ?? 0,
             ),
           ),
           puntoVenta: PuntoVentaModel(
             id: bodegaData['puntoVenta']['id'] ?? 0,
             nombre: bodegaData['puntoVenta']['nombre'] ?? "",
-            ubicacion:
-                bodegaData['puntoVenta']['ubicacion'] ?? "",
+            ubicacion: bodegaData['puntoVenta']['ubicacion'] ?? "",
             estado: bodegaData['puntoVenta']['estado'] ?? true,
             sede: bodegaData['puntoVenta']['sede'] ?? 0,
           ),

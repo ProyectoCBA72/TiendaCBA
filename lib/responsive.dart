@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-const defaultPadding = 16.0;
-
 class Responsive extends StatelessWidget {
   final Widget mobile;
   final Widget? tablet;
@@ -21,7 +19,7 @@ class Responsive extends StatelessWidget {
   // Método estático para verificar si el dispositivo es una tablet
   static bool isTablet(BuildContext context) =>
       MediaQuery.of(context).size.width < 1100 &&
-      MediaQuery.of(context).size.width >= 720;
+      MediaQuery.of(context).size.width >= 700;
 
   // Método estático para verificar si el dispositivo es de escritorio
   static bool isDesktop(BuildContext context) =>

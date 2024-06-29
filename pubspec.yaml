@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.3.4 <4.0.0'
+  sdk: '>=3.4.1 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -36,12 +36,37 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   http: ^1.2.1
-  google_fonts: ^4.0.4
   lottie: 
   universal_platform: ^1.0.0+1
   flutter_map: 
   latlong2: 
-  
+  flutter_svg:
+  provider:
+  syncfusion_flutter_datagrid: ^25.2.5
+  syncfusion_flutter_charts: ^25.2.5
+  local_auth:
+  mask_text_input_formatter:
+  mailto:
+  mailer: ^6.1.0
+  cryptography: ^2.7.0
+  cryptography_flutter: ^2.3.2
+  flutter_email_sender: ^6.0.3
+  dropdown_button2:
+  intl: ^0.19.0
+  flutter_speed_dial:
+  image_picker:
+  file_picker:
+  image: ^4.0.17
+  multi_image_picker_view: ^0.0.17
+  pdf:
+  printing:
+  dio:
+  open_file:
+  path_provider:
+  qr_flutter: ^4.1.0
+  barcode_widget:
+  shared_preferences:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -66,8 +91,9 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/
+    - assets/img/
     - assets/animation/
+    - assets/icons/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -81,15 +107,24 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: BakbakOne
+    - family: Calibri
       fonts:
-        - asset: fonts/BakbakOne-Regular.ttf
-    - family: JosefinSans-SemiBold
+        - asset: fonts/calibri/calibri.ttf
+    - family: Calibri-Bold
       fonts:
-        - asset: fonts/JosefinSans-SemiBold.ttf
-    - family: DelaGothicOne
+        - asset: fonts/calibri/calibrib.ttf
+    - family: Calibri-Italic
       fonts:
-        - asset: fonts/DelaGothicOne-Regular.ttf
+        - asset: fonts/calibri/calibrii.ttf
+    - family: Calibri-Light
+      fonts:
+        - asset: fonts/calibri/calibril.ttf
+    - family: Calibri-Light-Italic
+      fonts:
+        - asset: fonts/calibri/calibrili.ttf
+    - family: Calibri-Bold-Italic
+      fonts:
+        - asset: fonts/calibri/calibriz.ttf
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf

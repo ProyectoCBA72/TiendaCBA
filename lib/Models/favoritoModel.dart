@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print, file_names
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'categoriaModel.dart';
@@ -59,12 +57,6 @@ Future<List<FavoritoModel>> getFavoritos() async {
             precioFuncionario:
                 favoritoData['producto']['precioFuncionario'] ?? 0,
             precioOferta: favoritoData['producto']['precioOferta'] ?? 0,
-            precioOfertaAprendiz:
-                favoritoData['producto']['precioOfertaAprendiz'] ?? 0,
-            precioOfertaFuncionario:
-                favoritoData['producto']['precioOfertaFuncionario'] ?? 0,
-            precioOfertaInstructor:
-                favoritoData['producto']['precioOfertaInstructor'] ?? 0,
             exclusivo: favoritoData['exclusivo'] ?? false,
             categoria: CategoriaModel(
               id: favoritoData['producto']['categoria']['id'] ?? 0,
@@ -134,7 +126,6 @@ Future<List<FavoritoModel>> getFavoritos() async {
               telefono: favoritoData['producto']['usuario']['telefono'] ?? "",
               telefonoCelular:
                   favoritoData['producto']['usuario']['telefonoCelular'] ?? "",
-              foto: favoritoData['producto']['usuario']['foto'] ?? "",
               rol1: favoritoData['producto']['usuario']['rol1'] ?? "",
               rol2: favoritoData['producto']['usuario']['rol2'] ?? "",
               rol3: favoritoData['producto']['usuario']['rol3'] ?? "",
@@ -145,13 +136,15 @@ Future<List<FavoritoModel>> getFavoritos() async {
               fechaRegistro:
                   favoritoData['producto']['usuario']['fechaRegistro'] ?? "",
               sede: favoritoData['producto']['usuario']['sede'] ?? 0,
+              puntoVenta:
+                  favoritoData['producto']['usuario']['puntoVenta'] ?? 0,
+              unidadProduccion:
+                  favoritoData['producto']['usuario']['unidadProduccion'] ?? 0,
             ),
           ),
         ),
       );
     }
-    
-    print(favoritos[0].producto.unidadProduccion.sede);
     // Devolver la lista llena
     return favoritos;
   } else {

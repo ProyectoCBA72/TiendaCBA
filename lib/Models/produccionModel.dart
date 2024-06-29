@@ -8,23 +8,27 @@ import '../source.dart';
 
 class ProduccionModel {
   final int id;
-  final bool estado;
+  final int numero;
+  final String estado;
+  final int cantidad;
   final String fechaDespacho;
   final String observaciones;
   final int costoProduccion;
   final String fechaProduccion;
-  final String fechaVencimineto;
+  final String fechaVencimiento;
   final int producto;
   final UnidadProduccionModel unidadProduccion;
 
   ProduccionModel({
+    required this.cantidad,
     required this.id,
+    required this.numero,
     required this.estado,
     required this.fechaDespacho,
     required this.observaciones,
     required this.costoProduccion,
     required this.fechaProduccion,
-    required this.fechaVencimineto,
+    required this.fechaVencimiento,
     required this.producto,
     required this.unidadProduccion,
   });
@@ -53,12 +57,14 @@ Future<List<ProduccionModel>> getProducciones() async {
       producciones.add(
         ProduccionModel(
           id: produccionData['id'] ?? 0,
-          estado: produccionData['estado'] ?? false,
+          numero: produccionData['numero'] ?? 0,
+          estado: produccionData['estado'] ?? "",
+          cantidad: produccionData['cantidad'] ?? 0,
           fechaDespacho: produccionData['fechaDespacho'] ?? "",
           observaciones: produccionData['observaciones'] ?? "",
           costoProduccion: produccionData['costoProduccion'] ?? "",
           fechaProduccion: produccionData['fechaProduccion'] ?? "",
-          fechaVencimineto: produccionData['fechaVencimineto'] ?? "",
+          fechaVencimiento: produccionData['fechaVencimiento'] ?? "",
           producto: produccionData['producto'] ?? 0,
           unidadProduccion: UnidadProduccionModel(
             id: produccionData['unidadProduccion']['id'] ?? 0,
@@ -97,7 +103,7 @@ Future<List<ProduccionModel>> getProducciones() async {
     }
 
     // Devolver la lista de producciones
-    
+
     return producciones;
   } else {
     throw Exception(

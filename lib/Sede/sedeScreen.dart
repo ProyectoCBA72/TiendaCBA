@@ -1,7 +1,6 @@
 // ignore_for_file: file_names
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:tienda_app/responsive.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tienda_app/constantsDesign.dart';
@@ -90,7 +89,7 @@ class _SedeScreenState extends State<SedeScreen> {
                                     onPressed: () {
                                       Navigator.pop(context);
                                     },
-                                    icon: Icon(
+                                    icon: const Icon(
                                       Icons.arrow_back_ios,
                                       size: 24,
                                       color: primaryColor,
@@ -136,6 +135,18 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 ? 3
                                                 : 0, // Ancho del borde resaltado
                                           ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                  0.5), // Color de la sombra
+                                              spreadRadius:
+                                                  1, // Radio de expansión de la sombra
+                                              blurRadius:
+                                                  2, // Radio de desenfoque de la sombra
+                                              offset: const Offset(0,
+                                                  3), // Desplazamiento de la sombra
+                                            ),
+                                          ],
                                         ),
                                         child: ClipRRect(
                                           borderRadius:
@@ -171,26 +182,26 @@ class _SedeScreenState extends State<SedeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Center(
+                              const Center(
                                 child: Text(
                                   'Centro de biotecnología agropecuaria',
                                   style: TextStyle(
                                     fontSize: 40,
                                     fontWeight: FontWeight.bold,
                                     color: primaryColor,
-                                    fontFamily: 'BakbakOne',
+                                    fontFamily: 'Calibri-Bold',
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              Text(
+                              const Text(
                                 'Unidades de producción',
                                 style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
-                                  fontFamily: 'BakbakOne',
+                                  fontFamily: 'Calibri-Bold',
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -253,7 +264,7 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 16,
-                                                  fontFamily: 'BakbakOne',
+                                                  fontFamily: 'Calibri-Bold',
                                                 ),
                                               ), // Título
                                             ],
@@ -267,13 +278,13 @@ class _SedeScreenState extends State<SedeScreen> {
                               const SizedBox(
                                 height: defaultPadding,
                               ),
-                              Text(
+                              const Text(
                                 'Dirección',
                                 style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
-                                  fontFamily: 'BakbakOne',
+                                  fontFamily: 'Calibri-Bold',
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -284,22 +295,42 @@ class _SedeScreenState extends State<SedeScreen> {
                                 child: SizedBox(
                                   width: MediaQuery.of(context).size.width,
                                   height: 400,
-                                  child: FlutterMap(options: MapOptions(initialCenter: LatLng(latitud, longitud), initialZoom: 14, interactionOptions: const InteractionOptions(flags: InteractiveFlag.doubleTapZoom)), children: [
-                                    openStreetMapTileLayer,
-                                    MarkerLayer(markers: [Marker(point: LatLng(latitud, longitud),width: 30, height: 30, alignment: Alignment.center, child: Icon(Icons.location_pin, size: 30, color: primaryColor,))]),
-                                  ]),
+                                  child: FlutterMap(
+                                      options: MapOptions(
+                                          initialCenter:
+                                              LatLng(latitud, longitud),
+                                          initialZoom: 14,
+                                          interactionOptions:
+                                              const InteractionOptions(
+                                                  flags: InteractiveFlag
+                                                      .doubleTapZoom)),
+                                      children: [
+                                        openStreetMapTileLayer,
+                                        MarkerLayer(markers: [
+                                          Marker(
+                                              point: LatLng(latitud, longitud),
+                                              width: 30,
+                                              height: 30,
+                                              alignment: Alignment.center,
+                                              child: const Icon(
+                                                Icons.location_pin,
+                                                size: 30,
+                                                color: primaryColor,
+                                              ))
+                                        ]),
+                                      ]),
                                 ),
                               ),
                               const SizedBox(
                                 height: defaultPadding,
                               ),
-                              Text(
+                              const Text(
                                 'Puntos de venta',
                                 style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
-                                  fontFamily: 'BakbakOne',
+                                  fontFamily: 'Calibri-Bold',
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -347,21 +378,19 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 style: TextStyle(
                                                   fontSize: 18.0,
                                                   fontWeight: FontWeight.bold,
-                                                  fontFamily: 'BakbakOne',
+                                                  fontFamily: 'Calibri-Bold',
                                                 ),
                                               ),
                                             ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                            const Padding(
+                                              padding: EdgeInsets.symmetric(
                                                 horizontal: 8.0,
                                                 vertical: 8.0,
                                               ),
                                               child: Row(
                                                 children: [
                                                   Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
+                                                    padding: EdgeInsets.only(
                                                       left: 8.0,
                                                       right: 8.0,
                                                     ),
@@ -371,10 +400,10 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       color: botonOscuro,
                                                     ),
                                                   ),
-                                                  const SizedBox(
+                                                  SizedBox(
                                                     width: 15,
                                                   ),
-                                                  const Column(
+                                                  Column(
                                                     children: [
                                                       Text(
                                                         "Ubicacion: ",
@@ -383,7 +412,7 @@ class _SedeScreenState extends State<SedeScreen> {
                                                               FontWeight.bold,
                                                           fontSize: 16.0,
                                                           fontFamily:
-                                                              'BakbakOne',
+                                                              'Calibri-Bold',
                                                         ),
                                                       ),
                                                       Text(
@@ -392,7 +421,7 @@ class _SedeScreenState extends State<SedeScreen> {
                                                           fontSize: 16.0,
                                                           color: Colors.grey,
                                                           fontFamily:
-                                                              'BakbakOne',
+                                                              'Calibri-Bold',
                                                         ),
                                                       ),
                                                     ],
@@ -433,7 +462,7 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       fontSize: 16.0,
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      fontFamily: 'BakbakOne',
+                                                      fontFamily: 'Calibri-Bold',
                                                     ),
                                                   ),
                                                   const Text(
@@ -441,7 +470,7 @@ class _SedeScreenState extends State<SedeScreen> {
                                                     style: TextStyle(
                                                       fontSize: 16.0,
                                                       color: Colors.grey,
-                                                      fontFamily: 'BakbakOne',
+                                                      fontFamily: 'Calibri-Bold',
                                                     ),
                                                   ),
                                                 ],
@@ -457,13 +486,13 @@ class _SedeScreenState extends State<SedeScreen> {
                               const SizedBox(
                                 height: defaultPadding,
                               ),
-                              Text(
+                              const Text(
                                 'Información',
                                 style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
-                                  fontFamily: 'BakbakOne',
+                                  fontFamily: 'Calibri-Bold',
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -498,8 +527,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                           ),
                                         ],
                                       ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(12.0),
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(12.0),
                                         child: SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
                                           child: Column(
@@ -509,8 +538,7 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -519,32 +547,31 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    const SizedBox(
+                                                    SizedBox(
                                                       width: 20,
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Ciudad: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Mosquera",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -552,32 +579,31 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    const SizedBox(
+                                                    SizedBox(
                                                       width: 20,
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Departamento: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Cundinamarca",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -585,32 +611,31 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    const SizedBox(
+                                                    SizedBox(
                                                       width: 20,
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Regional: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Cundinamarca",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -618,32 +643,31 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    const SizedBox(
+                                                    SizedBox(
                                                       width: 20,
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Dirección: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Km 7 vía Mosquera-Bogotá",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -651,32 +675,31 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    const SizedBox(
+                                                    SizedBox(
                                                       width: 20,
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Telefono 1: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "1234567890",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -684,32 +707,31 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    const SizedBox(
+                                                    SizedBox(
                                                       width: 20,
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Telefono 2: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "1234567890",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -717,24 +739,24 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    const SizedBox(
+                                                    SizedBox(
                                                       width: 20,
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Correo electronico: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "senacba@gmail.com",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
@@ -812,7 +834,7 @@ class _SedeScreenState extends State<SedeScreen> {
                                   onPressed: () {
                                     Navigator.pop(context);
                                   },
-                                  icon: Icon(
+                                  icon: const Icon(
                                     Icons.arrow_back_ios,
                                     size: 24,
                                     color: primaryColor,
@@ -856,6 +878,18 @@ class _SedeScreenState extends State<SedeScreen> {
                                               ? 3
                                               : 0, // Ancho del borde resaltado
                                         ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                                0.5), // Color de la sombra
+                                            spreadRadius:
+                                                1, // Radio de expansión de la sombra
+                                            blurRadius:
+                                                2, // Radio de desenfoque de la sombra
+                                            offset: const Offset(0,
+                                                3), // Desplazamiento de la sombra
+                                          ),
+                                        ],
                                       ),
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(10),
@@ -891,26 +925,26 @@ class _SedeScreenState extends State<SedeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Center(
+                              const Center(
                                 child: Text(
                                   'Centro de biotecnología agropecuaria',
                                   style: TextStyle(
                                     fontSize: 40,
                                     fontWeight: FontWeight.bold,
                                     color: primaryColor,
-                                    fontFamily: 'BakbakOne',
+                                    fontFamily: 'Calibri-Bold',
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              Text(
+                              const Text(
                                 'Unidades de producción',
                                 style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
-                                  fontFamily: 'BakbakOne',
+                                  fontFamily: 'Calibri-Bold',
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -973,7 +1007,7 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 16,
-                                                  fontFamily: 'BakbakOne',
+                                                  fontFamily: 'Calibri-Bold',
                                                 ),
                                               ), // Título
                                             ],
@@ -987,13 +1021,13 @@ class _SedeScreenState extends State<SedeScreen> {
                               const SizedBox(
                                 height: defaultPadding,
                               ),
-                              Text(
+                              const Text(
                                 'Dirección',
                                 style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
-                                  fontFamily: 'BakbakOne',
+                                  fontFamily: 'Calibri-Bold',
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -1004,22 +1038,42 @@ class _SedeScreenState extends State<SedeScreen> {
                                 child: SizedBox(
                                   width: MediaQuery.of(context).size.width,
                                   height: 400,
-                                  child: FlutterMap(options: MapOptions(initialCenter: LatLng(latitud, longitud), initialZoom: 14, interactionOptions: const InteractionOptions(flags: InteractiveFlag.doubleTapZoom)), children: [
-                                    openStreetMapTileLayer,
-                                    MarkerLayer(markers: [Marker(point: LatLng(latitud, longitud),width: 30, height: 30, alignment: Alignment.center, child: Icon(Icons.location_pin, size: 30, color: primaryColor,))]),
-                                  ]),
+                                  child: FlutterMap(
+                                      options: MapOptions(
+                                          initialCenter:
+                                              LatLng(latitud, longitud),
+                                          initialZoom: 14,
+                                          interactionOptions:
+                                              const InteractionOptions(
+                                                  flags: InteractiveFlag
+                                                      .doubleTapZoom)),
+                                      children: [
+                                        openStreetMapTileLayer,
+                                        MarkerLayer(markers: [
+                                          Marker(
+                                              point: LatLng(latitud, longitud),
+                                              width: 30,
+                                              height: 30,
+                                              alignment: Alignment.center,
+                                              child: const Icon(
+                                                Icons.location_pin,
+                                                size: 30,
+                                                color: primaryColor,
+                                              ))
+                                        ]),
+                                      ]),
                                 ),
                               ),
                               const SizedBox(
                                 height: defaultPadding,
                               ),
-                              Text(
+                              const Text(
                                 'Puntos de venta',
                                 style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
-                                  fontFamily: 'BakbakOne',
+                                  fontFamily: 'Calibri-Bold',
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -1067,21 +1121,19 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 style: TextStyle(
                                                   fontSize: 18.0,
                                                   fontWeight: FontWeight.bold,
-                                                  fontFamily: 'BakbakOne',
+                                                  fontFamily: 'Calibri-Bold',
                                                 ),
                                               ),
                                             ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                            const Padding(
+                                              padding: EdgeInsets.symmetric(
                                                 horizontal: 8.0,
                                                 vertical: 8.0,
                                               ),
                                               child: Row(
                                                 children: [
                                                   Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
+                                                    padding: EdgeInsets.only(
                                                       left: 8.0,
                                                       right: 8.0,
                                                     ),
@@ -1091,10 +1143,10 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       color: botonOscuro,
                                                     ),
                                                   ),
-                                                  const SizedBox(
+                                                  SizedBox(
                                                     width: 15,
                                                   ),
-                                                  const Column(
+                                                  Column(
                                                     children: [
                                                       Text(
                                                         "Ubicacion: ",
@@ -1103,7 +1155,7 @@ class _SedeScreenState extends State<SedeScreen> {
                                                               FontWeight.bold,
                                                           fontSize: 16.0,
                                                           fontFamily:
-                                                              'BakbakOne',
+                                                              'Calibri-Bold',
                                                         ),
                                                       ),
                                                       Text(
@@ -1112,7 +1164,7 @@ class _SedeScreenState extends State<SedeScreen> {
                                                           fontSize: 16.0,
                                                           color: Colors.grey,
                                                           fontFamily:
-                                                              'BakbakOne',
+                                                              'Calibri-Bold',
                                                         ),
                                                       ),
                                                     ],
@@ -1153,7 +1205,7 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       fontSize: 16.0,
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      fontFamily: 'BakbakOne',
+                                                      fontFamily: 'Calibri-Bold',
                                                     ),
                                                   ),
                                                   const Text(
@@ -1161,7 +1213,7 @@ class _SedeScreenState extends State<SedeScreen> {
                                                     style: TextStyle(
                                                       fontSize: 16.0,
                                                       color: Colors.grey,
-                                                      fontFamily: 'BakbakOne',
+                                                      fontFamily: 'Calibri-Bold',
                                                     ),
                                                   ),
                                                 ],
@@ -1177,13 +1229,13 @@ class _SedeScreenState extends State<SedeScreen> {
                               const SizedBox(
                                 height: defaultPadding,
                               ),
-                              Text(
+                              const Text(
                                 'Información',
                                 style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
-                                  fontFamily: 'BakbakOne',
+                                  fontFamily: 'Calibri-Bold',
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -1218,8 +1270,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                           ),
                                         ],
                                       ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(12.0),
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(12.0),
                                         child: SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
                                           child: Column(
@@ -1229,8 +1281,7 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 MainAxisAlignment.start,
                                             children: [
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -1239,32 +1290,31 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    const SizedBox(
+                                                    SizedBox(
                                                       width: 20,
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Ciudad: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Mosquera",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -1272,32 +1322,31 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    const SizedBox(
+                                                    SizedBox(
                                                       width: 20,
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Departamento: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Cundinamarca",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -1305,32 +1354,31 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    const SizedBox(
+                                                    SizedBox(
                                                       width: 20,
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Regional: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Cundinamarca",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -1338,32 +1386,31 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    const SizedBox(
+                                                    SizedBox(
                                                       width: 20,
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Dirección: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Km 7 vía Mosquera-Bogotá",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -1371,32 +1418,31 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    const SizedBox(
+                                                    SizedBox(
                                                       width: 20,
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Telefono 1: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "1234567890",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -1404,32 +1450,31 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    const SizedBox(
+                                                    SizedBox(
                                                       width: 20,
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Telefono 2: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "1234567890",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
                                                     Icon(
@@ -1437,24 +1482,24 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    const SizedBox(
+                                                    SizedBox(
                                                       width: 20,
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "Correo electronico: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
-                                                    const Text(
+                                                    Text(
                                                       "senacba@gmail.com",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'BakbakOne',
+                                                        fontFamily: 'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
@@ -1503,4 +1548,7 @@ void _modalAmpliacion(BuildContext context, String src) {
   );
 }
 
-TileLayer get openStreetMapTileLayer => TileLayer(urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", userAgentPackageName: "dev.fleaflet.flutter_map.example",);
+TileLayer get openStreetMapTileLayer => TileLayer(
+      urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      userAgentPackageName: "dev.fleaflet.flutter_map.example",
+    );

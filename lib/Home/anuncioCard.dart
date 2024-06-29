@@ -16,9 +16,9 @@ class _AnuncioCardState extends State<AnuncioCard> {
   int _currentImageIndex = 0;
   Timer? _timer;
   final List<String> _images = [
-    'https://scontent-bog2-2.xx.fbcdn.net/v/t39.30808-6/291054585_608787604116674_5459347250647540917_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=5f2048&_nc_ohc=9CpZgunGxXgQ7kNvgEsEiU8&_nc_ht=scontent-bog2-2.xx&oh=00_AYC08wPJP49Mm_7MKrVz5tCUY62v2BBlx9llMRjS0sEGTg&oe=664C87B4',
-    'https://scontent-bog2-2.xx.fbcdn.net/v/t39.30808-6/290347158_608787637450004_7021336845368539183_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=5f2048&_nc_ohc=DI5OZ4T9EnIQ7kNvgHzWZvD&_nc_ht=scontent-bog2-2.xx&oh=00_AYASPCVujt3prdtWPIdV7XDC3YK7hrW1YlPst2QkhGNC1g&oe=664C87E8',
-    'https://scontent-bog2-2.xx.fbcdn.net/v/t39.30808-6/290313642_608787627450005_4351049694493049378_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=5f2048&_nc_ohc=UI9LTAh0uckQ7kNvgFLY6eU&_nc_ht=scontent-bog2-2.xx&oh=00_AYBruzjs-541wag9nOqYyxkJkBtTmNPie2P3DapSWoZAJA&oe=664C912A',
+    'https://fotoscba.000webhostapp.com/fotos/289997837_608787780783323_2583591377802539793_n.jpg',
+    'https://fotoscba.000webhostapp.com/fotos/290313642_608787627450005_4351049694493049378_n.jpg',
+    'https://fotoscba.000webhostapp.com/fotos/290347158_608787637450004_7021336845368539183_n.jpg',
   ];
 
   @override
@@ -109,7 +109,7 @@ class _AnuncioCardState extends State<AnuncioCard> {
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20,
-                                      fontFamily: 'BakbakOne',
+                                      fontFamily: 'Calibri-Bold',
                                       color: Colors.white,
                                     ),
                                   ),

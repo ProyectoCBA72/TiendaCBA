@@ -1,6 +1,5 @@
 // ignore_for_file: file_names, avoid_print, use_build_context_synchronously, unnecessary_this
 import 'package:tienda_app/constantsDesign.dart';
-import 'package:tienda_app/responsive.dart';
 import 'package:flutter/material.dart';
 
 class Comentario extends StatefulWidget {
@@ -27,15 +26,15 @@ class _ComentarioState extends State<Comentario> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 10),
+          const Padding(
+            padding: EdgeInsets.only(left: 10),
             child: Text(
               "Crear Comentario",
               style: TextStyle(
                   color: primaryColor,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'JosefinSans-SemiBold'),
+                  fontFamily: 'Calibri-Bold'),
             ),
           ),
           const SizedBox(height: 15),
@@ -97,7 +96,7 @@ class _ComentarioState extends State<Comentario> {
                         offset: const Offset(0, 3),
                       ),
                     ]),
-                child: Text(
+                child: const Text(
                   "Enviar",
                   style: TextStyle(color: primaryColor),
                 ),

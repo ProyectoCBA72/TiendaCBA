@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'usuarioModel.dart';
@@ -21,9 +19,6 @@ class ProductoModel {
   final int precioInstructor;
   final int precioFuncionario;
   final int precioOferta;
-  final int precioOfertaAprendiz;
-  final int precioOfertaFuncionario;
-  final int precioOfertaInstructor;
   final CategoriaModel categoria;
   final UnidadProduccionModel unidadProduccion;
   final UsuarioModel usuario;
@@ -42,9 +37,6 @@ class ProductoModel {
     required this.precioInstructor,
     required this.precioFuncionario,
     required this.precioOferta,
-    required this.precioOfertaAprendiz,
-    required this.precioOfertaFuncionario,
-    required this.precioOfertaInstructor,
     required this.categoria,
     required this.unidadProduccion,
     required this.usuario,
@@ -86,9 +78,6 @@ Future<List<ProductoModel>> getProductos() async {
           precioInstructor: productoData['precioInstructor'] ?? 0,
           precioFuncionario: productoData['precioFuncionario'] ?? 0,
           precioOferta: productoData['precioOferta'] ?? 0,
-          precioOfertaAprendiz: productoData['precioOfertaAprendiz'] ?? 0,
-          precioOfertaFuncionario: productoData['precioOfertaFuncionario'] ?? 0,
-          precioOfertaInstructor: productoData['precioOfertaInstructor'] ?? 0,
           exclusivo: productoData['exclusivo'] ?? false,
           categoria: CategoriaModel(
             id: productoData['categoria']['id'] ?? 0,
@@ -136,7 +125,6 @@ Future<List<ProductoModel>> getProductos() async {
             direccion: productoData['usuario']['direccion'] ?? "",
             telefono: productoData['usuario']['telefono'] ?? "",
             telefonoCelular: productoData['usuario']['telefonoCelular'] ?? "",
-            foto: productoData['usuario']['foto'] ?? "",
             rol1: productoData['usuario']['rol1'] ?? "",
             rol2: productoData['usuario']['rol2'] ?? "",
             rol3: productoData['usuario']['rol3'] ?? "",
@@ -146,6 +134,8 @@ Future<List<ProductoModel>> getProductos() async {
             vocero: productoData['usuario']['vocero'] ?? false,
             fechaRegistro: productoData['usuario']['fechaRegistro'] ?? "",
             sede: productoData['usuario']['sede'] ?? 0,
+            puntoVenta: productoData['usuario']['puntoVenta'] ?? 0,
+            unidadProduccion: productoData['usuario']['unidadProduccion'] ?? 0,
           ),
         ),
       );

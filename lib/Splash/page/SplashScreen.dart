@@ -81,31 +81,30 @@ class _SplashScreenState extends State<SplashScreen> {
                                 }
                                 if (listaComponents[index].background ==
                                     Colors.white) {
-                                  return SingleChildScrollView(
-                                    scrollDirection: Axis.vertical,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 20, right: 20),
-                                          child: Text(
-                                            listaComponents[index].titulo,
-                                            style: TextStyle(
-                                                fontSize: 30,
-                                                fontWeight: FontWeight.bold,
-                                                color: colors
-                                                    ? primaryColor
-                                                    : Colors.white,
-                                                fontFamily: "DelaGothicOne"),
-                                            textAlign: TextAlign.center,
-                                          ),
+                                  return Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 20, right: 20),
+                                        child: Text(
+                                          listaComponents[index].titulo,
+                                          style: TextStyle(
+                                              fontSize: 30,
+                                              fontWeight: FontWeight.bold,
+                                              color: colors
+                                                  ? primaryColor
+                                                  : Colors.white,
+                                              fontFamily: "Calibri"),
+                                          textAlign: TextAlign.center,
                                         ),
-                                        const SizedBox(height: 30),
-                                        Padding(
+                                      ),
+                                      const SizedBox(height: 30),
+                                      Flexible(
+                                        child: Padding(
                                           padding: const EdgeInsets.only(
                                               left: 20, right: 20),
                                           child: Text(
@@ -120,36 +119,35 @@ class _SplashScreenState extends State<SplashScreen> {
                                             textAlign: TextAlign.center,
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   );
                                 } else {
-                                  return SingleChildScrollView(
-                                    scrollDirection: Axis.vertical,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        const SizedBox(height: 60),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 20, right: 20),
-                                          child: Text(
-                                            listaComponents[index].titulo,
-                                            style: TextStyle(
-                                                fontSize: 30,
-                                                fontWeight: FontWeight.bold,
-                                                color: colors
-                                                    ? primaryColor
-                                                    : Colors.white,
-                                                fontFamily: "DelaGothicOne"),
-                                            textAlign: TextAlign.center,
-                                          ),
+                                  return Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      const SizedBox(height: 60),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 20, right: 20),
+                                        child: Text(
+                                          listaComponents[index].titulo,
+                                          style: TextStyle(
+                                              fontSize: 30,
+                                              fontWeight: FontWeight.bold,
+                                              color: colors
+                                                  ? primaryColor
+                                                  : Colors.white,
+                                              fontFamily: "Calibri"),
+                                          textAlign: TextAlign.center,
                                         ),
-                                        const SizedBox(height: 30),
-                                        Padding(
+                                      ),
+                                      const SizedBox(height: 30),
+                                      Flexible(
+                                        child: Padding(
                                           padding: const EdgeInsets.only(
                                               left: 20, right: 20),
                                           child: Text(
@@ -164,8 +162,8 @@ class _SplashScreenState extends State<SplashScreen> {
                                             textAlign: TextAlign.center,
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   );
                                 }
                               })),
@@ -218,7 +216,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                                           Colors.white
                                                       ? Colors.white
                                                       : primaryColor,
-                                                  fontFamily: 'BakbakOne',
+                                                  fontFamily: 'Calibri-Bold',
                                                   fontSize: 17),
                                               textAlign: TextAlign.center,
                                             ),
@@ -383,7 +381,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                                                 FontWeight.bold,
                                                             color: Colors.white,
                                                             fontFamily:
-                                                                "DelaGothicOne"),
+                                                                "Calibri"),
                                                         textAlign:
                                                             TextAlign.center,
                                                       ),
@@ -477,7 +475,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                                                 FontWeight.bold,
                                                             color: Colors.white,
                                                             fontFamily:
-                                                                "DelaGothicOne"),
+                                                                "Calibri"),
                                                         textAlign:
                                                             TextAlign.center,
                                                       ),
@@ -536,7 +534,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                                           Colors.white
                                                       ? Colors.white
                                                       : primaryColor,
-                                                  fontFamily: 'BakbakOne',
+                                                  fontFamily: 'Calibri-Bold',
                                                   fontSize: 20),
                                               textAlign: TextAlign.center,
                                             ),
@@ -656,31 +654,30 @@ class _SplashScreenState extends State<SplashScreen> {
                                 }
                                 if (listaComponents[index].background ==
                                     Colors.white) {
-                                  return SingleChildScrollView(
-                                    scrollDirection: Axis.vertical,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 20, right: 20),
-                                          child: Text(
-                                            listaComponents[index].titulo,
-                                            style: TextStyle(
-                                                fontSize: 37,
-                                                fontWeight: FontWeight.bold,
-                                                color: colors
-                                                    ? primaryColor
-                                                    : Colors.white,
-                                                fontFamily: "DelaGothicOne"),
-                                            textAlign: TextAlign.center,
-                                          ),
+                                  return Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 20, right: 20),
+                                        child: Text(
+                                          listaComponents[index].titulo,
+                                          style: TextStyle(
+                                              fontSize: 37,
+                                              fontWeight: FontWeight.bold,
+                                              color: colors
+                                                  ? primaryColor
+                                                  : Colors.white,
+                                              fontFamily: "Calibri"),
+                                          textAlign: TextAlign.center,
                                         ),
-                                        const SizedBox(height: 30),
-                                        Padding(
+                                      ),
+                                      const SizedBox(height: 30),
+                                      Flexible(
+                                        child: Padding(
                                           padding: const EdgeInsets.only(
                                               left: 20, right: 20),
                                           child: Text(
@@ -695,36 +692,35 @@ class _SplashScreenState extends State<SplashScreen> {
                                             textAlign: TextAlign.center,
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   );
                                 } else {
-                                  return SingleChildScrollView(
-                                    scrollDirection: Axis.vertical,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        const SizedBox(height: 60),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 20, right: 20),
-                                          child: Text(
-                                            listaComponents[index].titulo,
-                                            style: TextStyle(
-                                                fontSize: 30,
-                                                fontWeight: FontWeight.bold,
-                                                color: colors
-                                                    ? primaryColor
-                                                    : Colors.white,
-                                                fontFamily: "DelaGothicOne"),
-                                            textAlign: TextAlign.center,
-                                          ),
+                                  return Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      const SizedBox(height: 60),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 20, right: 20),
+                                        child: Text(
+                                          listaComponents[index].titulo,
+                                          style: TextStyle(
+                                              fontSize: 30,
+                                              fontWeight: FontWeight.bold,
+                                              color: colors
+                                                  ? primaryColor
+                                                  : Colors.white,
+                                              fontFamily: "Calibri"),
+                                          textAlign: TextAlign.center,
                                         ),
-                                        const SizedBox(height: 30),
-                                        Padding(
+                                      ),
+                                      const SizedBox(height: 30),
+                                      Flexible(
+                                        child: Padding(
                                           padding: const EdgeInsets.only(
                                               left: 20, right: 20),
                                           child: Text(
@@ -739,8 +735,8 @@ class _SplashScreenState extends State<SplashScreen> {
                                             textAlign: TextAlign.center,
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   );
                                 }
                               })),
@@ -790,7 +786,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                                   color: listaComponents[
                                                           currentIndex]
                                                       .background,
-                                                  fontFamily: 'BakbakOne',
+                                                  fontFamily: 'Calibri-Bold',
                                                   fontSize: 20),
                                               textAlign: TextAlign.center,
                                             ),

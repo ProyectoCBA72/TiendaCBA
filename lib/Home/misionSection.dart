@@ -1,5 +1,6 @@
 // ignore_for_file: file_names
 
+import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 import 'package:flutter/material.dart';
 
@@ -16,9 +17,9 @@ class _MisionSectionState extends State<MisionSection> {
     return Responsive.isDesktop(context) || Responsive.isTablet(context)
         ? Column(
             children: [
-              const Center(
+              Center(
                 child: Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Text(
                     "Misión y Visión SENA",
                     textAlign: TextAlign.center,
@@ -26,7 +27,16 @@ class _MisionSectionState extends State<MisionSection> {
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
-                      fontFamily: 'BakbakOne',
+                      fontFamily: 'Calibri-Bold',
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(
+                              0.5), // Color y opacidad de la sombra
+                          offset: const Offset(2,
+                              2), // Desplazamiento de la sombra (horizontal, vertical)
+                          blurRadius: 3, // Radio de desenfoque de la sombra
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -34,7 +44,7 @@ class _MisionSectionState extends State<MisionSection> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -44,16 +54,35 @@ class _MisionSectionState extends State<MisionSection> {
                             fontSize: 40,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
-                            fontFamily: 'BakbakOne',
+                            fontFamily: 'Calibri-Bold',
+                            shadows: [
+                              Shadow(
+                                color: Colors.black.withOpacity(
+                                    0.5), // Color y opacidad de la sombra
+                                offset: const Offset(2,
+                                    2), // Desplazamiento de la sombra (horizontal, vertical)
+                                blurRadius:
+                                    3, // Radio de desenfoque de la sombra
+                              ),
+                            ],
                           ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Text(
                           "El SENA está  encargado de cumplir la función que le corresponde al Estado de invertir en el desarrollo social y técnico de los trabajadores colombianos, ofreciendo y ejecutando la formación profesional integral, para la incorporación y el desarrollo de las personas en actividades productivas que contribuyan al desarrollo social, económico y tecnológico del país (Ley 119/1994).",
                           style: TextStyle(
                             fontSize: 20,
                             color: Colors.white,
-                            fontFamily: 'BakbakOne',
+                            shadows: [
+                              Shadow(
+                                color: Colors.black.withOpacity(
+                                    0.5), // Color y opacidad de la sombra
+                                offset: const Offset(2,
+                                    2), // Desplazamiento de la sombra (horizontal, vertical)
+                                blurRadius:
+                                    3, // Radio de desenfoque de la sombra
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -82,7 +111,7 @@ class _MisionSectionState extends State<MisionSection> {
                               ),
                               child: ClipOval(
                                 child: Image.asset(
-                                  "assets/sena2.jpg",
+                                  "assets/img/sena2.jpg",
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -123,7 +152,7 @@ class _MisionSectionState extends State<MisionSection> {
                               ),
                               child: ClipOval(
                                 child: Image.asset(
-                                  "assets/sena3.jpg",
+                                  "assets/img/sena3.jpg",
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -133,7 +162,7 @@ class _MisionSectionState extends State<MisionSection> {
                       ),
                     ),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -143,16 +172,35 @@ class _MisionSectionState extends State<MisionSection> {
                             fontSize: 40,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
-                            fontFamily: 'BakbakOne',
+                            fontFamily: 'Calibri-Bold',
+                            shadows: [
+                              Shadow(
+                                color: Colors.black.withOpacity(
+                                    0.5), // Color y opacidad de la sombra
+                                offset: const Offset(2,
+                                    2), // Desplazamiento de la sombra (horizontal, vertical)
+                                blurRadius:
+                                    3, // Radio de desenfoque de la sombra
+                              ),
+                            ],
                           ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Text(
                           "Para el año 2026, el Servicio Nacional de Aprendizaje - SENA estará a la vanguardia de la cualificación del talento humano, tanto a nivel nacional como internacional. Esto se logrará a través de la formación profesional integral, el empleo, el emprendimiento y el reconocimiento de aprendizajes previos. Nuestro objetivo es generar valor público y fortalecer la economía campesina, popular, verde y digital, siempre con un enfoque diferencial orientado a la construcción del cambio, la transformación productiva, la soberanía alimentaria y la consolidación de una paz total, materializando así la autonomía territorial, y promoviendo la justicia social, ambiental y económica.",
                           style: TextStyle(
                             fontSize: 20,
                             color: Colors.white,
-                            fontFamily: 'BakbakOne',
+                            shadows: [
+                              Shadow(
+                                color: Colors.black.withOpacity(
+                                    0.5), // Color y opacidad de la sombra
+                                offset: const Offset(2,
+                                    2), // Desplazamiento de la sombra (horizontal, vertical)
+                                blurRadius:
+                                    3, // Radio de desenfoque de la sombra
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -164,9 +212,9 @@ class _MisionSectionState extends State<MisionSection> {
           )
         : Column(
             children: [
-              const Center(
+              Center(
                 child: Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Text(
                     "Misión y Visión SENA",
                     textAlign: TextAlign.center,
@@ -174,7 +222,16 @@ class _MisionSectionState extends State<MisionSection> {
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
-                      fontFamily: 'BakbakOne',
+                      fontFamily: 'Calibri-Bold',
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(
+                              0.5), // Color y opacidad de la sombra
+                          offset: const Offset(2,
+                              2), // Desplazamiento de la sombra (horizontal, vertical)
+                          blurRadius: 3, // Radio de desenfoque de la sombra
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -182,7 +239,7 @@ class _MisionSectionState extends State<MisionSection> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -191,16 +248,33 @@ class _MisionSectionState extends State<MisionSection> {
                           fontSize: 40,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
-                          fontFamily: 'BakbakOne',
+                          fontFamily: 'Calibri-Bold',
+                          shadows: [
+                            Shadow(
+                              color: Colors.black.withOpacity(
+                                  0.5), // Color y opacidad de la sombra
+                              offset: const Offset(2,
+                                  2), // Desplazamiento de la sombra (horizontal, vertical)
+                              blurRadius: 3, // Radio de desenfoque de la sombra
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Text(
                         "El SENA está  encargado de cumplir la función que le corresponde al Estado de invertir en el desarrollo social y técnico de los trabajadores colombianos, ofreciendo y ejecutando la formación profesional integral, para la incorporación y el desarrollo de las personas en actividades productivas que contribuyan al desarrollo social, económico y tecnológico del país (Ley 119/1994).",
                         style: TextStyle(
                           fontSize: 20,
                           color: Colors.white,
-                          fontFamily: 'BakbakOne',
+                          shadows: [
+                            Shadow(
+                              color: Colors.black.withOpacity(
+                                  0.5), // Color y opacidad de la sombra
+                              offset: const Offset(2,
+                                  2), // Desplazamiento de la sombra (horizontal, vertical)
+                              blurRadius: 3, // Radio de desenfoque de la sombra
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -231,7 +305,7 @@ class _MisionSectionState extends State<MisionSection> {
                               ),
                               child: ClipOval(
                                 child: Image.asset(
-                                  "assets/sena2.jpg",
+                                  "assets/img/sena2.jpg",
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -249,7 +323,7 @@ class _MisionSectionState extends State<MisionSection> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -258,16 +332,33 @@ class _MisionSectionState extends State<MisionSection> {
                           fontSize: 40,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
-                          fontFamily: 'BakbakOne',
+                          fontFamily: 'Calibri-Bold',
+                          shadows: [
+                            Shadow(
+                              color: Colors.black.withOpacity(
+                                  0.5), // Color y opacidad de la sombra
+                              offset: const Offset(2,
+                                  2), // Desplazamiento de la sombra (horizontal, vertical)
+                              blurRadius: 3, // Radio de desenfoque de la sombra
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Text(
                         "Para el año 2026, el Servicio Nacional de Aprendizaje - SENA estará a la vanguardia de la cualificación del talento humano, tanto a nivel nacional como internacional. Esto se logrará a través de la formación profesional integral, el empleo, el emprendimiento y el reconocimiento de aprendizajes previos. Nuestro objetivo es generar valor público y fortalecer la economía campesina, popular, verde y digital, siempre con un enfoque diferencial orientado a la construcción del cambio, la transformación productiva, la soberanía alimentaria y la consolidación de una paz total, materializando así la autonomía territorial, y promoviendo la justicia social, ambiental y económica.",
                         style: TextStyle(
                           fontSize: 20,
                           color: Colors.white,
-                          fontFamily: 'BakbakOne',
+                          shadows: [
+                            Shadow(
+                              color: Colors.black.withOpacity(
+                                  0.5), // Color y opacidad de la sombra
+                              offset: const Offset(2,
+                                  2), // Desplazamiento de la sombra (horizontal, vertical)
+                              blurRadius: 3, // Radio de desenfoque de la sombra
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -298,7 +389,7 @@ class _MisionSectionState extends State<MisionSection> {
                               ),
                               child: ClipOval(
                                 child: Image.asset(
-                                  "assets/sena3.jpg",
+                                  "assets/img/sena3.jpg",
                                   fit: BoxFit.cover,
                                 ),
                               ),

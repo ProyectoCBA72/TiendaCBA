@@ -108,7 +108,7 @@ class _SedeCardState extends State<SedeCard> {
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20,
-                                      fontFamily: 'BakbakOne',
+                                      fontFamily: 'Calibri-Bold',
                                       color: Colors.white,
                                     ),
                                   ),
