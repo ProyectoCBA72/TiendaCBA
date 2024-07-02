@@ -100,449 +100,510 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                       usuario: usuarioAutenticado!,
                                     ),
                                     const SizedBox(height: defaultPadding),
-                                    const Divider(
-                                      height: 1,
-                                      color: Colors.grey,
-                                    ),
-                                    const SizedBox(height: defaultPadding),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            "Estadísticas",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge
-                                                ?.copyWith(
-                                                    fontFamily: 'Calibri-Bold'),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: defaultPadding),
-                                    DefaultTabController(
-                                        length: 8,
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 16,
-                                                      vertical: 8),
-                                              // Contenedor que alberga la barra de pestañas.
-                                              child:
-                                                  Builder(builder: (context) {
-                                                return Row(
-                                                  children: [
-                                                    IconButton(
-                                                      icon: const Icon(
-                                                        Icons.arrow_back_ios,
-                                                        color: primaryColor,
-                                                      ),
-                                                      onPressed: () =>
-                                                          _scrollToPreviousTab(
-                                                              context),
-                                                    ),
-                                                    Expanded(
-                                                      child: TabBar(
-                                                        indicatorColor:
-                                                            primaryColor,
-                                                        isScrollable: true,
-                                                        tabAlignment:
-                                                            TabAlignment.center,
-                                                        onTap: (index) {
-                                                          setState(() {
-                                                            _selectedItem =
-                                                                index;
-                                                          });
-                                                        },
-                                                        tabs: [
-                                                          Tooltip(
-                                                            message:
-                                                                "Costo de producción por año",
-                                                            child: Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      left: 12,
-                                                                      right: 12,
-                                                                      bottom: 4,
-                                                                      top: 4),
-                                                              // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                              child: Column(
-                                                                children: [
-                                                                  SvgPicture
-                                                                      .asset(
-                                                                    "assets/icons/costoProduccion.svg",
-                                                                    width: 24,
-                                                                    height: 24,
-                                                                    colorFilter: const ColorFilter
-                                                                        .mode(
-                                                                        Color(
-                                                                            0xFFCD5C5C),
-                                                                        BlendMode
-                                                                            .srcIn),
-                                                                  ),
-                                                                  const Text(
-                                                                    "Año",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          14,
-                                                                      color:
-                                                                          primaryColor,
-                                                                    ),
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Tooltip(
-                                                            message:
-                                                                "Costo de producción por mes",
-                                                            child: Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      left: 12,
-                                                                      right: 12,
-                                                                      bottom: 4,
-                                                                      top: 4),
-                                                              // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                              child: Column(
-                                                                children: [
-                                                                  SvgPicture
-                                                                      .asset(
-                                                                    "assets/icons/costoProduccion.svg",
-                                                                    width: 24,
-                                                                    height: 24,
-                                                                    colorFilter: const ColorFilter
-                                                                        .mode(
-                                                                        Color(
-                                                                            0xFFCD5C5C),
-                                                                        BlendMode
-                                                                            .srcIn),
-                                                                  ),
-                                                                  const Text(
-                                                                    "Mes",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          14,
-                                                                      color:
-                                                                          primaryColor,
-                                                                    ),
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Tooltip(
-                                                            message:
-                                                                "Productos más vendidos por año",
-                                                            child: Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      left: 12,
-                                                                      right: 12,
-                                                                      bottom: 4,
-                                                                      top: 4),
-                                                              // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                              child: Column(
-                                                                children: [
-                                                                  SvgPicture
-                                                                      .asset(
-                                                                    "assets/icons/productosVendidos.svg",
-                                                                    width: 24,
-                                                                    height: 24,
-                                                                    colorFilter: const ColorFilter
-                                                                        .mode(
-                                                                        Color(
-                                                                            0xFF4682B4),
-                                                                        BlendMode
-                                                                            .srcIn),
-                                                                  ),
-                                                                  const Text(
-                                                                    "Año",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          14,
-                                                                      color:
-                                                                          primaryColor,
-                                                                    ),
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Tooltip(
-                                                            message:
-                                                                "Productos más vendidos por mes",
-                                                            child: Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      left: 12,
-                                                                      right: 12,
-                                                                      bottom: 4,
-                                                                      top: 4),
-                                                              // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                              child: Column(
-                                                                children: [
-                                                                  SvgPicture
-                                                                      .asset(
-                                                                    "assets/icons/productosVendidos.svg",
-                                                                    width: 24,
-                                                                    height: 24,
-                                                                    colorFilter: const ColorFilter
-                                                                        .mode(
-                                                                        Color(
-                                                                            0xFF4682B4),
-                                                                        BlendMode
-                                                                            .srcIn),
-                                                                  ),
-                                                                  const Text(
-                                                                    "Mes",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          14,
-                                                                      color:
-                                                                          primaryColor,
-                                                                    ),
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Tooltip(
-                                                            message:
-                                                                "Producciones despachadas por año",
-                                                            child: Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      left: 12,
-                                                                      right: 12,
-                                                                      bottom: 4,
-                                                                      top: 4),
-                                                              // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                              child: Column(
-                                                                children: [
-                                                                  SvgPicture
-                                                                      .asset(
-                                                                    "assets/icons/produccion.svg",
-                                                                    width: 24,
-                                                                    height: 24,
-                                                                    colorFilter: const ColorFilter
-                                                                        .mode(
-                                                                        Color(
-                                                                            0xFFB8860B),
-                                                                        BlendMode
-                                                                            .srcIn),
-                                                                  ),
-                                                                  const Text(
-                                                                    "Año",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          14,
-                                                                      color:
-                                                                          primaryColor,
-                                                                    ),
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Tooltip(
-                                                            message:
-                                                                "Producciones despachadas por mes",
-                                                            child: Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      left: 12,
-                                                                      right: 12,
-                                                                      bottom: 4,
-                                                                      top: 4),
-                                                              // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                              child: Column(
-                                                                children: [
-                                                                  SvgPicture
-                                                                      .asset(
-                                                                    "assets/icons/produccion.svg",
-                                                                    width: 24,
-                                                                    height: 24,
-                                                                    colorFilter: const ColorFilter
-                                                                        .mode(
-                                                                        Color(
-                                                                            0xFFB8860B),
-                                                                        BlendMode
-                                                                            .srcIn),
-                                                                  ),
-                                                                  const Text(
-                                                                    "Mes",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          14,
-                                                                      color:
-                                                                          primaryColor,
-                                                                    ),
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Tooltip(
-                                                            message:
-                                                                "Producciones recibidas por año",
-                                                            child: Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      left: 12,
-                                                                      right: 12,
-                                                                      bottom: 4,
-                                                                      top: 4),
-                                                              // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                              child: Column(
-                                                                children: [
-                                                                  SvgPicture
-                                                                      .asset(
-                                                                    "assets/icons/recibidas.svg",
-                                                                    width: 24,
-                                                                    height: 24,
-                                                                    colorFilter: const ColorFilter
-                                                                        .mode(
-                                                                        Color(
-                                                                            0xFFBA55D3),
-                                                                        BlendMode
-                                                                            .srcIn),
-                                                                  ),
-                                                                  const Text(
-                                                                    "Año",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          14,
-                                                                      color:
-                                                                          primaryColor,
-                                                                    ),
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Tooltip(
-                                                            message:
-                                                                "Producciones recibidas por mes",
-                                                            child: Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      left: 12,
-                                                                      right: 12,
-                                                                      bottom: 4,
-                                                                      top: 4),
-                                                              // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                              child: Column(
-                                                                children: [
-                                                                  SvgPicture
-                                                                      .asset(
-                                                                    "assets/icons/recibidas.svg",
-                                                                    width: 24,
-                                                                    height: 24,
-                                                                    colorFilter: const ColorFilter
-                                                                        .mode(
-                                                                        Color(
-                                                                            0xFFBA55D3),
-                                                                        BlendMode
-                                                                            .srcIn),
-                                                                  ),
-                                                                  const Text(
-                                                                    "Mes",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          14,
-                                                                      color:
-                                                                          primaryColor,
-                                                                    ),
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    IconButton(
-                                                      icon: const Icon(
-                                                        Icons.arrow_forward_ios,
-                                                        color: primaryColor,
-                                                      ),
-                                                      onPressed: () =>
-                                                          _scrollToNextTab(
-                                                              context),
-                                                    ),
-                                                  ],
-                                                );
-                                              }),
+                                    if (!Responsive.isMobile(context))
+                                      const Divider(
+                                        height: 1,
+                                        color: Colors.grey,
+                                      ),
+                                    if (!Responsive.isMobile(context))
+                                      const SizedBox(height: defaultPadding),
+                                    if (!Responsive.isMobile(context))
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              "Estadísticas",
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge
+                                                  ?.copyWith(
+                                                      fontFamily:
+                                                          'Calibri-Bold'),
                                             ),
-                                          ],
-                                        )),
-                                    const SizedBox(
-                                      height: defaultPadding,
-                                    ),
-                                    _selectedItem == 0
-                                        ? const ReporteCostoProduccionAgnoUnidad()
-                                        : _selectedItem == 1
-                                            ? const ReporteCostoProduccionMesUnidad()
-                                            : _selectedItem == 2
-                                                ? const ReporteProductosMasVendidosAgnoUnidad()
-                                                : _selectedItem == 3
-                                                    ? const ReporteProductosMasVendidosMesUnidad()
-                                                    : _selectedItem == 4
-                                                        ? const ReporteProduccionAgnoUnidad()
-                                                        : _selectedItem == 5
-                                                            ? const ReporteProduccionMesUnidad()
-                                                            : _selectedItem == 6
-                                                                ? const ReporteRecibidoAgnoUnidad()
-                                                                : _selectedItem ==
-                                                                        7
-                                                                    ? const ReporteRecibidoMesUnidad()
-                                                                    : const ReporteCostoProduccionAgnoUnidad(),
-                                    const SizedBox(height: defaultPadding),
+                                          ),
+                                        ],
+                                      ),
+                                    if (!Responsive.isMobile(context))
+                                      const SizedBox(height: defaultPadding),
+                                    if (!Responsive.isMobile(context))
+                                      DefaultTabController(
+                                          length: 8,
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 16,
+                                                        vertical: 8),
+                                                // Contenedor que alberga la barra de pestañas.
+                                                child:
+                                                    Builder(builder: (context) {
+                                                  return Row(
+                                                    children: [
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                          Icons.arrow_back_ios,
+                                                          color: primaryColor,
+                                                        ),
+                                                        onPressed: () =>
+                                                            _scrollToPreviousTab(
+                                                                context),
+                                                      ),
+                                                      Expanded(
+                                                        child: TabBar(
+                                                          indicatorColor:
+                                                              primaryColor,
+                                                          isScrollable: true,
+                                                          tabAlignment:
+                                                              TabAlignment
+                                                                  .center,
+                                                          onTap: (index) {
+                                                            setState(() {
+                                                              _selectedItem =
+                                                                  index;
+                                                            });
+                                                          },
+                                                          tabs: [
+                                                            Tooltip(
+                                                              message:
+                                                                  "Costo de producción por año",
+                                                              child: Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            12,
+                                                                        right:
+                                                                            12,
+                                                                        bottom:
+                                                                            4,
+                                                                        top: 4),
+                                                                // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                                child: Column(
+                                                                  children: [
+                                                                    SvgPicture
+                                                                        .asset(
+                                                                      "assets/icons/costoProduccion.svg",
+                                                                      width: 24,
+                                                                      height:
+                                                                          24,
+                                                                      colorFilter: const ColorFilter
+                                                                          .mode(
+                                                                          Color(
+                                                                              0xFFCD5C5C),
+                                                                          BlendMode
+                                                                              .srcIn),
+                                                                    ),
+                                                                    const Text(
+                                                                      "Año",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        fontSize:
+                                                                            14,
+                                                                        color:
+                                                                            primaryColor,
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Tooltip(
+                                                              message:
+                                                                  "Costo de producción por mes",
+                                                              child: Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            12,
+                                                                        right:
+                                                                            12,
+                                                                        bottom:
+                                                                            4,
+                                                                        top: 4),
+                                                                // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                                child: Column(
+                                                                  children: [
+                                                                    SvgPicture
+                                                                        .asset(
+                                                                      "assets/icons/costoProduccion.svg",
+                                                                      width: 24,
+                                                                      height:
+                                                                          24,
+                                                                      colorFilter: const ColorFilter
+                                                                          .mode(
+                                                                          Color(
+                                                                              0xFFCD5C5C),
+                                                                          BlendMode
+                                                                              .srcIn),
+                                                                    ),
+                                                                    const Text(
+                                                                      "Mes",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        fontSize:
+                                                                            14,
+                                                                        color:
+                                                                            primaryColor,
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Tooltip(
+                                                              message:
+                                                                  "Productos más vendidos por año",
+                                                              child: Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            12,
+                                                                        right:
+                                                                            12,
+                                                                        bottom:
+                                                                            4,
+                                                                        top: 4),
+                                                                // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                                child: Column(
+                                                                  children: [
+                                                                    SvgPicture
+                                                                        .asset(
+                                                                      "assets/icons/productosVendidos.svg",
+                                                                      width: 24,
+                                                                      height:
+                                                                          24,
+                                                                      colorFilter: const ColorFilter
+                                                                          .mode(
+                                                                          Color(
+                                                                              0xFF4682B4),
+                                                                          BlendMode
+                                                                              .srcIn),
+                                                                    ),
+                                                                    const Text(
+                                                                      "Año",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        fontSize:
+                                                                            14,
+                                                                        color:
+                                                                            primaryColor,
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Tooltip(
+                                                              message:
+                                                                  "Productos más vendidos por mes",
+                                                              child: Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            12,
+                                                                        right:
+                                                                            12,
+                                                                        bottom:
+                                                                            4,
+                                                                        top: 4),
+                                                                // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                                child: Column(
+                                                                  children: [
+                                                                    SvgPicture
+                                                                        .asset(
+                                                                      "assets/icons/productosVendidos.svg",
+                                                                      width: 24,
+                                                                      height:
+                                                                          24,
+                                                                      colorFilter: const ColorFilter
+                                                                          .mode(
+                                                                          Color(
+                                                                              0xFF4682B4),
+                                                                          BlendMode
+                                                                              .srcIn),
+                                                                    ),
+                                                                    const Text(
+                                                                      "Mes",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        fontSize:
+                                                                            14,
+                                                                        color:
+                                                                            primaryColor,
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Tooltip(
+                                                              message:
+                                                                  "Producciones despachadas por año",
+                                                              child: Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            12,
+                                                                        right:
+                                                                            12,
+                                                                        bottom:
+                                                                            4,
+                                                                        top: 4),
+                                                                // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                                child: Column(
+                                                                  children: [
+                                                                    SvgPicture
+                                                                        .asset(
+                                                                      "assets/icons/produccion.svg",
+                                                                      width: 24,
+                                                                      height:
+                                                                          24,
+                                                                      colorFilter: const ColorFilter
+                                                                          .mode(
+                                                                          Color(
+                                                                              0xFFB8860B),
+                                                                          BlendMode
+                                                                              .srcIn),
+                                                                    ),
+                                                                    const Text(
+                                                                      "Año",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        fontSize:
+                                                                            14,
+                                                                        color:
+                                                                            primaryColor,
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Tooltip(
+                                                              message:
+                                                                  "Producciones despachadas por mes",
+                                                              child: Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            12,
+                                                                        right:
+                                                                            12,
+                                                                        bottom:
+                                                                            4,
+                                                                        top: 4),
+                                                                // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                                child: Column(
+                                                                  children: [
+                                                                    SvgPicture
+                                                                        .asset(
+                                                                      "assets/icons/produccion.svg",
+                                                                      width: 24,
+                                                                      height:
+                                                                          24,
+                                                                      colorFilter: const ColorFilter
+                                                                          .mode(
+                                                                          Color(
+                                                                              0xFFB8860B),
+                                                                          BlendMode
+                                                                              .srcIn),
+                                                                    ),
+                                                                    const Text(
+                                                                      "Mes",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        fontSize:
+                                                                            14,
+                                                                        color:
+                                                                            primaryColor,
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Tooltip(
+                                                              message:
+                                                                  "Producciones recibidas por año",
+                                                              child: Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            12,
+                                                                        right:
+                                                                            12,
+                                                                        bottom:
+                                                                            4,
+                                                                        top: 4),
+                                                                // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                                child: Column(
+                                                                  children: [
+                                                                    SvgPicture
+                                                                        .asset(
+                                                                      "assets/icons/recibidas.svg",
+                                                                      width: 24,
+                                                                      height:
+                                                                          24,
+                                                                      colorFilter: const ColorFilter
+                                                                          .mode(
+                                                                          Color(
+                                                                              0xFFBA55D3),
+                                                                          BlendMode
+                                                                              .srcIn),
+                                                                    ),
+                                                                    const Text(
+                                                                      "Año",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        fontSize:
+                                                                            14,
+                                                                        color:
+                                                                            primaryColor,
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Tooltip(
+                                                              message:
+                                                                  "Producciones recibidas por mes",
+                                                              child: Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            12,
+                                                                        right:
+                                                                            12,
+                                                                        bottom:
+                                                                            4,
+                                                                        top: 4),
+                                                                // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                                child: Column(
+                                                                  children: [
+                                                                    SvgPicture
+                                                                        .asset(
+                                                                      "assets/icons/recibidas.svg",
+                                                                      width: 24,
+                                                                      height:
+                                                                          24,
+                                                                      colorFilter: const ColorFilter
+                                                                          .mode(
+                                                                          Color(
+                                                                              0xFFBA55D3),
+                                                                          BlendMode
+                                                                              .srcIn),
+                                                                    ),
+                                                                    const Text(
+                                                                      "Mes",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        fontSize:
+                                                                            14,
+                                                                        color:
+                                                                            primaryColor,
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                          Icons
+                                                              .arrow_forward_ios,
+                                                          color: primaryColor,
+                                                        ),
+                                                        onPressed: () =>
+                                                            _scrollToNextTab(
+                                                                context),
+                                                      ),
+                                                    ],
+                                                  );
+                                                }),
+                                              ),
+                                            ],
+                                          )),
+                                    if (!Responsive.isMobile(context))
+                                      const SizedBox(
+                                        height: defaultPadding,
+                                      ),
+                                    if (!Responsive.isMobile(context))
+                                      _selectedItem == 0
+                                          ? ReporteCostoProduccionAgnoUnidad(
+                                              usuario: usuarioAutenticado,
+                                            )
+                                          : _selectedItem == 1
+                                              ? ReporteCostoProduccionMesUnidad(
+                                                  usuario: usuarioAutenticado,
+                                                )
+                                              : _selectedItem == 2
+                                                  ? ReporteProductosMasVendidosAgnoUnidad(
+                                                      usuario:
+                                                          usuarioAutenticado,
+                                                    )
+                                                  : _selectedItem == 3
+                                                      ? ReporteProductosMasVendidosMesUnidad(
+                                                          usuario:
+                                                              usuarioAutenticado,
+                                                        )
+                                                      : _selectedItem == 4
+                                                          ? ReporteProduccionAgnoUnidad(
+                                                              usuario:
+                                                                  usuarioAutenticado,
+                                                            )
+                                                          : _selectedItem == 5
+                                                              ? ReporteProduccionMesUnidad(
+                                                                  usuario:
+                                                                      usuarioAutenticado,
+                                                                )
+                                                              : _selectedItem ==
+                                                                      6
+                                                                  ? ReporteRecibidoAgnoUnidad(
+                                                                      usuario:
+                                                                          usuarioAutenticado,
+                                                                    )
+                                                                  : _selectedItem ==
+                                                                          7
+                                                                      ? ReporteRecibidoMesUnidad(
+                                                                          usuario:
+                                                                              usuarioAutenticado,
+                                                                        )
+                                                                      : ReporteCostoProduccionAgnoUnidad(
+                                                                          usuario:
+                                                                              usuarioAutenticado,
+                                                                        ),
+                                    if (!Responsive.isMobile(context))
+                                      const SizedBox(height: defaultPadding),
                                     const Divider(
                                       height: 1,
                                       color: Colors.grey,

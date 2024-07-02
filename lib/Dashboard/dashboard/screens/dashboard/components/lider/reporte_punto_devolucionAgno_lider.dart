@@ -8,7 +8,6 @@ import 'package:tienda_app/Models/devolucionesModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
-import 'package:tienda_app/responsive.dart';
 
 class ReporteDevolucionesPuntoAgnoLider extends StatelessWidget {
   final UsuarioModel usuario;
@@ -61,8 +60,8 @@ class ReporteDevolucionesPuntoAgnoLider extends StatelessWidget {
                   return SfCartesianChart(
                     // Configuración del gráfico
                     tooltipBehavior: TooltipBehavior(enable: true),
-                    legend: Legend(
-                      isVisible: Responsive.isMobile(context) ? false : true,
+                    legend: const Legend(
+                      isVisible: true,
                     ),
                     primaryXAxis: const CategoryAxis(
                       title: AxisTitle(text: 'Año'),
@@ -70,27 +69,27 @@ class ReporteDevolucionesPuntoAgnoLider extends StatelessWidget {
                     ),
                     primaryYAxis: NumericAxis(
                       title: const AxisTitle(text: 'Devoluciones (COP)'),
-                      numberFormat: NumberFormat.currency(
-                          locale: 'es_CO', symbol: ''),
+                      numberFormat:
+                          NumberFormat.currency(locale: 'es_CO', symbol: ''),
                     ),
                     series: <CartesianSeries>[
                       // Generación dinámica de series para cada punto de venta
                       for (var i = 0; i < puntos.length; i++)
-                        SplineAreaSeries<DevolucionesAgnoDataLider, String>(
-                          name: puntos[i].nombre,
-                          dataSource: _getDevolucionesDataAgno(
-                            puntos[i],
-                            auxPedidos,
-                            devoluciones,
-                            usuario,
+                        if (puntos[i].sede == usuario.sede)
+                          SplineAreaSeries<DevolucionesAgnoDataLider, String>(
+                            name: puntos[i].nombre,
+                            dataSource: _getDevolucionesDataAgno(
+                              puntos[i],
+                              auxPedidos,
+                              devoluciones,
+                            ),
+                            xValueMapper: (DevolucionesAgnoDataLider data, _) =>
+                                data.agno,
+                            yValueMapper: (DevolucionesAgnoDataLider data, _) =>
+                                data.devoluciones,
+                            color: _getColor(i, puntos.length),
+                            borderWidth: 2,
                           ),
-                          xValueMapper: (DevolucionesAgnoDataLider data, _) =>
-                              data.agno,
-                          yValueMapper: (DevolucionesAgnoDataLider data, _) =>
-                              data.devoluciones,
-                          color: _getColor(i, puntos.length),
-                          borderWidth: 2,
-                        ),
                     ],
                   );
                 }
@@ -107,7 +106,6 @@ class ReporteDevolucionesPuntoAgnoLider extends StatelessWidget {
     PuntoVentaModel puntoVenta,
     List<AuxPedidoModel> auxPedidos,
     List<DevolucionesModel> devoluciones,
-    UsuarioModel usuario,
   ) {
     Map<String, double> devolucionesPorAnio = {};
     int currentYear = DateTime.now().year;
@@ -115,9 +113,8 @@ class ReporteDevolucionesPuntoAgnoLider extends StatelessWidget {
     for (var devolucion in devoluciones) {
       var pedido = devolucion.factura.pedido;
 
-      // Filtrar devoluciones por punto de venta y sede del usuario
-      if (puntoVenta.id == pedido.puntoVenta &&
-          puntoVenta.sede == usuario.sede) {
+      // Filtrar devoluciones por punto de venta
+      if (puntoVenta.id == pedido.puntoVenta) {
         var anio = DateTime.parse(devolucion.fecha).year;
 
         // Considerar solo los últimos 3 años (incluyendo el año actual)
@@ -156,4 +153,3 @@ class DevolucionesAgnoDataLider {
   final String agno;
   final double devoluciones;
 }
-

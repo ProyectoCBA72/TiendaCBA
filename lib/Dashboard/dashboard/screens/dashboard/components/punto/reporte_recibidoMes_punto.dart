@@ -1,19 +1,26 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, unnecessary_null_comparison
+
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:tienda_app/Models/inventarioModel.dart';
+import 'package:tienda_app/Models/produccionModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
-import 'package:tienda_app/responsive.dart';
 
 class ReporteRecibidoMesPunto extends StatelessWidget {
+  final UsuarioModel usuario;
   const ReporteRecibidoMesPunto({
     super.key,
+    required this.usuario,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Título del reporte
         Text(
           "Producciones recibidas por mes",
           style: Theme.of(context)
@@ -22,113 +29,174 @@ class ReporteRecibidoMesPunto extends StatelessWidget {
               .copyWith(fontFamily: 'Calibri-Bold'),
         ),
         const SizedBox(height: defaultPadding),
+        // Contenedor principal para el gráfico
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: SizedBox(
             height: 300,
             width: MediaQuery.of(context).size.width,
-            child: SfCartesianChart(
-              tooltipBehavior: TooltipBehavior(enable: true),
-              legend: Legend(isVisible: Responsive.isMobile(context) ? false : true),
-              primaryXAxis: const CategoryAxis(
-                title: AxisTitle(text: 'Meses'),
-              ),
-              primaryYAxis: const NumericAxis(
-                title: AxisTitle(text: 'Cantidad de Producciones'),
-              ),
-              series: <CartesianSeries>[
-                FastLineSeries<ProduccionMesDataPunto, String>(
-                  name: 'Cárnicos',
-                  dataSource: _getProduccionDataMes('Cárnicos'),
-                  xValueMapper: (ProduccionMesDataPunto data, _) => data.mes,
-                  yValueMapper: (ProduccionMesDataPunto data, _) =>
-                      data.cantidad,
-                  color: Colors.red,
-                ),
-                FastLineSeries<ProduccionMesDataPunto, String>(
-                  name: 'Lácteos',
-                  dataSource: _getProduccionDataMes('Lácteos'),
-                  xValueMapper: (ProduccionMesDataPunto data, _) => data.mes,
-                  yValueMapper: (ProduccionMesDataPunto data, _) =>
-                      data.cantidad,
-                  color: Colors.blue,
-                ),
-                FastLineSeries<ProduccionMesDataPunto, String>(
-                  name: 'Apicultura',
-                  dataSource: _getProduccionDataMes('Apicultura'),
-                  xValueMapper: (ProduccionMesDataPunto data, _) => data.mes,
-                  yValueMapper: (ProduccionMesDataPunto data, _) =>
-                      data.cantidad,
-                  color: Colors.green,
-                ),
-                FastLineSeries<ProduccionMesDataPunto, String>(
-                  name: 'Porcicultura',
-                  dataSource: _getProduccionDataMes('Porcicultura'),
-                  xValueMapper: (ProduccionMesDataPunto data, _) => data.mes,
-                  yValueMapper: (ProduccionMesDataPunto data, _) =>
-                      data.cantidad,
-                  color: Colors.orange,
-                ),
-                FastLineSeries<ProduccionMesDataPunto, String>(
-                  name: 'Hortalizas',
-                  dataSource: _getProduccionDataMes('Hortalizas'),
-                  xValueMapper: (ProduccionMesDataPunto data, _) => data.mes,
-                  yValueMapper: (ProduccionMesDataPunto data, _) =>
-                      data.cantidad,
-                  color: Colors.purple,
-                ),
-              ],
-            ),
+            // Usando FutureBuilder para manejar la carga de datos asíncrona
+            child: FutureBuilder(
+                // Esperar a que se completen las futuras de getProducciones y getInventario
+                future: Future.wait([getProducciones(), getInventario()]),
+                builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+                  // Mostrar indicador de carga mientras los datos se están cargando
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                    // Mostrar mensaje de error si ocurre algún problema al cargar los datos
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Text('Error al cargar datos: ${snapshot.error}'),
+                    );
+                  } else {
+                    // Cuando los datos están disponibles, procesarlos
+                    List<ProduccionModel> producciones = snapshot.data![0];
+                    List<InventarioModel> inventarios = snapshot.data![1];
+
+                    // Filtrar y agrupar los datos por mes y unidad de producción
+                    Map<String, Map<String, double>> data =
+                        _processData(producciones, inventarios, usuario);
+
+                    // Crear el gráfico con los datos procesados
+                    return SfCartesianChart(
+                      tooltipBehavior: TooltipBehavior(enable: true),
+                      legend: const Legend(isVisible: true),
+                      primaryXAxis: const CategoryAxis(
+                        title: AxisTitle(text: 'Meses'),
+                      ),
+                      primaryYAxis: const NumericAxis(
+                        title: AxisTitle(text: 'Cantidad de Producciones'),
+                      ),
+                      series: _buildSeries(data),
+                    );
+                  }
+                }),
           ),
         ),
       ],
     );
   }
 
-  List<ProduccionMesDataPunto> _getProduccionDataMes(String tipoProduccion) {
-    // Aquí puedes definir tus datos. Este es un ejemplo de datos simulados.
-    final data = {
-      'Cárnicos': [
-        ProduccionMesDataPunto('Enero', 30),
-        ProduccionMesDataPunto('Febrero', 28),
-        ProduccionMesDataPunto('Marzo', 34),
-        ProduccionMesDataPunto('Abril', 32),
-        ProduccionMesDataPunto('Mayo', 40),
-      ],
-      'Lácteos': [
-        ProduccionMesDataPunto('Enero', 20),
-        ProduccionMesDataPunto('Febrero', 24),
-        ProduccionMesDataPunto('Marzo', 22),
-        ProduccionMesDataPunto('Abril', 26),
-        ProduccionMesDataPunto('Mayo', 30),
-      ],
-      'Apicultura': [
-        ProduccionMesDataPunto('Enero', 10),
-        ProduccionMesDataPunto('Febrero', 12),
-        ProduccionMesDataPunto('Marzo', 14),
-        ProduccionMesDataPunto('Abril', 15),
-        ProduccionMesDataPunto('Mayo', 18),
-      ],
-      'Porcicultura': [
-        ProduccionMesDataPunto('Enero', 15),
-        ProduccionMesDataPunto('Febrero', 18),
-        ProduccionMesDataPunto('Marzo', 20),
-        ProduccionMesDataPunto('Abril', 22),
-        ProduccionMesDataPunto('Mayo', 25),
-      ],
-      'Hortalizas': [
-        ProduccionMesDataPunto('Enero', 25),
-        ProduccionMesDataPunto('Febrero', 27),
-        ProduccionMesDataPunto('Marzo', 29),
-        ProduccionMesDataPunto('Abril', 30),
-        ProduccionMesDataPunto('Mayo', 35),
-      ],
-    };
+  // Función para procesar y agrupar los datos por mes y unidad de producción
+  Map<String, Map<String, double>> _processData(
+      List<ProduccionModel> producciones,
+      List<InventarioModel> inventarios,
+      UsuarioModel usuario) {
+    Map<String, Map<String, double>> data = {};
 
-    return data[tipoProduccion] ?? [];
+    // Obtener la fecha actual
+    final now = DateTime.now();
+    // Obtener los últimos cuatro meses incluyendo el mes actual
+    final pastMonths =
+        List.generate(4, (i) => DateTime(now.year, now.month - i, 1))
+            .map((date) => _getMonthName(date.month))
+            .toList();
+
+    // Recorrer todos los inventarios
+    for (var inventario in inventarios) {
+      // Convertir la fecha del inventario a un objeto DateTime
+      final inventarioDate = DateTime.parse(inventario.fecha);
+      // Obtener el mes del inventario en formato de texto
+      final inventarioMonth = _getMonthName(inventarioDate.month);
+
+      // Verificar si el mes del inventario está dentro de los últimos cuatro meses
+      if (pastMonths.contains(inventarioMonth)) {
+        // Encontrar la producción correspondiente al inventario
+        final produccion = producciones.firstWhere((prod) =>
+            prod.id == inventario.produccion &&
+            inventario.bodega.puntoVenta.id == usuario.puntoVenta &&
+            prod.estado == "RECIBIDO");
+        if (produccion != null) {
+          // Obtener el nombre de la unidad de producción
+          final unidadProduccion = produccion.unidadProduccion.nombre;
+
+          // Inicializar la entrada en el mapa si no existe
+          if (!data.containsKey(unidadProduccion)) {
+            data[unidadProduccion] = {for (var month in pastMonths) month: 0};
+          }
+
+          // Incrementar el contador de producciones para el mes correspondiente
+          data[unidadProduccion]![inventarioMonth] =
+              (data[unidadProduccion]![inventarioMonth] ?? 0) + 1;
+        }
+      }
+    }
+
+    return data;
+  }
+
+  // Función para construir las series del gráfico a partir de los datos procesados
+  List<FastLineSeries<ProduccionMesDataPunto, String>> _buildSeries(
+      Map<String, Map<String, double>> data) {
+    List<FastLineSeries<ProduccionMesDataPunto, String>> series = [];
+
+    // Recorrer los datos agrupados por unidad de producción y mes
+    data.forEach((unidadProduccion, monthlyData) {
+      series.add(
+        FastLineSeries<ProduccionMesDataPunto, String>(
+          name: unidadProduccion,
+          // Convertir los datos mensuales en una lista de objetos ProduccionMesDataPunto
+          dataSource: monthlyData.entries
+              .map((entry) => ProduccionMesDataPunto(entry.key, entry.value))
+              .toList(),
+          xValueMapper: (ProduccionMesDataPunto data, _) => data.mes,
+          yValueMapper: (ProduccionMesDataPunto data, _) => data.cantidad,
+          color: _getColor(),
+        ),
+      );
+    });
+
+    return series;
   }
 }
 
+// Función para obtener el color de la serie (aleatorio)
+Color _getColor() {
+  final random = Random();
+  final hue = random.nextDouble() * 360; // Generar tono aleatorio
+  final saturation =
+      random.nextDouble() * (0.5 - 0.2) + 0.2; // Saturation entre 0.2 y 0.5
+  final value =
+      random.nextDouble() * (0.9 - 0.5) + 0.5; // Value entre 0.5 y 0.9
+
+  return HSVColor.fromAHSV(1.0, hue, saturation, value).toColor();
+}
+
+// Función para obtener el nombre del mes basado en su número
+String _getMonthName(int month) {
+  switch (month) {
+    case 1:
+      return 'Enero';
+    case 2:
+      return 'Febrero';
+    case 3:
+      return 'Marzo';
+    case 4:
+      return 'Abril';
+    case 5:
+      return 'Mayo';
+    case 6:
+      return 'Junio';
+    case 7:
+      return 'Julio';
+    case 8:
+      return 'Agosto';
+    case 9:
+      return 'Septiembre';
+    case 10:
+      return 'Octubre';
+    case 11:
+      return 'Noviembre';
+    case 12:
+      return 'Diciembre';
+    default:
+      return '';
+  }
+}
+
+// Clase para representar los datos del gráfico, con el mes y la cantidad de producciones
 class ProduccionMesDataPunto {
   ProduccionMesDataPunto(this.mes, this.cantidad);
 

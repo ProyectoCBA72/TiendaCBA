@@ -1,12 +1,13 @@
 // ignore_for_file: file_names, unnecessary_null_comparison
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tienda_app/Models/produccionModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
-import 'package:tienda_app/responsive.dart';
 import 'package:intl/intl.dart';
 
 class ReporteCostoProduccionMesLider extends StatelessWidget {
@@ -57,46 +58,33 @@ class ReporteCostoProduccionMesLider extends StatelessWidget {
                     var data = _calculateTopRecentProductions(
                         allProductions, allProducts, usuario);
 
-                    // Definir colores para las barras
-                    List<Color> colors = [
-                      Colors.red,
-                      Colors.blue,
-                      Colors.green,
-                      Colors.orange,
-                      Colors.purple,
-                      Colors.brown,
-                      Colors.pink,
-                    ];
-
                     // Construir y mostrar la gráfica
                     return SfCartesianChart(
                       tooltipBehavior: TooltipBehavior(enable: true),
-                      legend: Legend(
-                          isVisible:
-                              Responsive.isMobile(context) ? false : true),
+                      legend: const Legend(
+                          isVisible:true),
                       primaryXAxis: const CategoryAxis(
                         title: AxisTitle(text: 'Meses'),
                         interval: 1,
                       ),
                       primaryYAxis: NumericAxis(
-                        title: const AxisTitle(text: 'Costo de Producción (COP)'),
+                        title:
+                            const AxisTitle(text: 'Costo de Producción (COP)'),
                         numberFormat:
                             NumberFormat.currency(locale: 'es_CO', symbol: ''),
                       ),
                       series: data.asMap().entries.map((entry) {
-                        int index = entry.key;
                         ProduccionCostoDataMesLiderGroup productData =
                             entry.value;
-                        return ColumnSeries<ProduccionCostoDataMesLider, String>(
+                        return ColumnSeries<ProduccionCostoDataMesLider,
+                            String>(
                           name: productData.nombre,
                           dataSource: productData.datos,
-                          xValueMapper:
-                              (ProduccionCostoDataMesLider data, _) =>
-                                  data.mes,
-                          yValueMapper:
-                              (ProduccionCostoDataMesLider data, _) =>
-                                  data.costo,
-                          color: colors[index % colors.length],
+                          xValueMapper: (ProduccionCostoDataMesLider data, _) =>
+                              data.mes,
+                          yValueMapper: (ProduccionCostoDataMesLider data, _) =>
+                              data.costo,
+                          color: _getColor(),
                         );
                       }).toList(),
                     );
@@ -106,6 +94,18 @@ class ReporteCostoProduccionMesLider extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  // Función para obtener el color de la serie (aleatorio)
+  Color _getColor() {
+    final random = Random();
+    final hue = random.nextDouble() * 360; // Generar tono aleatorio
+    final saturation =
+        random.nextDouble() * (0.5 - 0.2) + 0.2; // Saturation entre 0.2 y 0.5
+    final value =
+        random.nextDouble() * (0.9 - 0.5) + 0.5; // Value entre 0.5 y 0.9
+
+    return HSVColor.fromAHSV(1.0, hue, saturation, value).toColor();
   }
 
   // Función para calcular los datos de los 7 productos con mayor costo de producción en los últimos 4 meses
@@ -121,29 +121,31 @@ class ReporteCostoProduccionMesLider extends StatelessWidget {
 
     for (var production in productions) {
       // Verificar si la fecha de producción no está vacía y la sede coincide con la del usuario
-      if (production.fechaProduccion.isEmpty &&
-          production.unidadProduccion.sede.id != usuario.sede) continue;
-      DateTime productionDate = DateTime.parse(production.fechaProduccion);
+      if (production.fechaProduccion.isNotEmpty &&
+          production.unidadProduccion.sede.id == usuario.sede) {
+        DateTime productionDate = DateTime.parse(production.fechaProduccion);
 
-      // Filtrar los datos para los últimos cuatro meses
-      if (productionDate.isBefore(DateTime(currentYear, currentMonth - 3))) {
-        continue;
+        // Filtrar los datos para los últimos cuatro meses
+        if (productionDate.isBefore(DateTime(currentYear, currentMonth - 3))) {
+          continue;
+        }
+
+        // Encontrar el producto correspondiente a la producción actual
+        ProductoModel? product =
+            products.firstWhere((product) => product.id == production.producto);
+        if (product == null) continue;
+
+        // Agrupar los datos por nombre del producto
+        if (!productionDataByProduct.containsKey(product.nombre)) {
+          productionDataByProduct[product.nombre] = [];
+        }
+
+        // Obtener el nombre del mes
+        String month = _getNombreMes(productionDate);
+        productionDataByProduct[product.nombre]!.add(
+            ProduccionCostoDataMesLider(
+                month, production.costoProduccion.toDouble()));
       }
-
-      // Encontrar el producto correspondiente a la producción actual
-      ProductoModel? product =
-          products.firstWhere((product) => product.id == production.producto);
-      if (product == null) continue;
-
-      // Agrupar los datos por nombre del producto
-      if (!productionDataByProduct.containsKey(product.nombre)) {
-        productionDataByProduct[product.nombre] = [];
-      }
-
-      // Obtener el nombre del mes
-      String month = DateFormat('MMMM', 'es_ES').format(productionDate);
-      productionDataByProduct[product.nombre]!.add(
-          ProduccionCostoDataMesLider(month, production.costoProduccion.toDouble()));
     }
 
     // Ordenar los productos por costo total de producción y seleccionar los 7 más caros
@@ -157,6 +159,38 @@ class ReporteCostoProduccionMesLider extends StatelessWidget {
     return sortedProducts.take(7).map((entry) {
       return ProduccionCostoDataMesLiderGroup(entry.key, entry.value);
     }).toList();
+  }
+}
+
+// Función para obtener el nombre del mes a partir de una fecha
+String _getNombreMes(DateTime fecha) {
+  switch (fecha.month) {
+    case 1:
+      return 'Enero';
+    case 2:
+      return 'Febrero';
+    case 3:
+      return 'Marzo';
+    case 4:
+      return 'Abril';
+    case 5:
+      return 'Mayo';
+    case 6:
+      return 'Junio';
+    case 7:
+      return 'Julio';
+    case 8:
+      return 'Agosto';
+    case 9:
+      return 'Septiembre';
+    case 10:
+      return 'Octubre';
+    case 11:
+      return 'Noviembre';
+    case 12:
+      return 'Diciembre';
+    default:
+      return '';
   }
 }
 
@@ -175,4 +209,3 @@ class ProduccionCostoDataMesLiderGroup {
   final String nombre;
   final List<ProduccionCostoDataMesLider> datos;
 }
-

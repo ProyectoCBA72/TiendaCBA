@@ -8,7 +8,6 @@ import 'package:tienda_app/Models/facturaModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
-import 'package:tienda_app/responsive.dart';
 
 class ReportePuntoVentasAgnoLider extends StatelessWidget {
   final UsuarioModel usuario;
@@ -63,8 +62,8 @@ class ReportePuntoVentasAgnoLider extends StatelessWidget {
                   return SfCartesianChart(
                     // Configuración del gráfico
                     tooltipBehavior: TooltipBehavior(enable: true),
-                    legend: Legend(
-                      isVisible: Responsive.isMobile(context) ? false : true,
+                    legend: const Legend(
+                      isVisible: true,
                     ),
                     primaryXAxis: const CategoryAxis(
                       title: AxisTitle(text: 'Año'),
@@ -72,26 +71,32 @@ class ReportePuntoVentasAgnoLider extends StatelessWidget {
                     ),
                     primaryYAxis: NumericAxis(
                       title: const AxisTitle(text: 'Ventas (COP)'),
-                      numberFormat: NumberFormat.currency(locale: 'es_CO', symbol: ''),
+                      numberFormat:
+                          NumberFormat.currency(locale: 'es_CO', symbol: ''),
                     ),
                     series: <CartesianSeries>[
                       // Generación dinámica de series para cada punto de venta
                       for (var i = 0; i < puntos.length; i++)
-                        SplineAreaSeries<BalanceVentasAgnoDataLider, String>(
-                          name: puntos[i].nombre,
-                          dataSource: _getBalanceVentasDataAgno(
-                            puntos[i],
-                            auxPedidos,
-                            facturas,
-                            usuario,
+                        if (puntos[i].sede == usuario.sede)
+                          SplineAreaSeries<BalanceVentasAgnoDataLider, String>(
+                            name: puntos[i].nombre,
+                            dataSource: _getBalanceVentasDataAgno(
+                              puntos[i],
+                              auxPedidos,
+                              facturas,
+                            ),
+                            xValueMapper:
+                                (BalanceVentasAgnoDataLider data, _) =>
+                                    data.agno,
+                            yValueMapper:
+                                (BalanceVentasAgnoDataLider data, _) =>
+                                    data.ventas,
+                            color: _getColor(
+                                i,
+                                puntos
+                                    .length), // Color automático basado en el índice
+                            borderWidth: 2,
                           ),
-                          xValueMapper: (BalanceVentasAgnoDataLider data, _) =>
-                              data.agno,
-                          yValueMapper: (BalanceVentasAgnoDataLider data, _) =>
-                              data.ventas,
-                          color: _getColor(i, puntos.length), // Color automático basado en el índice
-                          borderWidth: 2,
-                        ),
                     ],
                   );
                 }
@@ -108,7 +113,6 @@ class ReportePuntoVentasAgnoLider extends StatelessWidget {
     PuntoVentaModel puntoVenta,
     List<AuxPedidoModel> auxPedidos,
     List<FacturaModel> facturas,
-    UsuarioModel usuario,
   ) {
     Map<String, double> ventasPorAnio = {};
     int currentYear = DateTime.now().year;
@@ -116,11 +120,10 @@ class ReportePuntoVentasAgnoLider extends StatelessWidget {
     for (var factura in facturas) {
       var pedido = factura.pedido;
 
-      // Filtrar facturas por punto de venta y sede del usuario
-      if (puntoVenta.id == pedido.puntoVenta &&
-          puntoVenta.sede == usuario.sede) {
+      // Filtrar facturas por punto de venta
+      if (puntoVenta.id == pedido.puntoVenta) {
         var anio = DateTime.parse(factura.fecha).year;
-        
+
         // Considerar solo los últimos 3 años (incluyendo el año actual)
         if (anio >= currentYear - 2) {
           var totalVenta = auxPedidos
@@ -145,8 +148,10 @@ class ReportePuntoVentasAgnoLider extends StatelessWidget {
 
   // Función para generar colores automáticamente basados en el índice
   Color _getColor(int index, int totalPuntos) {
-    final hue = (360 / totalPuntos) * index; // Calcular el tono de color basado en el índice
-    return HSVColor.fromAHSV(1.0, hue, 0.8, 0.9).toColor(); // Convertir a color HSV y luego a Color
+    final hue = (360 / totalPuntos) *
+        index; // Calcular el tono de color basado en el índice
+    return HSVColor.fromAHSV(1.0, hue, 0.8, 0.9)
+        .toColor(); // Convertir a color HSV y luego a Color
   }
 }
 
@@ -157,4 +162,3 @@ class BalanceVentasAgnoDataLider {
   final String agno;
   final double ventas;
 }
-

@@ -85,8 +85,8 @@ class _SideMenuState extends State<SideMenu> {
                               )));
                 },
               ),
-            if (usuarioAutenticado.rol3 == "TUTOR" &&
-                usuarioAutenticado.unidadProduccion != null)
+            //if (usuarioAutenticado.rol3 == "TUTOR" &&
+              //  usuarioAutenticado.unidadProduccion != null)
               DrawerListTile(
                 title: "Panel unidad de producción",
                 svgSrc: "assets/icons/produccion.svg",
@@ -107,8 +107,8 @@ class _SideMenuState extends State<SideMenu> {
                               )));
                 },
               ),
-            if (usuarioAutenticado.rol3 == "PUNTO" &&
-                usuarioAutenticado.puntoVenta != null)
+            //if (usuarioAutenticado.rol3 == "PUNTO" &&
+              //  usuarioAutenticado.puntoVenta != null)
               DrawerListTile(
                 title: "Panel punto de venta",
                 svgSrc: "assets/icons/store.svg",
@@ -129,7 +129,7 @@ class _SideMenuState extends State<SideMenu> {
                               )));
                 },
               ),
-            if (usuarioAutenticado.rol3 == "LIDER")
+            //if (usuarioAutenticado.rol3 == "LIDER")
               DrawerListTile(
                 title: "Panel líder SENA",
                 svgSrc: "assets/icons/lider.svg",

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
@@ -6,7 +8,6 @@ import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
-import 'package:tienda_app/responsive.dart';
 
 class ReporteProductosMasVendidosMesLider extends StatelessWidget {
   final UsuarioModel usuario;
@@ -61,13 +62,16 @@ class ReporteProductosMasVendidosMesLider extends StatelessWidget {
 
                   // Filtrar las facturas de los últimos 4 meses incluyendo el mes actual
                   final DateTime now = DateTime.now();
-                  final List<FacturaModel> facturasUltimos4Meses = facturas.where((factura) {
+                  final List<FacturaModel> facturasUltimos4Meses =
+                      facturas.where((factura) {
                     final DateTime fechaFactura = DateTime.parse(factura.fecha);
-                    return fechaFactura.isAfter(now.subtract(const Duration(days: 30 * 4 - 1)));
+                    return fechaFactura.isAfter(
+                        now.subtract(const Duration(days: 30 * 4 - 1)));
                   }).toList();
 
                   // Mapa para almacenar las ventas por producto por mes
-                  final Map<String, Map<String, double>> ventasPorProductoPorMes = {};
+                  final Map<String, Map<String, double>>
+                      ventasPorProductoPorMes = {};
 
                   // Iterar sobre las facturas filtradas para calcular las ventas por producto por mes
                   for (var factura in facturasUltimos4Meses) {
@@ -78,11 +82,16 @@ class ReporteProductosMasVendidosMesLider extends StatelessWidget {
                         if (auxPedido.pedido.id == factura.pedido.id &&
                             punto.id == factura.pedido.puntoVenta &&
                             punto.sede == usuario.sede) {
-                          final producto = productos.firstWhere((p) => p.id == auxPedido.producto).nombre;
-                          ventasPorProductoPorMes.putIfAbsent(producto, () => {});
-                          ventasPorProductoPorMes[producto]!.putIfAbsent(mes, () => 0);
+                          final producto = productos
+                              .firstWhere((p) => p.id == auxPedido.producto)
+                              .nombre;
+                          ventasPorProductoPorMes.putIfAbsent(
+                              producto, () => {});
+                          ventasPorProductoPorMes[producto]!
+                              .putIfAbsent(mes, () => 0);
                           ventasPorProductoPorMes[producto]![mes] =
-                              ventasPorProductoPorMes[producto]![mes]! + auxPedido.cantidad.toDouble();
+                              ventasPorProductoPorMes[producto]![mes]! +
+                                  auxPedido.cantidad.toDouble();
                         }
                       }
                     }
@@ -99,22 +108,10 @@ class ReporteProductosMasVendidosMesLider extends StatelessWidget {
                   final top7Productos =
                       productosMasVendidos.take(7).map((e) => e.key).toList();
 
-                  // Colores para las series
-                  final List<Color> coloresSeries = [
-                    Colors.red,
-                    Colors.blue,
-                    Colors.green,
-                    Colors.orange,
-                    Colors.purple,
-                    Colors.brown,
-                    Colors.pink,
-                  ];
-
                   // Construir el gráfico de líneas con los datos obtenidos
                   return SfCartesianChart(
                     tooltipBehavior: TooltipBehavior(enable: true),
-                    legend: Legend(
-                        isVisible: Responsive.isMobile(context) ? false : true),
+                    legend: const Legend(isVisible: true),
                     primaryXAxis: const CategoryAxis(
                       title: AxisTitle(text: 'Meses'),
                       interval: 1,
@@ -133,7 +130,8 @@ class ReporteProductosMasVendidosMesLider extends StatelessWidget {
                               data.mes,
                           yValueMapper: (ProduccionVentaDataMesLider data, _) =>
                               data.cantidad,
-                          color: coloresSeries[i % coloresSeries.length], // Asignar color basado en la lista de colores
+                          color:
+                              _getColor(), // Asignar color basado en la lista de colores
                         ),
                     ],
                   );
@@ -146,9 +144,21 @@ class ReporteProductosMasVendidosMesLider extends StatelessWidget {
     );
   }
 
+  // Función para obtener el color de la serie (aleatorio)
+  Color _getColor() {
+    final random = Random();
+    final hue = random.nextDouble() * 360; // Generar tono aleatorio
+    final saturation =
+        random.nextDouble() * (0.5 - 0.2) + 0.2; // Saturation entre 0.2 y 0.5
+    final value =
+        random.nextDouble() * (0.9 - 0.5) + 0.5; // Value entre 0.5 y 0.9
+
+    return HSVColor.fromAHSV(1.0, hue, saturation, value).toColor();
+  }
+
   // Función para obtener los datos de ventas por producto por mes
-  List<ProduccionVentaDataMesLider> _getProduccionVentaDataMes(
-      String producto, Map<String, Map<String, double>> ventasPorProductoPorMes) {
+  List<ProduccionVentaDataMesLider> _getProduccionVentaDataMes(String producto,
+      Map<String, Map<String, double>> ventasPorProductoPorMes) {
     final List<ProduccionVentaDataMesLider> data = [];
     if (ventasPorProductoPorMes.containsKey(producto)) {
       ventasPorProductoPorMes[producto]!.forEach((mes, cantidad) {
@@ -198,4 +208,3 @@ class ProduccionVentaDataMesLider {
   final String mes;
   final double cantidad;
 }
-

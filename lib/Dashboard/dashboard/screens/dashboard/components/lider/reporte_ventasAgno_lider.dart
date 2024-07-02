@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
@@ -6,7 +8,6 @@ import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
-import 'package:tienda_app/responsive.dart';
 
 class ReporteProductosMasVendidosAgnoLider extends StatelessWidget {
   final UsuarioModel usuario;
@@ -60,7 +61,8 @@ class ReporteProductosMasVendidosAgnoLider extends StatelessWidget {
                   final puntos = snapshot.data![3] as List<PuntoVentaModel>;
 
                   // Mapa para almacenar las ventas por producto por año
-                  final Map<String, Map<String, double>> ventasPorProductoPorAgno = {};
+                  final Map<String, Map<String, double>>
+                      ventasPorProductoPorAgno = {};
 
                   // Iterar sobre las facturas para calcular las ventas por producto por año
                   for (var factura in facturas) {
@@ -72,10 +74,16 @@ class ReporteProductosMasVendidosAgnoLider extends StatelessWidget {
                           if (auxPedido.pedido.id == factura.pedido.id &&
                               punto.id == factura.pedido.puntoVenta &&
                               punto.sede == usuario.sede) {
-                            final producto = productos.firstWhere((p) => p.id == auxPedido.producto).nombre;
-                            ventasPorProductoPorAgno.putIfAbsent(producto, () => {});
-                            ventasPorProductoPorAgno[producto]!.putIfAbsent(agno, () => 0);
-                            ventasPorProductoPorAgno[producto]![agno] = ventasPorProductoPorAgno[producto]![agno]! + auxPedido.cantidad.toDouble();
+                            final producto = productos
+                                .firstWhere((p) => p.id == auxPedido.producto)
+                                .nombre;
+                            ventasPorProductoPorAgno.putIfAbsent(
+                                producto, () => {});
+                            ventasPorProductoPorAgno[producto]!
+                                .putIfAbsent(agno, () => 0);
+                            ventasPorProductoPorAgno[producto]![agno] =
+                                ventasPorProductoPorAgno[producto]![agno]! +
+                                    auxPedido.cantidad.toDouble();
                           }
                         }
                       }
@@ -93,22 +101,11 @@ class ReporteProductosMasVendidosAgnoLider extends StatelessWidget {
                   final top7Productos =
                       productosMasVendidos.take(7).map((e) => e.key).toList();
 
-                  // Colores para las series
-                  final List<Color> coloresSeries = [
-                    Colors.red,
-                    Colors.blue,
-                    Colors.green,
-                    Colors.orange,
-                    Colors.purple,
-                    Colors.brown,
-                    Colors.pink,
-                  ];
-
                   // Construir el gráfico de líneas con los datos obtenidos
                   return SfCartesianChart(
                     tooltipBehavior: TooltipBehavior(enable: true),
-                    legend: Legend(
-                        isVisible: Responsive.isMobile(context) ? false : true),
+                    legend: const Legend(
+                        isVisible: true),
                     primaryXAxis: const CategoryAxis(
                       title: AxisTitle(text: 'Año'),
                       interval: 1,
@@ -123,11 +120,14 @@ class ReporteProductosMasVendidosAgnoLider extends StatelessWidget {
                           name: top7Productos[i],
                           dataSource: _getProduccionVentaDataAgno(
                               top7Productos[i], ventasPorProductoPorAgno),
-                          xValueMapper: (ProduccionVentaAgnoDataLider data, _) =>
-                              data.agno,
-                          yValueMapper: (ProduccionVentaAgnoDataLider data, _) =>
-                              data.cantidad,
-                          color: coloresSeries[i % coloresSeries.length], // Asignar color basado en la lista de colores
+                          xValueMapper:
+                              (ProduccionVentaAgnoDataLider data, _) =>
+                                  data.agno,
+                          yValueMapper:
+                              (ProduccionVentaAgnoDataLider data, _) =>
+                                  data.cantidad,
+                          color:
+                              _getColor(), // Asignar color basado en la lista de colores
                         ),
                     ],
                   );
@@ -140,9 +140,22 @@ class ReporteProductosMasVendidosAgnoLider extends StatelessWidget {
     );
   }
 
+  // Función para obtener el color de la serie (aleatorio)
+  Color _getColor() {
+    final random = Random();
+    final hue = random.nextDouble() * 360; // Generar tono aleatorio
+    final saturation =
+        random.nextDouble() * (0.5 - 0.2) + 0.2; // Saturation entre 0.2 y 0.5
+    final value =
+        random.nextDouble() * (0.9 - 0.5) + 0.5; // Value entre 0.5 y 0.9
+
+    return HSVColor.fromAHSV(1.0, hue, saturation, value).toColor();
+  }
+
   // Función para obtener los datos de ventas por producto por año
   List<ProduccionVentaAgnoDataLider> _getProduccionVentaDataAgno(
-      String producto, Map<String, Map<String, double>> ventasPorProductoPorAgno) {
+      String producto,
+      Map<String, Map<String, double>> ventasPorProductoPorAgno) {
     final List<ProduccionVentaAgnoDataLider> data = [];
     if (ventasPorProductoPorAgno.containsKey(producto)) {
       ventasPorProductoPorAgno[producto]!.forEach((agno, cantidad) {

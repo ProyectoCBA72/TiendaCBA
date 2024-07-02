@@ -1,5 +1,7 @@
 // ignore_for_file: file_names
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -8,7 +10,6 @@ import 'package:tienda_app/Models/facturaModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
-import 'package:tienda_app/responsive.dart';
 
 class ReportePuntoVentasMesLider extends StatelessWidget {
   final UsuarioModel usuario;
@@ -20,21 +21,6 @@ class ReportePuntoVentasMesLider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Lista de colores predefinidos para las series
-    List<Color> seriesColors = [
-      Colors.blue.withOpacity(0.5),
-      Colors.green.withOpacity(0.5),
-      Colors.red.withOpacity(0.5),
-      Colors.orange.withOpacity(0.5),
-      Colors.purple.withOpacity(0.5),
-      Colors.teal.withOpacity(0.5),
-      Colors.yellow.withOpacity(0.5),
-      Colors.indigo.withOpacity(0.5),
-      Colors.deepOrange.withOpacity(0.5),
-      Colors.pink.withOpacity(0.5),
-      Colors.amber.withOpacity(0.5),
-    ];
-
     return Column(
       children: [
         // Título del reporte
@@ -75,11 +61,14 @@ class ReportePuntoVentasMesLider extends StatelessWidget {
                   List<FacturaModel> facturas = snapshot.data![1];
                   List<PuntoVentaModel> puntos = snapshot.data![2];
 
+                  List<PuntoVentaModel> puntosFiltrados =
+                      puntos.where((p) => p.sede == usuario.sede).toList();
+
                   return SfCartesianChart(
                     // Configuración del gráfico
                     tooltipBehavior: TooltipBehavior(enable: true),
-                    legend: Legend(
-                      isVisible: Responsive.isMobile(context) ? false : true,
+                    legend: const Legend(
+                      isVisible: true,
                     ),
                     primaryXAxis: const CategoryAxis(
                       title: AxisTitle(text: 'Meses'),
@@ -87,24 +76,24 @@ class ReportePuntoVentasMesLider extends StatelessWidget {
                     ),
                     primaryYAxis: NumericAxis(
                       title: const AxisTitle(text: 'Ventas (COP)'),
-                      numberFormat: NumberFormat.currency(locale: 'es_CO', symbol: ''),
+                      numberFormat:
+                          NumberFormat.currency(locale: 'es_CO', symbol: ''),
                     ),
-                    series: puntos.asMap().entries.map((entry) {
-                      int index = entry.key;
+                    series: puntosFiltrados.asMap().entries.map((entry) {
                       PuntoVentaModel punto = entry.value;
-                      Color color = seriesColors[index % seriesColors.length];
 
-                      return SplineAreaSeries<BalanceVentasDataMesLider, String>(
+                      return SplineAreaSeries<BalanceVentasDataMesLider,
+                          String>(
                         // Nombre de la serie basado en el nombre del punto de venta
                         name: punto.nombre,
                         // Datos de ventas por mes para el punto de venta actual
                         dataSource: _getBalanceVentasDataMes(
-                            punto, auxPedidos, facturas, usuario),
+                            punto, auxPedidos, facturas),
                         xValueMapper: (BalanceVentasDataMesLider data, _) =>
                             data.mes,
                         yValueMapper: (BalanceVentasDataMesLider data, _) =>
                             data.ventas,
-                        color: color, // Asignación automática de color
+                        color: _getColor(), // Asignación automática de color
                         borderWidth: 2,
                       );
                     }).toList(),
@@ -122,16 +111,15 @@ class ReportePuntoVentasMesLider extends StatelessWidget {
   List<BalanceVentasDataMesLider> _getBalanceVentasDataMes(
       PuntoVentaModel puntoVenta,
       List<AuxPedidoModel> auxPedidos,
-      List<FacturaModel> facturas,
-      UsuarioModel usuario) {
+      List<FacturaModel> facturas) {
     Map<String, double> ventasPorMes = {};
     DateTime now = DateTime.now();
 
     for (var factura in facturas) {
       var pedido = factura.pedido;
 
-      // Filtrar facturas por punto de venta y sede del usuario
-      if (puntoVenta.id == pedido.puntoVenta && puntoVenta.sede == usuario.sede) {
+      // Filtrar facturas por punto de venta
+      if (puntoVenta.id == pedido.puntoVenta) {
         var fechaFactura = DateTime.parse(factura.fecha);
         // Considerar solo los últimos 4 meses (incluyendo el mes actual)
         if (fechaFactura.isAfter(now.subtract(const Duration(days: 120)))) {
@@ -154,6 +142,18 @@ class ReportePuntoVentasMesLider extends StatelessWidget {
     return ventasPorMes.entries
         .map((entry) => BalanceVentasDataMesLider(entry.key, entry.value))
         .toList();
+  }
+
+  // Función para obtener el color de la serie (aleatorio)
+  Color _getColor() {
+    final random = Random();
+    final hue = random.nextDouble() * 360; // Generar tono aleatorio
+    final saturation =
+        random.nextDouble() * (0.5 - 0.2) + 0.2; // Saturation entre 0.2 y 0.5
+    final value =
+        random.nextDouble() * (0.9 - 0.5) + 0.5; // Value entre 0.5 y 0.9
+
+    return HSVColor.fromAHSV(1.0, hue, saturation, value).toColor();
   }
 
   // Función para obtener el nombre del mes basado en su número
@@ -196,4 +196,3 @@ class BalanceVentasDataMesLider {
   final String mes;
   final double ventas;
 }
-

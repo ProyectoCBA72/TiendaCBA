@@ -1,19 +1,26 @@
-// ignore_for_file: file_names
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:tienda_app/Models/auxPedidoModel.dart';
+import 'package:tienda_app/Models/facturaModel.dart';
+import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/Models/puntoVentaModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
-import 'package:tienda_app/responsive.dart';
 
 class ReporteProductosMasVendidosAgnoUnidad extends StatelessWidget {
+  final UsuarioModel usuario;
   const ReporteProductosMasVendidosAgnoUnidad({
     super.key,
+    required this.usuario,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Título del reporte
         Text(
           "Productos más vendidos por año",
           style: Theme.of(context)
@@ -27,82 +34,108 @@ class ReporteProductosMasVendidosAgnoUnidad extends StatelessWidget {
           child: SizedBox(
             height: 300,
             width: MediaQuery.of(context).size.width,
-            child: SfCartesianChart(
-              tooltipBehavior: TooltipBehavior(enable: true),
-              legend: Legend(
-                  isVisible: Responsive.isMobile(context) ? false : true),
-              primaryXAxis: const CategoryAxis(
-                title: AxisTitle(text: 'Año'),
-                interval: 1,
-              ),
-              primaryYAxis: const NumericAxis(
-                title: AxisTitle(text: 'Cantidad Vendida'),
-              ),
-              series: <CartesianSeries>[
-                SplineSeries<ProduccionVentaAgnoDataUnidad, String>(
-                  name: 'Huevos',
-                  dataSource: _getProduccionVentaDataAgno('Huevos'),
-                  xValueMapper: (ProduccionVentaAgnoDataUnidad data, _) =>
-                      data.agno,
-                  yValueMapper: (ProduccionVentaAgnoDataUnidad data, _) =>
-                      data.cantidad,
-                  color: Colors.red,
-                ),
-                SplineSeries<ProduccionVentaAgnoDataUnidad, String>(
-                  name: 'Leche',
-                  dataSource: _getProduccionVentaDataAgno('Leche'),
-                  xValueMapper: (ProduccionVentaAgnoDataUnidad data, _) =>
-                      data.agno,
-                  yValueMapper: (ProduccionVentaAgnoDataUnidad data, _) =>
-                      data.cantidad,
-                  color: Colors.blue,
-                ),
-                SplineSeries<ProduccionVentaAgnoDataUnidad, String>(
-                  name: 'Queso',
-                  dataSource: _getProduccionVentaDataAgno('Queso'),
-                  xValueMapper: (ProduccionVentaAgnoDataUnidad data, _) =>
-                      data.agno,
-                  yValueMapper: (ProduccionVentaAgnoDataUnidad data, _) =>
-                      data.cantidad,
-                  color: Colors.green,
-                ),
-                SplineSeries<ProduccionVentaAgnoDataUnidad, String>(
-                  name: 'Astromelias',
-                  dataSource: _getProduccionVentaDataAgno('Astromelias'),
-                  xValueMapper: (ProduccionVentaAgnoDataUnidad data, _) =>
-                      data.agno,
-                  yValueMapper: (ProduccionVentaAgnoDataUnidad data, _) =>
-                      data.cantidad,
-                  color: Colors.orange,
-                ),
-                SplineSeries<ProduccionVentaAgnoDataUnidad, String>(
-                  name: 'Miel',
-                  dataSource: _getProduccionVentaDataAgno('Miel'),
-                  xValueMapper: (ProduccionVentaAgnoDataUnidad data, _) =>
-                      data.agno,
-                  yValueMapper: (ProduccionVentaAgnoDataUnidad data, _) =>
-                      data.cantidad,
-                  color: Colors.purple,
-                ),
-                SplineSeries<ProduccionVentaAgnoDataUnidad, String>(
-                  name: 'Leche de cabra',
-                  dataSource: _getProduccionVentaDataAgno('Leche de cabra'),
-                  xValueMapper: (ProduccionVentaAgnoDataUnidad data, _) =>
-                      data.agno,
-                  yValueMapper: (ProduccionVentaAgnoDataUnidad data, _) =>
-                      data.cantidad,
-                  color: Colors.brown,
-                ),
-                SplineSeries<ProduccionVentaAgnoDataUnidad, String>(
-                  name: 'Pan',
-                  dataSource: _getProduccionVentaDataAgno('Pan'),
-                  xValueMapper: (ProduccionVentaAgnoDataUnidad data, _) =>
-                      data.agno,
-                  yValueMapper: (ProduccionVentaAgnoDataUnidad data, _) =>
-                      data.cantidad,
-                  color: Colors.pink,
-                ),
-              ],
+            child: FutureBuilder(
+              // FutureBuilder para esperar la carga de datos asincrónicos
+              future: Future.wait([
+                getFacturas(),
+                getProductos(),
+                getAuxPedidos(),
+                getPuntosVenta()
+              ]),
+              builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+                // Si los datos están cargando, mostrar un indicador de carga
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (snapshot.hasError) {
+                  // Si ocurre un error al cargar los datos, mostrar un mensaje de error
+                  return Center(
+                    child: Text('Error al cargar datos: ${snapshot.error}'),
+                  );
+                } else {
+                  // Procesar los datos para obtener los productos más vendidos
+                  final facturas = snapshot.data![0] as List<FacturaModel>;
+                  final productos = snapshot.data![1] as List<ProductoModel>;
+                  final auxPedidos = snapshot.data![2] as List<AuxPedidoModel>;
+                  final puntos = snapshot.data![3] as List<PuntoVentaModel>;
+
+                  // Mapa para almacenar las ventas por producto por año
+                  final Map<String, Map<String, double>>
+                      ventasPorProductoPorAgno = {};
+
+                  // Iterar sobre las facturas para calcular las ventas por producto por año
+                  for (var factura in facturas) {
+                    final agno = factura.fecha.split('-')[0];
+                    // Considerar solo los datos de los últimos 3 años (incluyendo el actual)
+                    if (int.parse(agno) >= DateTime.now().year - 2) {
+                      for (var punto in puntos) {
+                        for (var auxPedido in auxPedidos) {
+                          if (auxPedido.pedido.id == factura.pedido.id &&
+                              punto.id == factura.pedido.puntoVenta &&
+                              punto.sede == usuario.sede) {
+                            final producto = productos
+                                .firstWhere((p) =>
+                                    p.id == auxPedido.producto &&
+                                    p.unidadProduccion.id ==
+                                        usuario.unidadProduccion)
+                                .nombre;
+
+                            ventasPorProductoPorAgno.putIfAbsent(
+                                producto, () => {});
+                            ventasPorProductoPorAgno[producto]!
+                                .putIfAbsent(agno, () => 0);
+                            ventasPorProductoPorAgno[producto]![agno] =
+                                ventasPorProductoPorAgno[producto]![agno]! +
+                                    auxPedido.cantidad.toDouble();
+                          }
+                        }
+                      }
+                    }
+                  }
+
+                  // Obtener los 7 productos más vendidos
+                  final List<MapEntry<String, double>> productosMasVendidos =
+                      ventasPorProductoPorAgno.entries
+                          .map((entry) => MapEntry(entry.key,
+                              entry.value.values.reduce((a, b) => a + b)))
+                          .toList()
+                        ..sort((a, b) => b.value.compareTo(a.value));
+
+                  final top7Productos =
+                      productosMasVendidos.take(7).map((e) => e.key).toList();
+
+                  // Construir el gráfico de líneas con los datos obtenidos
+                  return SfCartesianChart(
+                    tooltipBehavior: TooltipBehavior(enable: true),
+                    legend: const Legend(isVisible: true),
+                    primaryXAxis: const CategoryAxis(
+                      title: AxisTitle(text: 'Año'),
+                      interval: 1,
+                    ),
+                    primaryYAxis: const NumericAxis(
+                      title: AxisTitle(text: 'Cantidad Vendida'),
+                    ),
+                    series: <CartesianSeries>[
+                      // Crear una serie por cada producto más vendido
+                      for (var i = 0; i < top7Productos.length; i++)
+                        SplineSeries<ProduccionVentaAgnoDataUnidad, String>(
+                          name: top7Productos[i],
+                          dataSource: _getProduccionVentaDataAgno(
+                              top7Productos[i], ventasPorProductoPorAgno),
+                          xValueMapper:
+                              (ProduccionVentaAgnoDataUnidad data, _) =>
+                                  data.agno,
+                          yValueMapper:
+                              (ProduccionVentaAgnoDataUnidad data, _) =>
+                                  data.cantidad,
+                          color:
+                              _getColor(), // Asignar color basado en la lista de colores
+                        ),
+                    ],
+                  );
+                }
+              },
             ),
           ),
         ),
@@ -110,51 +143,33 @@ class ReporteProductosMasVendidosAgnoUnidad extends StatelessWidget {
     );
   }
 
-  List<ProduccionVentaAgnoDataUnidad> _getProduccionVentaDataAgno(
-      String producto) {
-    // Aquí puedes definir tus datos. Este es un ejemplo de datos simulados.
-    final data = {
-      'Huevos': [
-        ProduccionVentaAgnoDataUnidad('2022', 500),
-        ProduccionVentaAgnoDataUnidad('2023', 550),
-        ProduccionVentaAgnoDataUnidad('2024', 600),
-      ],
-      'Leche': [
-        ProduccionVentaAgnoDataUnidad('2022', 400),
-        ProduccionVentaAgnoDataUnidad('2023', 420),
-        ProduccionVentaAgnoDataUnidad('2024', 450),
-      ],
-      'Queso': [
-        ProduccionVentaAgnoDataUnidad('2022', 700),
-        ProduccionVentaAgnoDataUnidad('2023', 750),
-        ProduccionVentaAgnoDataUnidad('2024', 800),
-      ],
-      'Astromelias': [
-        ProduccionVentaAgnoDataUnidad('2022', 300),
-        ProduccionVentaAgnoDataUnidad('2023', 320),
-        ProduccionVentaAgnoDataUnidad('2024', 350),
-      ],
-      'Miel': [
-        ProduccionVentaAgnoDataUnidad('2022', 600),
-        ProduccionVentaAgnoDataUnidad('2023', 620),
-        ProduccionVentaAgnoDataUnidad('2024', 650),
-      ],
-      'Leche de cabra': [
-        ProduccionVentaAgnoDataUnidad('2022', 800),
-        ProduccionVentaAgnoDataUnidad('2023', 850),
-        ProduccionVentaAgnoDataUnidad('2024', 900),
-      ],
-      'Pan': [
-        ProduccionVentaAgnoDataUnidad('2022', 200),
-        ProduccionVentaAgnoDataUnidad('2023', 220),
-        ProduccionVentaAgnoDataUnidad('2024', 250),
-      ],
-    };
+  // Función para obtener el color de la serie (aleatorio)
+  Color _getColor() {
+    final random = Random();
+    final hue = random.nextDouble() * 360; // Generar tono aleatorio
+    final saturation =
+        random.nextDouble() * (0.5 - 0.2) + 0.2; // Saturation entre 0.2 y 0.5
+    final value =
+        random.nextDouble() * (0.9 - 0.5) + 0.5; // Value entre 0.5 y 0.9
 
-    return data[producto] ?? [];
+    return HSVColor.fromAHSV(1.0, hue, saturation, value).toColor();
+  }
+
+  // Función para obtener los datos de ventas por producto por año
+  List<ProduccionVentaAgnoDataUnidad> _getProduccionVentaDataAgno(
+      String producto,
+      Map<String, Map<String, double>> ventasPorProductoPorAgno) {
+    final List<ProduccionVentaAgnoDataUnidad> data = [];
+    if (ventasPorProductoPorAgno.containsKey(producto)) {
+      ventasPorProductoPorAgno[producto]!.forEach((agno, cantidad) {
+        data.add(ProduccionVentaAgnoDataUnidad(agno, cantidad));
+      });
+    }
+    return data;
   }
 }
 
+// Clase para modelar los datos de producción y venta por año
 class ProduccionVentaAgnoDataUnidad {
   ProduccionVentaAgnoDataUnidad(this.agno, this.cantidad);
 

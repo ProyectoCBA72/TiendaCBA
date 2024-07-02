@@ -7,7 +7,6 @@ import 'package:syncfusion_flutter_charts/charts.dart'; // Importación de Syncf
 import 'package:tienda_app/Models/produccionModel.dart'; // Importación del modelo de datos de producción
 import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart'; // Importación de constantes de diseño
-import 'package:tienda_app/responsive.dart'; // Importación de utilidades para diseño responsivo
 
 class ReporteProduccionAgnoLider extends StatelessWidget {
   final UsuarioModel usuario;
@@ -53,14 +52,17 @@ class ReporteProduccionAgnoLider extends StatelessWidget {
                   List<ProduccionModel> producciones = snapshot.data ??
                       []; // Obtiene la lista de producciones del snapshot
 
+                  List<ProduccionModel> produccionesFiltradas = producciones
+                      .where((p) =>
+                          p.unidadProduccion.sede.id == usuario.sede)
+                      .toList();
+
                   // Construye y retorna el gráfico de Syncfusion con los datos de producción
                   return SfCartesianChart(
                     tooltipBehavior: TooltipBehavior(
                         enable: true), // Habilita tooltips en el gráfico
-                    legend: Legend(
-                        isVisible: Responsive.isMobile(context)
-                            ? false
-                            : true), // Configura visibilidad de la leyenda
+                    legend: const Legend(
+                        isVisible: true), // Configura visibilidad de la leyenda
                     primaryXAxis: const CategoryAxis(
                       title: AxisTitle(text: 'Año'), // Título del eje X
                     ),
@@ -68,7 +70,7 @@ class ReporteProduccionAgnoLider extends StatelessWidget {
                       title: AxisTitle(
                           text: 'Cantidad de Producciones'), // Título del eje Y
                     ),
-                    series: producciones
+                    series: produccionesFiltradas
                         .map((produccion) =>
                             StepLineSeries<ProduccionAgnoDataLider, String>(
                               name: produccion.unidadProduccion
@@ -79,8 +81,7 @@ class ReporteProduccionAgnoLider extends StatelessWidget {
                                   data.agno, // Mapeo de datos para el eje X
                               yValueMapper: (ProduccionAgnoDataLider data, _) =>
                                   data.cantidad, // Mapeo de datos para el eje Y
-                              color:
-                                  _getColor(), // Color de la serie (puedes personalizarlo)
+                              color: _getColor(), // Color de la serie
                             ))
                         .toList(), // Convierte a lista de series
                   );
@@ -114,8 +115,7 @@ class ReporteProduccionAgnoLider extends StatelessWidget {
       var year = fechaDespacho.year; // Obtiene el año como cadena
 
       // Verifica si la producción  es de los últimos 3 años y si la unidad de producción corresponde a la del usuario
-      if (year >= (currentYear - 2) &&
-          produccion.unidadProduccion.sede.id == usuario.sede) {
+      if (year >= (currentYear - 2) && produccion.estado == "ENVIADO") {
         produccionesPorAgno[year.toString()] = (produccionesPorAgno[
                     year.toString()] ??
                 0) +
