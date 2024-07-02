@@ -54,6 +54,7 @@ class _LoginScreenState extends State<LoginScreen>
             imagen = false;
           }
           return Scaffold(
+            resizeToAvoidBottomInset: true,
             body: Container(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,

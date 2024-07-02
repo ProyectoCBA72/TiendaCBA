@@ -129,3 +129,14 @@ NumberFormat formatter = NumberFormat.currency(
 );
 
 String twoDigits(int n) => n.toString().padLeft(2, '0');
+
+
+// formato para las fechas para no estar a cada rato haciendolo
+String formatFechaHora(String fechaString) {
+  try {
+    DateTime fecha = DateTime.parse(fechaString);
+    return '${fecha.day}/${fecha.month}/${fecha.year} ${fecha.hour}:${fecha.minute}';
+  } catch (e) {
+    return 'Fecha inválida';
+  }
+}

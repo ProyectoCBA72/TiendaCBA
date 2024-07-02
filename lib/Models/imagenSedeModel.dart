@@ -5,23 +5,23 @@ import 'package:http/http.dart' as http;
 import '../source.dart';
 import 'sedeModel.dart';
 
-class ImagenSede {
+class ImagenSedeModel {
   final int id;
   final String imagen;
   final SedeModel sede;
 
-  ImagenSede({
+  ImagenSedeModel({
     required this.id,
     required this.imagen,
     required this.sede,
   });
 }
 
-List<ImagenSede> imagenSedes = [];
+List<ImagenSedeModel> imagenSedes = [];
 
 // Futuro para traer los datos de la api
 
-Future<List<ImagenSede>> getImagenSedes() async {
+Future<List<ImagenSedeModel>> getImagenSedes() async {
   String url = "";
 
   url = "$sourceApi/api/imagenes-sede/";
@@ -38,7 +38,7 @@ Future<List<ImagenSede>> getImagenSedes() async {
 
     for (var imagenSedeData in decodedData) {
       imagenSedes.add(
-        ImagenSede(
+        ImagenSedeModel(
           id: imagenSedeData['id'] ?? 0,
           imagen: imagenSedeData['imagen'] ?? "",
           sede: SedeModel(
@@ -59,7 +59,7 @@ Future<List<ImagenSede>> getImagenSedes() async {
     }
 
     // Devolver la lista de imagenes de sede
-    
+
     return imagenSedes;
   } else {
     throw Exception(

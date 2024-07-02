@@ -1,11 +1,14 @@
 // ignore_for_file: library_private_types_in_public_api, file_names
 
 import 'dart:async';
+import 'package:tienda_app/Models/sedeModel.dart';
 import 'package:tienda_app/Sede/sedeScreen.dart';
 import 'package:flutter/material.dart';
 
 class SedeCardLider extends StatefulWidget {
-  const SedeCardLider({super.key});
+  final SedeModel sede;
+  final List<String> images;
+  const SedeCardLider({super.key, required this.sede, required this.images});
 
   @override
   _SedeCardLiderState createState() => _SedeCardLiderState();
@@ -14,15 +17,12 @@ class SedeCardLider extends StatefulWidget {
 class _SedeCardLiderState extends State<SedeCardLider> {
   int _currentImageIndex = 0;
   Timer? _timer;
-  final List<String> _images = [
-    'https://i.ytimg.com/vi/UMBALomvR1Y/hqdefault.jpg',
-    'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgGbwguyMNuaGlMS987Ez-BzaCGhhIMCK31lDVf1zcksljEozNYfaJJB0f4m_p95QW5sLiL57lGHXpNmAEzzTfueJyn7DHg9t9Sme4SLl29LP-eJdq3qOYD2AZ6xKrRAe-2UAdTEHKyFN0/s1600/Auditorio.JPG',
-    'https://pronacon.com.co/wp-content/uploads/2023/03/WhatsApp-Image-2023-03-08-at-4.49.52-PM.jpeg',
-  ];
+  List<String> _images = [];
 
   @override
   void initState() {
     super.initState();
+    _loadImages();
   }
 
   @override
@@ -39,8 +39,13 @@ class _SedeCardLiderState extends State<SedeCardLider> {
     });
   }
 
+  void _loadImages() {
+    _images = widget.images;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final sede = widget.sede;
     return Padding(
       padding: const EdgeInsets.all(20),
       child: SizedBox(
@@ -48,8 +53,13 @@ class _SedeCardLiderState extends State<SedeCardLider> {
         height: 200,
         child: InkWell(
           onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (builder) => const SedeScreen()));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (builder) => SedeScreen(
+                          imagenes: _images,
+                          sede: sede,
+                        )));
           },
           onHover: (isHovered) {
             if (isHovered) {
@@ -127,8 +137,8 @@ class _SedeCardLiderState extends State<SedeCardLider> {
                             color: Colors.black54,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.only(top: 5, left: 6),
+                          child:  Padding(
+                            padding: const EdgeInsets.only(top: 5, left: 6),
                             child: SingleChildScrollView(
                               scrollDirection: Axis.vertical,
                               child: Column(
@@ -136,8 +146,8 @@ class _SedeCardLiderState extends State<SedeCardLider> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "Centro de biotecnología agropecuaria",
-                                    style: TextStyle(
+                                   sede.nombre,
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20,
                                       fontFamily: 'Calibri-Bold',

@@ -1,18 +1,21 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:tienda_app/Models/medioPagoModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
 class MetodoCardLider extends StatelessWidget {
+  final MedioPagoModel medioPago;
   const MetodoCardLider({
     super.key,
+    required this.medioPago,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        _modalSeguridad(context);
+        _modalSeguridad(context, medioPago);
       },
       child: Container(
         width: 200, // Ancho de la tarjeta
@@ -58,9 +61,9 @@ class MetodoCardLider extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
-                    "Efectivo",
-                    style: TextStyle(
+                  Text(
+                    medioPago.nombre,
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                       fontFamily: 'Calibri-Bold',
@@ -145,7 +148,7 @@ class MetodoCardLider extends StatelessWidget {
   }
 }
 
-void _modalSeguridad(BuildContext context) {
+void _modalSeguridad(BuildContext context, MedioPagoModel medioPAgo) {
   showDialog(
       context: context,
       builder: (context) {
@@ -161,7 +164,7 @@ void _modalSeguridad(BuildContext context) {
                 ),
                 // Título del modal
                 Text(
-                  "Efectivo",
+                  medioPAgo.nombre,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(
@@ -187,10 +190,10 @@ void _modalSeguridad(BuildContext context) {
                   child: SizedBox(
                     height: 495,
                     width: MediaQuery.of(context).size.width,
-                    child: const SingleChildScrollView(
+                    child: SingleChildScrollView(
                       child: Text(
-                        "Método de pago destinado a compras presenciales en puntos de venta físicos.",
-                        style: TextStyle(
+                        medioPAgo.detalle,
+                        style: const TextStyle(
                           color: Colors.grey,
                         ),
                         textAlign: TextAlign.center,

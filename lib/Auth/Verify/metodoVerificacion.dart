@@ -105,6 +105,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
         // verificar si la oantalla es del tamaño movil.
         if (responsive.maxWidth <= 970) {
           return Scaffold(
+            resizeToAvoidBottomInset: true,
             body: Container(
               decoration:
                   const BoxDecoration(image: DecorationImage(image: AssetImage(
@@ -202,7 +203,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                             focusNode: _focusNodes[index],
                                             textAlign: TextAlign.center,
                                             style: const TextStyle(
-                                                fontSize: 23,
+                                                fontSize: 35,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.black),
                                             decoration: InputDecoration(
@@ -219,7 +220,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                               fillColor: Colors.white,
                                               hintText: '*',
                                               hintStyle: const TextStyle(
-                                                  fontSize: 24,
+                                                  fontSize: 35,
                                                   color: Colors.black),
                                             ),
                                             maxLength: 1,
@@ -456,7 +457,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                                         _focusNodes[index],
                                                     textAlign: TextAlign.center,
                                                     style: const TextStyle(
-                                                        fontSize: 23,
+                                                        fontSize: 35,
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors.black),
@@ -480,7 +481,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                                       hintText: '*',
                                                       hintStyle:
                                                           const TextStyle(
-                                                              fontSize: 24,
+                                                              fontSize: 35,
                                                               color:
                                                                   Colors.black),
                                                     ),

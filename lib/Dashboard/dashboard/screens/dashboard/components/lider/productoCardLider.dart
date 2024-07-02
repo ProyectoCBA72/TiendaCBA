@@ -3,9 +3,15 @@
 import 'dart:async';
 import 'package:tienda_app/Details/detailScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/constantsDesign.dart';
 
 class ProductoCardLider extends StatefulWidget {
-  const ProductoCardLider({Key? key}) : super(key: key);
+  final List<String> images;
+  final ProductoModel producto;
+  const ProductoCardLider(
+      {Key? key, required this.images, required this.producto})
+      : super(key: key);
 
   @override
   _ProductoCardLiderState createState() => _ProductoCardLiderState();
@@ -14,17 +20,14 @@ class ProductoCardLider extends StatefulWidget {
 class _ProductoCardLiderState extends State<ProductoCardLider> {
   int _currentImageIndex = 0;
   Timer? _timer;
-  final List<String> _images = [
-    'https://definicion.de/wp-content/uploads/2011/02/carne-1.jpg',
-    'https://media.gq.com.mx/photos/620bcf7243f71a078a355280/16:9/w_2560%2Cc_limit/carnes-85650597.jpg',
-    'https://www.cocinista.es/download/bancorecursos/recetas/cocinar-la-carne-de-vacuno.jpg',
-  ];
+  List<String> _images = [];
 
   bool _isOnSale = true; // Variable que indica si el producto está en oferta
 
   @override
   void initState() {
     super.initState();
+    _loadImages();
   }
 
   @override
@@ -41,8 +44,13 @@ class _ProductoCardLiderState extends State<ProductoCardLider> {
     });
   }
 
+  void _loadImages() {
+    _images = widget.images;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final producto = widget.producto;
     return Padding(
       padding: const EdgeInsets.all(20),
       child: SizedBox(
@@ -50,10 +58,12 @@ class _ProductoCardLiderState extends State<ProductoCardLider> {
         height: 200,
         child: InkWell(
           onTap: () {
-            /*
-            Navigator.push(context,
-                MaterialPageRoute(builder: (builder) => const DetailsScreen()));
-            */
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (builder) => DetailsScreen(
+                          producto: producto,
+                        )));
           },
           onHover: (isHovered) {
             if (isHovered) {
@@ -100,8 +110,8 @@ class _ProductoCardLiderState extends State<ProductoCardLider> {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: IconButton(
-                                icon: const Icon(Icons.edit,
-                                    color: Colors.white),
+                                icon:
+                                    const Icon(Icons.edit, color: Colors.white),
                                 onPressed: () {
                                   // Acción al presionar el favorito
                                 },
@@ -140,8 +150,8 @@ class _ProductoCardLiderState extends State<ProductoCardLider> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      "Carne de res",
+                                    Text(
+                                      producto.nombre,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20,
@@ -151,11 +161,17 @@ class _ProductoCardLiderState extends State<ProductoCardLider> {
                                     ),
                                     const SizedBox(height: 5),
                                     Text(
-                                      _isOnSale ? "\$ 8.000 COP" : "\$ 11.000 COP",
+                                      _isOnSale
+                                          ? '\$${formatter.format(producto.precioOferta)}'
+                                          : '\$${formatter.format(producto.precio)}',
                                       style: TextStyle(
                                         fontSize: 16,
-                                        color: _isOnSale ? Colors.white : Colors.red,
-                                        decoration: _isOnSale ? null : TextDecoration.lineThrough,
+                                        color: _isOnSale
+                                            ? Colors.white
+                                            : Colors.red,
+                                        decoration: _isOnSale
+                                            ? null
+                                            : TextDecoration.lineThrough,
                                       ),
                                     ),
                                     if (_isOnSale)
@@ -185,5 +201,3 @@ class _ProductoCardLiderState extends State<ProductoCardLider> {
     );
   }
 }
-
-

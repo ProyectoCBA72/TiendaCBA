@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lider/sedeCardLider.dart';
+import 'package:tienda_app/Models/imagenSedeModel.dart';
+import 'package:tienda_app/Models/sedeModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 
@@ -9,6 +11,10 @@ class CardsSedeLider extends StatelessWidget {
   const CardsSedeLider({
     super.key,
   });
+
+  Future<List<dynamic>> fechData() {
+    return Future.wait([getSedes(), getImagenSedes()]);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,11 +119,34 @@ class CardsSedeLider extends StatelessWidget {
         const SizedBox(height: defaultPadding),
         SizedBox(
           height: 300,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 10,
-            itemBuilder: (context, index) {
-              return const SedeCardLider();
+          child: FutureBuilder(
+            future: fechData(),
+            builder:
+                (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else {
+                List<SedeModel> sedes = snapshot.data![0];
+                List<ImagenSedeModel> allImagesSedes = snapshot.data![1];
+
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: sedes.length,
+                  itemBuilder: (context, index) {
+                    SedeModel sede = sedes[index];
+                    List<String> images = allImagesSedes
+                        .where((imagen) => imagen.sede.id == sede.id)
+                        .map((imagen) => imagen.imagen)
+                        .toList();
+                    return SedeCardLider(
+                      sede: sede,
+                      images: images,
+                    );
+                  },
+                );
+              }
             },
           ),
         ),

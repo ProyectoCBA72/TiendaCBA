@@ -1,9 +1,12 @@
 // ignore_for_file: prefer_final_fields, file_names, use_super_parameters, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:tienda_app/Models/categoriaModel.dart';
 
 class CategoriaCardLider extends StatefulWidget {
-  const CategoriaCardLider({Key? key}) : super(key: key);
+  final CategoriaModel categoria;
+  const CategoriaCardLider({Key? key, required this.categoria})
+      : super(key: key);
 
   @override
   _CategoriaCardLiderState createState() => _CategoriaCardLiderState();
@@ -17,6 +20,7 @@ class _CategoriaCardLiderState extends State<CategoriaCardLider> {
 
   @override
   Widget build(BuildContext context) {
+    final categoria = widget.categoria;
     return Padding(
       padding: const EdgeInsets.all(20),
       child: SizedBox(
@@ -28,8 +32,9 @@ class _CategoriaCardLiderState extends State<CategoriaCardLider> {
               margin: const EdgeInsets.all(10),
               padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
-                image: const DecorationImage(
-                  image: NetworkImage('https://definicion.de/wp-content/uploads/2011/02/carne-1.jpg'),
+                image:  DecorationImage(
+                  image: NetworkImage(
+                      categoria.imagen),
                   fit: BoxFit.fill,
                 ),
                 color: Colors.black12,
@@ -93,10 +98,10 @@ class _CategoriaCardLiderState extends State<CategoriaCardLider> {
                           )
                         ],
                       ),
-                      child: const Center(
+                      child:  Center(
                         child: Text(
-                          "Carnicos",
-                          style: TextStyle(
+                          categoria.nombre,
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 24,
                             fontFamily: 'Calibri-Bold',
@@ -122,6 +127,3 @@ class _CategoriaCardLiderState extends State<CategoriaCardLider> {
     );
   }
 }
-
-
-

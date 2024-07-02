@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/productoCardPunto.dart';
+import 'package:tienda_app/Models/imagenProductoModel.dart';
+import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 
@@ -9,6 +11,10 @@ class CardsProductoPunto extends StatelessWidget {
   const CardsProductoPunto({
     super.key,
   });
+
+  Future<List<dynamic>> futureData() async {
+    return Future.wait([getProductos(), getImagenProductos()]);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,11 +119,40 @@ class CardsProductoPunto extends StatelessWidget {
         const SizedBox(height: defaultPadding),
         SizedBox(
           height: 300,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 10,
-            itemBuilder: (context, index) {
-              return const ProductoCardPunto();
+          child: FutureBuilder(
+            future: futureData(),
+            builder:
+                (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text('error: ${snapshot.error}'),
+                );
+              } else {
+                // creamos las intancias de los datos traidos del futuro en su respectivo indice
+                List<ProductoModel> productos = snapshot.data![0];
+                List<ImagenProductoModel> allImages = snapshot.data![1];
+                // creamos otra lista con el fin de tener solo los productos que el usuario con el rol unidad tiene.
+
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: productos.length,
+                  itemBuilder: (context, index) {
+                    ProductoModel producto = productos[index];
+                    List<String> images = allImages
+                        .where((imagen) => imagen.producto.id == producto.id)
+                        .map((imagen) => imagen.imagen)
+                        .toList();
+                    return ProductoCardPunto(
+                      images: images,
+                      producto: producto,
+                    );
+                  },
+                );
+              }
             },
           ),
         ),

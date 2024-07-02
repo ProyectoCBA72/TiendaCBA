@@ -1,11 +1,14 @@
 // ignore_for_file: library_private_types_in_public_api, file_names
 
 import 'dart:async';
+import 'package:tienda_app/Models/sedeModel.dart';
 import 'package:tienda_app/Sede/sedeScreen.dart';
 import 'package:flutter/material.dart';
 
 class SedeCard extends StatefulWidget {
-  const SedeCard({super.key});
+  final SedeModel sede;
+  final List<String> imagenes;
+  const SedeCard({super.key, required this.sede, required this.imagenes});
 
   @override
   _SedeCardState createState() => _SedeCardState();
@@ -14,21 +17,22 @@ class SedeCard extends StatefulWidget {
 class _SedeCardState extends State<SedeCard> {
   int _currentImageIndex = 0;
   Timer? _timer;
-  final List<String> _images = [
-    'https://i.ytimg.com/vi/UMBALomvR1Y/hqdefault.jpg',
-    'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgGbwguyMNuaGlMS987Ez-BzaCGhhIMCK31lDVf1zcksljEozNYfaJJB0f4m_p95QW5sLiL57lGHXpNmAEzzTfueJyn7DHg9t9Sme4SLl29LP-eJdq3qOYD2AZ6xKrRAe-2UAdTEHKyFN0/s1600/Auditorio.JPG',
-    'https://pronacon.com.co/wp-content/uploads/2023/03/WhatsApp-Image-2023-03-08-at-4.49.52-PM.jpeg',
-  ];
+  List<String> _images = [];
 
   @override
   void initState() {
     super.initState();
+    _loadImages();
   }
 
   @override
   void dispose() {
     _timer?.cancel();
     super.dispose();
+  }
+
+  void _loadImages() async {
+    _images = widget.imagenes;
   }
 
   void _startTimer() {
@@ -41,6 +45,7 @@ class _SedeCardState extends State<SedeCard> {
 
   @override
   Widget build(BuildContext context) {
+    final sede = widget.sede;
     return Padding(
       padding: const EdgeInsets.all(20),
       child: SizedBox(
@@ -48,8 +53,13 @@ class _SedeCardState extends State<SedeCard> {
         height: 200,
         child: InkWell(
           onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (builder) => const SedeScreen()));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (builder) => SedeScreen(
+                          imagenes: widget.imagenes,
+                          sede: sede,
+                        )));
           },
           onHover: (isHovered) {
             if (isHovered) {
@@ -58,71 +68,80 @@ class _SedeCardState extends State<SedeCard> {
               _timer?.cancel();
             }
           },
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 500),
-            child: FadeTransition(
-              key: ValueKey<int>(_currentImageIndex),
-              opacity: const AlwaysStoppedAnimation(1),
-              child: Container(
-                margin: const EdgeInsets.all(10),
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: NetworkImage(_images[_currentImageIndex]),
-                    fit: BoxFit.fill,
-                  ),
-                  color: Colors.black12,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x000005cc),
-                      blurRadius: 30,
-                      offset: Offset(10, 10),
-                    )
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        bottom: 6,
-                        left: 5,
+          child: Stack(
+            children: [
+              _images.isNotEmpty
+                  ? AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 500),
+                      child: FadeTransition(
+                        key: ValueKey<int>(_currentImageIndex),
+                        opacity: const AlwaysStoppedAnimation(1),
                         child: Container(
-                          width: 200,
-                          height: 100,
+                          margin: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                            color: Colors.black54,
+                            image: DecorationImage(
+                              image: NetworkImage(_images[_currentImageIndex]),
+                              fit: BoxFit.fill,
+                            ),
+                            color: Colors.black12,
                             borderRadius: BorderRadius.circular(10),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x000005cc),
+                                blurRadius: 30,
+                                offset: Offset(10, 10),
+                              )
+                            ],
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.only(top: 5, left: 6),
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.vertical,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Centro de biotecnología agropecuaria",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                      fontFamily: 'Calibri-Bold',
-                                      color: Colors.white,
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  bottom: 6,
+                                  left: 5,
+                                  child: Container(
+                                    width: 200,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                      color: Colors.black54,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 5, left: 6),
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.vertical,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              sede.nombre,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 20,
+                                                fontFamily: 'Calibri-Bold',
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+                    )
+                  : const Center(child: CircularProgressIndicator()),
+            ],
           ),
         ),
       ),

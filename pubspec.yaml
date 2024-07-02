@@ -66,6 +66,8 @@ dependencies:
   qr_flutter: ^4.1.0
   barcode_widget:
   shared_preferences:
+  share_plus: ^9.0.0
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:

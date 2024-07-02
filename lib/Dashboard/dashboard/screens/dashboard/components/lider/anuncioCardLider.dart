@@ -4,9 +4,13 @@ import 'dart:async';
 
 import 'package:tienda_app/Anuncio/anuncioScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:tienda_app/Models/anuncioModel.dart';
 
 class AnuncioCardLider extends StatefulWidget {
-  const AnuncioCardLider({super.key});
+  final AnuncioModel anuncio;
+  final List<String> images;
+  const AnuncioCardLider(
+      {super.key, required this.anuncio, required this.images});
 
   @override
   _AnuncioCardLiderState createState() => _AnuncioCardLiderState();
@@ -15,15 +19,12 @@ class AnuncioCardLider extends StatefulWidget {
 class _AnuncioCardLiderState extends State<AnuncioCardLider> {
   int _currentImageIndex = 0;
   Timer? _timer;
-  final List<String> _images = [
-    'https://fotoscba.000webhostapp.com/fotos/289997837_608787780783323_2583591377802539793_n.jpg',
-    'https://fotoscba.000webhostapp.com/fotos/290313642_608787627450005_4351049694493049378_n.jpg',
-    'https://fotoscba.000webhostapp.com/fotos/290347158_608787637450004_7021336845368539183_n.jpg',
-  ];
+  List<String> _images = [];
 
   @override
   void initState() {
     super.initState();
+    _loadImages();
   }
 
   @override
@@ -40,8 +41,13 @@ class _AnuncioCardLiderState extends State<AnuncioCardLider> {
     });
   }
 
+  void _loadImages() {
+    _images = widget.images;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final anuncio = widget.anuncio;
     return Padding(
       padding: const EdgeInsets.all(20),
       child: SizedBox(
@@ -49,8 +55,13 @@ class _AnuncioCardLiderState extends State<AnuncioCardLider> {
         height: 200,
         child: InkWell(
           onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (builder) => const AnuncioScreen()));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (builder) => AnuncioScreen(
+                          anuncio: anuncio,
+                          images: _images,
+                        )));
           },
           onHover: (isHovered) {
             if (isHovered) {
@@ -128,8 +139,8 @@ class _AnuncioCardLiderState extends State<AnuncioCardLider> {
                             color: Colors.black54,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.only(top: 5, left: 6),
+                          child:  Padding(
+                            padding: const EdgeInsets.only(top: 5, left: 6),
                             child: SingleChildScrollView(
                               scrollDirection: Axis.vertical,
                               child: Column(
@@ -137,8 +148,8 @@ class _AnuncioCardLiderState extends State<AnuncioCardLider> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "Subasta de bovinos por modalidad de sobre",
-                                    style: TextStyle(
+                                    anuncio.titulo,
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20,
                                       fontFamily: 'Calibri-Bold',

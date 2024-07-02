@@ -1,11 +1,13 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:tienda_app/Models/unidadProduccionModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
 class UnidadCardLider extends StatelessWidget {
+  final UnidadProduccionModel undProduccion;
   const UnidadCardLider({
-    super.key,
+    super.key, required this.undProduccion,
   });
 
   @override
@@ -35,14 +37,15 @@ class UnidadCardLider extends StatelessWidget {
                             .withOpacity(0.3), // Color y opacidad de la sombra
                         spreadRadius: 5,
                         blurRadius: 7,
-                        offset: const Offset(0, 3), // Desplazamiento de la sombra
+                        offset:
+                            const Offset(0, 3), // Desplazamiento de la sombra
                       ),
                     ],
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(50),
                     child: Image.network(
-                      "https://static.vecteezy.com/system/resources/previews/004/182/846/original/meat-products-flat-design-long-shadow-glyph-icon-chicken-leg-beef-steak-and-sausage-grocery-store-bbq-items-silhouette-illustration-vector.jpg",
+                     undProduccion.logo,
                       height: 100,
                       width: 100,
                       fit: BoxFit.fill,
@@ -50,8 +53,8 @@ class UnidadCardLider extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  "Carnicos",
+                 Text(
+                  undProduccion.nombre,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -85,8 +88,8 @@ class UnidadCardLider extends StatelessWidget {
                         color: Colors.white,
                       ),
                       child: IconButton(
-                        icon:
-                            const Icon(Icons.edit, size: 25, color: primaryColor),
+                        icon: const Icon(Icons.edit,
+                            size: 25, color: primaryColor),
                         onPressed: () {
                           // Acción al presionar el botón de editar
                         },

@@ -1,18 +1,25 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
-class CardPuntoLider extends StatelessWidget {
+class CardPuntoLider extends StatefulWidget {
+  final PuntoVentaModel puntoVenta;
   const CardPuntoLider({
     super.key,
-    required this.state,
+    required this.puntoVenta,
   });
 
-  final bool state;
 
   @override
+  State<CardPuntoLider> createState() => _CardPuntoLiderState();
+}
+
+class _CardPuntoLiderState extends State<CardPuntoLider> {
+  @override
   Widget build(BuildContext context) {
+    final puntoVenta = widget.puntoVenta;
     return Container(
       width: 250, // Ancho de la tarjeta
       margin: const EdgeInsets.symmetric(
@@ -36,30 +43,30 @@ class CardPuntoLider extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Padding(
-              padding: EdgeInsets.only(
+             Padding(
+              padding: const EdgeInsets.only(
                 left: 8,
                 right: 8,
                 top: 13,
                 bottom: 8,
               ),
               child: Text(
-                "Principal",
-                style: TextStyle(
+                puntoVenta.nombre,
+                style: const TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Calibri-Bold',
                 ),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(
+             Padding(
+              padding: const EdgeInsets.symmetric(
                 horizontal: 8.0,
                 vertical: 8.0,
               ),
               child: Row(
                 children: [
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(
                       left: 8.0,
                       right: 8.0,
@@ -70,13 +77,13 @@ class CardPuntoLider extends StatelessWidget {
                       color: botonOscuro,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 15,
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         "Ubicacion: ",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -85,8 +92,8 @@ class CardPuntoLider extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "Portería del CBA",
-                        style: TextStyle(
+                        puntoVenta.ubicacion,
+                        style: const TextStyle(
                           fontSize: 16.0,
                           color: Colors.grey,
                           fontFamily: 'Calibri-Bold',
@@ -110,7 +117,7 @@ class CardPuntoLider extends StatelessWidget {
                       right: 8.0,
                     ),
                     child: Icon(
-                      state
+                      puntoVenta.estado
                           ? Icons.check_circle_outline
                           : Icons.cancel_outlined,
                       size: 30,
@@ -128,9 +135,9 @@ class CardPuntoLider extends StatelessWidget {
                       fontFamily: 'Calibri-Bold',
                     ),
                   ),
-                  const Text(
-                    "Activo",
-                    style: TextStyle(
+                   Text(
+                    puntoVenta.estado ? "Activo" : "Inactivo",
+                    style: const TextStyle(
                       fontSize: 16.0,
                       color: Colors.grey,
                       fontFamily: 'Calibri-Bold',
@@ -170,13 +177,16 @@ class CardPuntoLider extends StatelessWidget {
                       color: Colors.white,
                     ),
                     child: IconButton(
-                      icon: const Icon(Icons.edit, size: 25, color: primaryColor),
+                      icon:
+                          const Icon(Icons.edit, size: 25, color: primaryColor),
                       onPressed: () {
                         // Acción al presionar el botón de editar
                       },
                     ),
                   ),
-                  const SizedBox(width: defaultPadding,),
+                  const SizedBox(
+                    width: defaultPadding,
+                  ),
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
@@ -200,7 +210,8 @@ class CardPuntoLider extends StatelessWidget {
                       color: Colors.white,
                     ),
                     child: IconButton(
-                      icon: const Icon(Icons.delete, size: 25, color: primaryColor),
+                      icon: const Icon(Icons.delete,
+                          size: 25, color: primaryColor),
                       onPressed: () {
                         // Acción al presionar el botón de editar
                       },

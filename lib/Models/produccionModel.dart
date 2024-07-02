@@ -15,7 +15,7 @@ class ProduccionModel {
   final String observaciones;
   final int costoProduccion;
   final String fechaProduccion;
-  final String fechaVencimineto;
+  final String fechaVencimiento;
   final int producto;
   final UnidadProduccionModel unidadProduccion;
 
@@ -28,7 +28,7 @@ class ProduccionModel {
     required this.observaciones,
     required this.costoProduccion,
     required this.fechaProduccion,
-    required this.fechaVencimineto,
+    required this.fechaVencimiento,
     required this.producto,
     required this.unidadProduccion,
   });
@@ -64,7 +64,7 @@ Future<List<ProduccionModel>> getProducciones() async {
           observaciones: produccionData['observaciones'] ?? "",
           costoProduccion: produccionData['costoProduccion'] ?? "",
           fechaProduccion: produccionData['fechaProduccion'] ?? "",
-          fechaVencimineto: produccionData['fechaVencimineto'] ?? "",
+          fechaVencimiento: produccionData['fechaVencimiento'] ?? "",
           producto: produccionData['producto'] ?? 0,
           unidadProduccion: UnidadProduccionModel(
             id: produccionData['unidadProduccion']['id'] ?? 0,

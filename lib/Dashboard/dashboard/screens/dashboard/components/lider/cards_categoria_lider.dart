@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lider/categoriaCardLider.dart';
+import 'package:tienda_app/Models/categoriaModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 
@@ -117,11 +118,31 @@ class CardsCategoriaLider extends StatelessWidget {
         const SizedBox(height: defaultPadding),
         SizedBox(
           height: 300,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 10,
-            itemBuilder: (context, index) {
-              return const CategoriaCardLider();
+          child: FutureBuilder(
+            future: getCategorias(),
+            builder: (BuildContext context,
+                AsyncSnapshot<List<CategoriaModel>> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text('Ocurrio un erro ${snapshot.error}'),
+                );
+              } else {
+                final categorias = snapshot.data!;
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: categorias.length,
+                  itemBuilder: (context, index) {
+                    CategoriaModel categoria = categorias[index];
+                    return CategoriaCardLider(
+                      categoria: categoria,
+                    );
+                  },
+                );
+              }
             },
           ),
         ),

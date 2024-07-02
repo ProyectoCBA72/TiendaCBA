@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lider/metodoCardLider.dart';
+import 'package:tienda_app/Models/medioPagoModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 
@@ -113,11 +114,26 @@ class CardsMetodoLider extends StatelessWidget {
         const SizedBox(height: defaultPadding),
         SizedBox(
           height: 215,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 10,
-            itemBuilder: (context, index) {
-              return const MetodoCardLider();
+          child: FutureBuilder(
+            future: getMediosPago(),
+            builder: (BuildContext context,
+                AsyncSnapshot<List<MedioPagoModel>> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else {
+                final mediosPago = snapshot.data!;
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: mediosPago.length,
+                  itemBuilder: (context, index) {
+                    return MetodoCardLider(
+                      medioPago: mediosPago[index],
+                    );
+                  },
+                );
+              }
             },
           ),
         ),

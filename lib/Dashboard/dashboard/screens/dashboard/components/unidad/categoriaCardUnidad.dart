@@ -1,9 +1,12 @@
 // ignore_for_file: prefer_final_fields, file_names, use_super_parameters, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:tienda_app/Models/categoriaModel.dart';
 
 class CategoriaCardUnidad extends StatefulWidget {
-  const CategoriaCardUnidad({Key? key}) : super(key: key);
+  final CategoriaModel categoria;
+  const CategoriaCardUnidad({Key? key, required this.categoria})
+      : super(key: key);
 
   @override
   _CategoriaCardUnidadState createState() => _CategoriaCardUnidadState();
@@ -17,6 +20,7 @@ class _CategoriaCardUnidadState extends State<CategoriaCardUnidad> {
 
   @override
   Widget build(BuildContext context) {
+    final categoria = widget.categoria;
     return Padding(
       padding: const EdgeInsets.all(20),
       child: SizedBox(
@@ -28,8 +32,9 @@ class _CategoriaCardUnidadState extends State<CategoriaCardUnidad> {
               margin: const EdgeInsets.all(10),
               padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
-                image: const DecorationImage(
-                  image: NetworkImage('https://definicion.de/wp-content/uploads/2011/02/carne-1.jpg'),
+                image:  DecorationImage(
+                  image: NetworkImage(
+                      categoria.imagen),
                   fit: BoxFit.fill,
                 ),
                 color: Colors.black12,
@@ -93,9 +98,9 @@ class _CategoriaCardUnidadState extends State<CategoriaCardUnidad> {
                           )
                         ],
                       ),
-                      child: const Center(
+                      child:  Center(
                         child: Text(
-                          "Carnicos",
+                          categoria.nombre,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 24,
@@ -122,6 +127,3 @@ class _CategoriaCardUnidadState extends State<CategoriaCardUnidad> {
     );
   }
 }
-
-
-

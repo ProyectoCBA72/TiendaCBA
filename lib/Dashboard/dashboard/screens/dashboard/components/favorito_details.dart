@@ -8,7 +8,6 @@ import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/provider.dart';
 import 'package:tienda_app/responsive.dart';
-
 import '../../../../../cardProducts.dart';
 
 // Contenedor el cual almacenará las cards de los sitios favoritos del usuario

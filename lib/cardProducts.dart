@@ -16,7 +16,8 @@ import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/provider.dart';
 import 'package:tienda_app/source.dart';
 import 'package:http/http.dart' as http;
-import 'Auth/authScreen.dart';
+
+import 'Details/sourceDetails/modalsCardAndDetails.dart';
 
 class CardProducts extends StatefulWidget {
   final List<String> imagenes;
@@ -35,10 +36,17 @@ class _CardProductsState extends State<CardProducts> {
   bool _isOnSale = true; // Variable que indica si el producto está en oferta
   bool _isFavorite = false;
   int _count = 0;
+  UsuarioModel? _usuario;
   @override
   void initState() {
     super.initState();
-    _loadImages();
+    // lo encontre en gogle porque daba alerta de debug, porque todas la imagenes no cargaban. y se llama el count cuando cargue el context
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    _usuario = Provider.of<AppState>(context, listen: false).usuarioAutenticado;
+    await _loadImages();
     _countPedidos();
   }
 
@@ -46,6 +54,7 @@ class _CardProductsState extends State<CardProducts> {
   void dispose() {
     _timer?.cancel();
     super.dispose();
+    _countPedidos();
   }
 
 // Verificar si el producto es favorito.
@@ -179,7 +188,7 @@ class _CardProductsState extends State<CardProducts> {
     }
   }
 
-  void _loadImages() async {
+  Future<void> _loadImages() async {
     _images = widget.imagenes;
   }
 
@@ -187,8 +196,6 @@ class _CardProductsState extends State<CardProducts> {
   Future addProductPedido(UsuarioModel usuario, ProductoModel producto) async {
     final pedidos = await getPedidos();
     final auxPedidos = await getAuxPedidos();
-    print('Pedidos $pedidos');
-    print('auxpedidos $auxPedidos');
     if (pedidos.isNotEmpty) {
       // Si la lista de pedidos no es vacia buscamos el pedido que el uaurio ya tiene, puede ser nulo.
       final pedidoPendiente = pedidos
@@ -234,7 +241,7 @@ class _CardProductsState extends State<CardProducts> {
             print('EL producto ya se añadió');
           }
         } else {
-          // si no hay aux agregamso el prodiuto.
+          // si no hay aux agregamso el producto.
           if (producto.exclusivo == false) {
             // agrgamos si el producto no es exclusivo
             print('Producto no exclusivo');
@@ -248,15 +255,44 @@ class _CardProductsState extends State<CardProducts> {
           }
         }
       } else {
-        addPedido(anteriorPedido, usuario.id);
-        addAuxPedido(producto, anteriorPedido + 1);
+        await addPedido(anteriorPedido, usuario.id);
+        final pedidosNuevo = await getPedidos();
+        final pedidoPendiente = pedidosNuevo
+            .where((pedido) =>
+                pedido.usuario.id == usuario.id &&
+                pedido.estado == "PENDIENTE" &&
+                pedido.pedidoConfirmado == false)
+            .firstOrNull;
+
+        if (producto.exclusivo == false) {
+          // agrgamos si el producto no es exclusivo
+          print('Producto no exclusivo');
+          addAuxPedido(producto, pedidoPendiente!.id);
+        } else {
+          productoExclusivo(context);
+        }
+
         print('Pedido pendiente es nulo  se crea otro pedido.');
       }
     } // en caso de que la lista sea vacia funcion else... para crear el pedido y el aux del mismo.
     else {
       const int primerPedido = 001000;
-      addPedido(primerPedido, usuario.id);
-      addAuxPedido(producto, primerPedido + 1);
+      await addPedido(primerPedido, usuario.id);
+      final pedidosNuevo = await getPedidos();
+      final pedidoPendiente = pedidosNuevo
+          .where((pedido) =>
+              pedido.usuario.id == usuario.id &&
+              pedido.estado == "PENDIENTE" &&
+              pedido.pedidoConfirmado == false)
+          .firstOrNull;
+
+      if (producto.exclusivo == false) {
+        // agrgamos si el producto no es exclusivo
+        print('Producto no exclusivo');
+        addAuxPedido(producto, pedidoPendiente!.id);
+      } else {
+        productoExclusivo(context);
+      }
       print('lista vacia Creando el primer pedido.');
     }
   }
@@ -322,25 +358,26 @@ class _CardProductsState extends State<CardProducts> {
     });
   }
 
-  Future _countPedidos() async {
+  Future<void> _countPedidos() async {
     final auxPedidos = await getAuxPedidos();
-    final usuario =
-        Provider.of<AppState>(context, listen: false).usuarioAutenticado;
     var count = 0;
-    if (usuario != null) {
+    if (_usuario != null) {
       count = auxPedidos
           .where((auxPedido) =>
               auxPedido.pedido.estado == "PENDIENTE" &&
               auxPedido.pedido.pedidoConfirmado == false &&
-              auxPedido.pedido.usuario.id == usuario.id)
+              auxPedido.pedido.usuario.id == _usuario!.id)
           .length;
     } else {
       count = 0;
     }
-    setState(() {
-      _count = count;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() {
+        _count = count;
+      });
+      Provider.of<Tiendacontroller>(context, listen: false).updateCount(_count);
     });
-    Provider.of<Tiendacontroller>(context, listen: false).updateCount(_count);
   }
 
   @override
@@ -477,7 +514,7 @@ class _CardProductsState extends State<CardProducts> {
                                               Icons.favorite_border,
                                               color: Colors.white),
                                           onPressed: () {
-                                            _InicioSesion(context);
+                                            inicioSesion(context);
                                           },
                                         ),
                                       ),
@@ -574,258 +611,6 @@ class _CardProductsState extends State<CardProducts> {
           ),
         );
       },
-    );
-  }
-
-  void _InicioSesion(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("¿Quiere agregar a favoritos?"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const Text("¡Para agregar a favoritos, debe iniciar sesión!"),
-              const SizedBox(
-                height: 10,
-              ),
-              ClipOval(
-                child: Container(
-                  width: 100, // Ajusta el tamaño según sea necesario
-                  height: 100, // Ajusta el tamaño según sea necesario
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: primaryColor,
-                  ),
-                  child: Image.asset(
-                    "assets/img/logo.png",
-                    fit: BoxFit.cover, // Ajusta la imagen al contenedor
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            ButtonBar(
-              alignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(defaultPadding),
-                  child: _buildButton("Cancelar", () {
-                    Navigator.pop(context);
-                  }),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(defaultPadding),
-                  child: _buildButton("Iniciar Sesión", () {
-                    // ignore: prefer_const_constructors
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginScreen()));
-                  }),
-                )
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void isProductAddedModal(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("¡Este producto ya está agregado!"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const Text("El producto seleccionado ya está en su pedido."),
-              const SizedBox(
-                height: 10,
-              ),
-              ClipOval(
-                child: Container(
-                  width: 100, // Ajusta el tamaño según sea necesario
-                  height: 100, // Ajusta el tamaño según sea necesario
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: primaryColor,
-                  ),
-                  child: Image.asset(
-                    "assets/img/logo.png",
-                    fit: BoxFit.cover, // Ajusta la imagen al contenedor
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            ButtonBar(
-              alignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(defaultPadding),
-                  child: _buildButton("Aceptar", () {
-                    Navigator.pop(context);
-                  }),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void productoExclusivo(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("¿Quiere agregar un producto exclusivo?"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const Text(
-                  "¡Tenga en cuenta que, para agregar un producto exclusivo como los huevos, tiene que agregar previamente otro producto!"),
-              const SizedBox(
-                height: 10,
-              ),
-              ClipOval(
-                child: Container(
-                  width: 100, // Ajusta el tamaño según sea necesario
-                  height: 100, // Ajusta el tamaño según sea necesario
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: primaryColor,
-                  ),
-                  child: Image.asset(
-                    "assets/img/logo.png",
-                    fit: BoxFit.cover, // Ajusta la imagen al contenedor
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            ButtonBar(
-              alignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(defaultPadding),
-                  child: _buildButton("Aceptar", () {
-                    Navigator.pop(context);
-                  }),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void loginPedidoScreen(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("¿Quiere agregar un producto a su pedido?"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const Text("¡Para agregar un pedido, debe iniciar sesión!"),
-              const SizedBox(
-                height: 10,
-              ),
-              ClipOval(
-                child: Container(
-                  width: 100, // Ajusta el tamaño según sea necesario
-                  height: 100, // Ajusta el tamaño según sea necesario
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: primaryColor,
-                  ),
-                  child: Image.asset(
-                    "assets/img/logo.png",
-                    fit: BoxFit.cover, // Ajusta la imagen al contenedor
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            ButtonBar(
-              alignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(defaultPadding),
-                  child: _buildButton("Cancelar", () {
-                    Navigator.pop(context);
-                  }),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(defaultPadding),
-                  child: _buildButton("Iniciar Sesión", () {
-                    // ignore: prefer_const_constructors
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginScreen()));
-                  }),
-                )
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildButton(String text, VoidCallback onPressed) {
-    return Container(
-      width: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        gradient: const LinearGradient(
-          colors: [
-            botonClaro,
-            botonOscuro,
-          ],
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: botonSombra,
-            blurRadius: 5,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(10),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Center(
-              child: Text(
-                text,
-                style: const TextStyle(
-                  color: background1,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Calibri-Bold',
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

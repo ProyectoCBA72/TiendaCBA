@@ -1,9 +1,16 @@
 // ignore_for_file: file_names, avoid_print, use_build_context_synchronously, unnecessary_this
+
+import 'dart:convert';
+import 'package:tienda_app/Home/homePage.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:flutter/material.dart';
+import 'package:tienda_app/source.dart';
+import 'package:http/http.dart' as http;
 
 class Comentario extends StatefulWidget {
-  const Comentario({super.key});
+  final int userID;
+  final int anuncioID;
+  const Comentario({super.key, required this.userID, required this.anuncioID});
 
   @override
   State<Comentario> createState() => _ComentarioState();
@@ -17,6 +24,37 @@ class _ComentarioState extends State<Comentario> {
   void dispose() {
     descripcion.dispose();
     super.dispose();
+  }
+
+  Future addComent() async {
+    String url;
+    url = '$sourceApi/api/comentarios/';
+
+    final DateTime now = DateTime.now();
+
+    final headers = {
+      'Content-Type': 'application/json',
+    };
+
+    final body = {
+      'descripcion': descripcion.text,
+      'fecha': now.toIso8601String(),
+      'usuario': widget.userID,
+      'anuncio': widget.anuncioID,
+    };
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 201) {
+      print('Datos enviados correctamente(Comentario)');
+      setState(() {});
+    } else {
+      print('Error al enviar datos: ${response.statusCode}');
+    }
   }
 
   @override
@@ -81,7 +119,11 @@ class _ComentarioState extends State<Comentario> {
           // Botón para guardar el comentario
           Center(
             child: InkWell(
-              onTap: () {},
+              onTap: () {
+                addComent();
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => const HomePage()));
+              },
               child: Container(
                 padding: const EdgeInsets.only(
                     left: 30, right: 30, top: 10, bottom: 10),

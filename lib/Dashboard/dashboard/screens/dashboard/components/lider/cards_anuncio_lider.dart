@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lider/anuncioCardLider.dart';
+import 'package:tienda_app/Models/anuncioModel.dart';
+import 'package:tienda_app/Models/imagenAnuncioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
-
 // Vista donde se llamaran las cards superiores de conteo de reservas y las organiza que se adapten a todos los dispositivos
 
 class CardsAnuncioLider extends StatelessWidget {
   const CardsAnuncioLider({
     super.key,
   });
+
+  Future<List<dynamic>> fechData() {
+    return Future.wait([
+      getAnuncios(),
+      getImagenesAnuncio(),
+    ]);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,11 +125,37 @@ class CardsAnuncioLider extends StatelessWidget {
         const SizedBox(height: defaultPadding),
         SizedBox(
           height: 300,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 10,
-            itemBuilder: (context, index) {
-              return const AnuncioCardLider();
+          child: FutureBuilder(
+            future: fechData(),
+            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else {
+                // creamos las instancias con los datos del futuro creado en la parte superior.
+                final List<AnuncioModel> anuncios = snapshot.data![0];
+                final List<ImagenAnuncioModel> allImagesAnuncio =
+                    snapshot.data![1];
+
+                // retornamos el contructor pasando la lista de imagenes y una instancia de la lista.
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: anuncios.length,
+                  itemBuilder: (context, index) {
+                    final anuncio = anuncios[index];
+                    // crear una lista con las urls de las imagenes relacionadas a cada uno de los anuncios.
+                    List<String> images = allImagesAnuncio
+                        .where((imagen) => imagen.anuncio.id == anuncio.id)
+                        .map((images) => images.imagen)
+                        .toList();
+                    return AnuncioCardLider(
+                      images: images,
+                      anuncio: anuncio,
+                    );
+                  },
+                );
+              }
             },
           ),
         ),

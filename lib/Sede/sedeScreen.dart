@@ -3,10 +3,15 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tienda_app/Models/puntoVentaModel.dart';
+import 'package:tienda_app/Models/sedeModel.dart';
+import 'package:tienda_app/Models/unidadProduccionModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
 class SedeScreen extends StatefulWidget {
-  const SedeScreen({super.key});
+  final SedeModel sede;
+  final List<String> imagenes;
+  const SedeScreen({super.key, required this.imagenes, required this.sede});
 
   @override
   State<SedeScreen> createState() => _SedeScreenState();
@@ -14,25 +19,34 @@ class SedeScreen extends StatefulWidget {
 
 class _SedeScreenState extends State<SedeScreen> {
   // pasar a double la longitud y la latitud del sitio
-  double latitud = double.parse("4.695992401469883");
+  late double latitud;
 
-  double longitud = double.parse("-74.21559381784357");
+  late double longitud;
 
   // URL de la imagen principal
-  String mainImageUrl = 'https://i.ytimg.com/vi/UMBALomvR1Y/hqdefault.jpg';
+  String mainImageUrl = '';
 
   // Lista de URL de miniaturas de imágenes
-  List<String> thumbnailUrls = [
-    'https://i.ytimg.com/vi/UMBALomvR1Y/hqdefault.jpg',
-    'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgGbwguyMNuaGlMS987Ez-BzaCGhhIMCK31lDVf1zcksljEozNYfaJJB0f4m_p95QW5sLiL57lGHXpNmAEzzTfueJyn7DHg9t9Sme4SLl29LP-eJdq3qOYD2AZ6xKrRAe-2UAdTEHKyFN0/s1600/Auditorio.JPG',
-    'https://pronacon.com.co/wp-content/uploads/2023/03/WhatsApp-Image-2023-03-08-at-4.49.52-PM.jpeg',
-    // Agrega más URL de miniaturas según sea necesario
-  ];
+  List<String> thumbnailUrls = [];
 
   late bool state = true;
 
   @override
+  void initState() {
+    super.initState();
+    _loadInit();
+  }
+
+  void _loadInit() async {
+    thumbnailUrls = widget.imagenes;
+    mainImageUrl = thumbnailUrls.first;
+    latitud = double.parse(widget.sede.latitud);
+    longitud = double.parse(widget.sede.longitud);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final sede = widget.sede;
     return Scaffold(
       body: LayoutBuilder(builder: (context, responsive) {
         if (responsive.maxWidth <= 900) {
@@ -182,10 +196,10 @@ class _SedeScreenState extends State<SedeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Center(
+                              Center(
                                 child: Text(
-                                  'Centro de biotecnología agropecuaria',
-                                  style: TextStyle(
+                                  sede.nombre,
+                                  style: const TextStyle(
                                     fontSize: 40,
                                     fontWeight: FontWeight.bold,
                                     color: primaryColor,
@@ -210,68 +224,104 @@ class _SedeScreenState extends State<SedeScreen> {
                               ),
                               SizedBox(
                                 height: 200,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: 10,
-                                  itemBuilder: (context, index) {
-                                    return Container(
-                                      width: 200, // Ancho de la tarjeta
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 10.0),
-                                      child: Card(
-                                        elevation: 5, // Elevación de la tarjeta
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              10.0), // Radio de la tarjeta
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(50),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: primaryColor
-                                                          .withOpacity(
-                                                              0.3), // Color y opacidad de la sombra
-                                                      spreadRadius: 5,
-                                                      blurRadius: 7,
-                                                      offset: const Offset(0,
-                                                          3), // Desplazamiento de la sombra
+                                child: FutureBuilder(
+                                  future: getUndadesProduccion(),
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot<List<UnidadProduccionModel>>
+                                          snapshotUndProduccion) {
+                                    if (snapshotUndProduccion.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    } else if (snapshotUndProduccion
+                                        .data!.isEmpty) {
+                                      return const Center(
+                                        child: Text(
+                                            'No hay Unidades de producción disponibles'),
+                                      );
+                                    } else if (snapshotUndProduccion.hasError) {
+                                      return Center(
+                                          child: Text(
+                                              'Ocurrio un error: ${snapshotUndProduccion.error}, por favor reportelo'));
+                                    } else {
+                                      final List<UnidadProduccionModel>
+                                          allUndProduccion =
+                                          snapshotUndProduccion.data!;
+                                      return ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: allUndProduccion.length,
+                                        itemBuilder: (context, index) {
+                                          final undProduccion =
+                                              allUndProduccion[index];
+                                          return Container(
+                                            width: 200, // Ancho de la tarjeta
+                                            margin: const EdgeInsets.symmetric(
+                                                horizontal: 10.0),
+                                            child: Card(
+                                              elevation:
+                                                  5, // Elevación de la tarjeta
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(
+                                                    10.0), // Radio de la tarjeta
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: <Widget>[
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: primaryColor
+                                                                .withOpacity(
+                                                                    0.3), // Color y opacidad de la sombra
+                                                            spreadRadius: 5,
+                                                            blurRadius: 7,
+                                                            offset: const Offset(
+                                                                0,
+                                                                3), // Desplazamiento de la sombra
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50),
+                                                        child: Image.network(
+                                                          undProduccion.logo,
+                                                          height: 100,
+                                                          width: 100,
+                                                          fit: BoxFit.fill,
+                                                        ),
+                                                      ),
                                                     ),
+                                                    const SizedBox(height: 10),
+                                                    Text(
+                                                      undProduccion.nombre,
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16,
+                                                        fontFamily:
+                                                            'Calibri-Bold',
+                                                      ),
+                                                    ), // Título
                                                   ],
                                                 ),
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(50),
-                                                  child: Image.network(
-                                                    "https://static.vecteezy.com/system/resources/previews/004/182/846/original/meat-products-flat-design-long-shadow-glyph-icon-chicken-leg-beef-steak-and-sausage-grocery-store-bbq-items-silhouette-illustration-vector.jpg",
-                                                    height: 100,
-                                                    width: 100,
-                                                    fit: BoxFit.fill,
-                                                  ),
-                                                ),
                                               ),
-                                              const SizedBox(height: 10),
-                                              const Text(
-                                                "Carnicos",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16,
-                                                  fontFamily: 'Calibri-Bold',
-                                                ),
-                                              ), // Título
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    );
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    }
                                   },
                                 ),
                               ),
@@ -462,7 +512,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                       fontSize: 16.0,
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      fontFamily: 'Calibri-Bold',
+                                                      fontFamily:
+                                                          'Calibri-Bold',
                                                     ),
                                                   ),
                                                   const Text(
@@ -470,7 +521,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                                     style: TextStyle(
                                                       fontSize: 16.0,
                                                       color: Colors.grey,
-                                                      fontFamily: 'Calibri-Bold',
+                                                      fontFamily:
+                                                          'Calibri-Bold',
                                                     ),
                                                   ),
                                                 ],
@@ -527,8 +579,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                           ),
                                         ],
                                       ),
-                                      child: const Padding(
-                                        padding: EdgeInsets.all(12.0),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12.0),
                                         child: SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
                                           child: Column(
@@ -538,225 +590,246 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Padding(
-                                                padding: EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
-                                                    Icon(
+                                                    const Icon(
                                                       Icons
                                                           .location_city_outlined,
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    SizedBox(
+                                                    const SizedBox(
                                                       width: 20,
                                                     ),
-                                                    Text(
+                                                    const Text(
                                                       "Ciudad: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                     Text(
-                                                      "Mosquera",
-                                                      style: TextStyle(
+                                                      sede.ciudad,
+                                                      style: const TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding: EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
-                                                    Icon(
+                                                    const Icon(
                                                       CupertinoIcons.map_fill,
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    SizedBox(
+                                                    const SizedBox(
                                                       width: 20,
                                                     ),
-                                                    Text(
+                                                    const Text(
                                                       "Departamento: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                     Text(
-                                                      "Cundinamarca",
-                                                      style: TextStyle(
+                                                      sede.departamento,
+                                                      style: const TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding: EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
-                                                    Icon(
+                                                    const Icon(
                                                       CupertinoIcons.globe,
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    SizedBox(
+                                                    const SizedBox(
                                                       width: 20,
                                                     ),
-                                                    Text(
+                                                    const Text(
                                                       "Regional: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                     Text(
-                                                      "Cundinamarca",
-                                                      style: TextStyle(
+                                                      sede.regional,
+                                                      style: const TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding: EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
-                                                    Icon(
+                                                    const Icon(
                                                       Icons.location_on_sharp,
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    SizedBox(
+                                                    const SizedBox(
                                                       width: 20,
                                                     ),
-                                                    Text(
+                                                    const Text(
                                                       "Dirección: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                     Text(
-                                                      "Km 7 vía Mosquera-Bogotá",
-                                                      style: TextStyle(
+                                                      sede.direccion,
+                                                      style: const TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding: EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
-                                                    Icon(
+                                                    const Icon(
                                                       Icons.call_rounded,
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    SizedBox(
+                                                    const SizedBox(
                                                       width: 20,
                                                     ),
-                                                    Text(
+                                                    const Text(
                                                       "Telefono 1: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                     Text(
-                                                      "1234567890",
-                                                      style: TextStyle(
+                                                      sede.telefono1,
+                                                      style: const TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding: EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
-                                                    Icon(
+                                                    const Icon(
                                                       Icons.call_rounded,
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    SizedBox(
+                                                    const SizedBox(
                                                       width: 20,
                                                     ),
-                                                    Text(
+                                                    const Text(
                                                       "Telefono 2: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                     Text(
-                                                      "1234567890",
-                                                      style: TextStyle(
+                                                      sede.telefono2,
+                                                      style: const TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding: EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
-                                                    Icon(
+                                                    const Icon(
                                                       Icons.email_outlined,
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    SizedBox(
+                                                    const SizedBox(
                                                       width: 20,
                                                     ),
-                                                    Text(
+                                                    const Text(
                                                       "Correo electronico: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                     Text(
-                                                      "senacba@gmail.com",
-                                                      style: TextStyle(
+                                                      sede.correo,
+                                                      style: const TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
@@ -925,10 +998,10 @@ class _SedeScreenState extends State<SedeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Center(
+                              Center(
                                 child: Text(
-                                  'Centro de biotecnología agropecuaria',
-                                  style: TextStyle(
+                                  sede.nombre,
+                                  style: const TextStyle(
                                     fontSize: 40,
                                     fontWeight: FontWeight.bold,
                                     color: primaryColor,
@@ -953,68 +1026,104 @@ class _SedeScreenState extends State<SedeScreen> {
                               ),
                               SizedBox(
                                 height: 200,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: 10,
-                                  itemBuilder: (context, index) {
-                                    return Container(
-                                      width: 200, // Ancho de la tarjeta
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 10.0),
-                                      child: Card(
-                                        elevation: 5, // Elevación de la tarjeta
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              10.0), // Radio de la tarjeta
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(50),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: primaryColor
-                                                          .withOpacity(
-                                                              0.3), // Color y opacidad de la sombra
-                                                      spreadRadius: 5,
-                                                      blurRadius: 7,
-                                                      offset: const Offset(0,
-                                                          3), // Desplazamiento de la sombra
+                                child: FutureBuilder(
+                                  future: getUndadesProduccion(),
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot<List<UnidadProduccionModel>>
+                                          snapshotUndProduccion) {
+                                    if (snapshotUndProduccion.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    } else if (snapshotUndProduccion
+                                        .data!.isEmpty) {
+                                      return const Center(
+                                        child: Text(
+                                            'No hay Unidades de producción disponibles'),
+                                      );
+                                    } else if (snapshotUndProduccion.hasError) {
+                                      return Center(
+                                          child: Text(
+                                              'Ocurrio un error: ${snapshotUndProduccion.error}, por favor reportelo'));
+                                    } else {
+                                      final List<UnidadProduccionModel>
+                                          allUndProduccion =
+                                          snapshotUndProduccion.data!;
+                                      return ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: allUndProduccion.length,
+                                        itemBuilder: (context, index) {
+                                          final undProduccion =
+                                              allUndProduccion[index];
+                                          return Container(
+                                            width: 200, // Ancho de la tarjeta
+                                            margin: const EdgeInsets.symmetric(
+                                                horizontal: 10.0),
+                                            child: Card(
+                                              elevation:
+                                                  5, // Elevación de la tarjeta
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(
+                                                    10.0), // Radio de la tarjeta
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: <Widget>[
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: primaryColor
+                                                                .withOpacity(
+                                                                    0.3), // Color y opacidad de la sombra
+                                                            spreadRadius: 5,
+                                                            blurRadius: 7,
+                                                            offset: const Offset(
+                                                                0,
+                                                                3), // Desplazamiento de la sombra
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50),
+                                                        child: Image.network(
+                                                          undProduccion.logo,
+                                                          height: 100,
+                                                          width: 100,
+                                                          fit: BoxFit.fill,
+                                                        ),
+                                                      ),
                                                     ),
+                                                    const SizedBox(height: 10),
+                                                    Text(
+                                                      undProduccion.nombre,
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16,
+                                                        fontFamily:
+                                                            'Calibri-Bold',
+                                                      ),
+                                                    ), // Título
                                                   ],
                                                 ),
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(50),
-                                                  child: Image.network(
-                                                    "https://static.vecteezy.com/system/resources/previews/004/182/846/original/meat-products-flat-design-long-shadow-glyph-icon-chicken-leg-beef-steak-and-sausage-grocery-store-bbq-items-silhouette-illustration-vector.jpg",
-                                                    height: 100,
-                                                    width: 100,
-                                                    fit: BoxFit.fill,
-                                                  ),
-                                                ),
                                               ),
-                                              const SizedBox(height: 10),
-                                              const Text(
-                                                "Carnicos",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16,
-                                                  fontFamily: 'Calibri-Bold',
-                                                ),
-                                              ), // Título
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    );
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    }
                                   },
                                 ),
                               ),
@@ -1079,150 +1188,192 @@ class _SedeScreenState extends State<SedeScreen> {
                               ),
                               SizedBox(
                                 height: 190,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: 2,
-                                  itemBuilder: (context, index) {
-                                    return Container(
-                                      width: 250, // Ancho de la tarjeta
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: 8.0,
-                                        vertical: 8.0,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            spreadRadius: 2,
-                                            blurRadius: 5,
-                                            offset: const Offset(0,
-                                                2), // changes position of shadow
-                                          ),
-                                        ],
-                                      ),
-                                      child: SingleChildScrollView(
-                                        scrollDirection: Axis.vertical,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            const Padding(
-                                              padding: EdgeInsets.only(
-                                                left: 8,
-                                                right: 8,
-                                                top: 13,
-                                                bottom: 8,
-                                              ),
-                                              child: Text(
-                                                "Principal",
-                                                style: TextStyle(
-                                                  fontSize: 18.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontFamily: 'Calibri-Bold',
+                                child: FutureBuilder(
+                                  future: getPuntosVenta(),
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot<List<PuntoVentaModel>>
+                                          snapshotPunVenta) {
+                                    if (snapshotPunVenta.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    } else if (snapshotPunVenta.hasError) {
+                                      return Center(
+                                        child: Text(
+                                            'Ocurrio un error: ${snapshotPunVenta.error}'),
+                                      );
+                                    } else if (snapshotPunVenta.data!.isEmpty) {
+                                      return const Center(
+                                        child: Text(
+                                            'No hay puntos de venta disponibles para esta sede.'),
+                                      );
+                                    } else {
+                                      final List<PuntoVentaModel>
+                                          pVentaDisponibles = snapshotPunVenta
+                                              .data!
+                                              .where((pVenta) =>
+                                                  pVenta.sede == sede.id)
+                                              .toList();
+                                      return ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: pVentaDisponibles.length,
+                                        itemBuilder: (context, index) {
+                                          final pVenta =
+                                              pVentaDisponibles[index];
+                                          return Container(
+                                            width: 250, // Ancho de la tarjeta
+                                            margin: const EdgeInsets.symmetric(
+                                              horizontal: 8.0,
+                                              vertical: 8.0,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey
+                                                      .withOpacity(0.5),
+                                                  spreadRadius: 2,
+                                                  blurRadius: 5,
+                                                  offset: const Offset(0,
+                                                      2), // changes position of shadow
                                                 ),
-                                              ),
+                                              ],
                                             ),
-                                            const Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 8.0,
-                                                vertical: 8.0,
-                                              ),
-                                              child: Row(
+                                            child: SingleChildScrollView(
+                                              scrollDirection: Axis.vertical,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
                                                 children: [
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                      left: 8.0,
-                                                      right: 8.0,
+                                                   Padding(
+                                                    padding: const EdgeInsets.only(
+                                                      left: 8,
+                                                      right: 8,
+                                                      top: 13,
+                                                      bottom: 8,
                                                     ),
-                                                    child: Icon(
-                                                      Icons.location_on,
-                                                      size: 30,
-                                                      color: botonOscuro,
+                                                    child: Text(
+                                                      pVenta.nombre,
+                                                      style: const TextStyle(
+                                                        fontSize: 18.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontFamily:
+                                                            'Calibri-Bold',
+                                                      ),
                                                     ),
                                                   ),
-                                                  SizedBox(
-                                                    width: 15,
-                                                  ),
-                                                  Column(
-                                                    children: [
-                                                      Text(
-                                                        "Ubicacion: ",
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 16.0,
-                                                          fontFamily:
-                                                              'Calibri-Bold',
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        "Portería del CBA",
-                                                        style: TextStyle(
-                                                          fontSize: 16.0,
-                                                          color: Colors.grey,
-                                                          fontFamily:
-                                                              'Calibri-Bold',
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 8.0,
-                                                vertical: 8.0,
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  Padding(
+                                                   Padding(
                                                     padding:
-                                                        const EdgeInsets.only(
-                                                      left: 8.0,
-                                                      right: 8.0,
+                                                        const EdgeInsets.symmetric(
+                                                      horizontal: 8.0,
+                                                      vertical: 8.0,
                                                     ),
-                                                    child: Icon(
-                                                      state
-                                                          ? Icons
-                                                              .check_circle_outline
-                                                          : Icons
-                                                              .cancel_outlined,
-                                                      size: 30,
-                                                      color: botonOscuro,
+                                                    child: Row(
+                                                      children: [
+                                                        const Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                            left: 8.0,
+                                                            right: 8.0,
+                                                          ),
+                                                          child: Icon(
+                                                            Icons.location_on,
+                                                            size: 30,
+                                                            color: botonOscuro,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 15,
+                                                        ),
+                                                        Column(
+                                                          children: [
+                                                            const Text(
+                                                              "Ubicacion: ",
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 16.0,
+                                                                fontFamily:
+                                                                    'Calibri-Bold',
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              pVenta.ubicacion,
+                                                              style: const TextStyle(
+                                                                fontSize: 16.0,
+                                                                color:
+                                                                    Colors.grey,
+                                                                fontFamily:
+                                                                    'Calibri-Bold',
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
-                                                  const SizedBox(
-                                                    width: 15,
-                                                  ),
-                                                  const Text(
-                                                    "Estado: ",
-                                                    style: TextStyle(
-                                                      fontSize: 16.0,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontFamily: 'Calibri-Bold',
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                      horizontal: 8.0,
+                                                      vertical: 8.0,
                                                     ),
-                                                  ),
-                                                  const Text(
-                                                    "Activo",
-                                                    style: TextStyle(
-                                                      fontSize: 16.0,
-                                                      color: Colors.grey,
-                                                      fontFamily: 'Calibri-Bold',
+                                                    child: Row(
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                            left: 8.0,
+                                                            right: 8.0,
+                                                          ),
+                                                          child: Icon(
+                                                            pVenta.estado
+                                                                ? Icons
+                                                                    .check_circle_outline
+                                                                : Icons
+                                                                    .cancel_outlined,
+                                                            size: 30,
+                                                            color: botonOscuro,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 15,
+                                                        ),
+                                                        const Text(
+                                                          "Estado: ",
+                                                          style: TextStyle(
+                                                            fontSize: 16.0,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontFamily:
+                                                                'Calibri-Bold',
+                                                          ),
+                                                        ),
+                                                         Text(
+                                                          pVenta.estado? "Activo" : "Inactivo",
+                                                          style: const TextStyle(
+                                                            fontSize: 16.0,
+                                                            color: Colors.grey,
+                                                            fontFamily:
+                                                                'Calibri-Bold',
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
                                                 ],
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
+                                          );
+                                        },
+                                      );
+                                    }
                                   },
                                 ),
                               ),
@@ -1270,8 +1421,8 @@ class _SedeScreenState extends State<SedeScreen> {
                                           ),
                                         ],
                                       ),
-                                      child: const Padding(
-                                        padding: EdgeInsets.all(12.0),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12.0),
                                         child: SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
                                           child: Column(
@@ -1281,225 +1432,246 @@ class _SedeScreenState extends State<SedeScreen> {
                                                 MainAxisAlignment.start,
                                             children: [
                                               Padding(
-                                                padding: EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
-                                                    Icon(
+                                                    const Icon(
                                                       Icons
                                                           .location_city_outlined,
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    SizedBox(
+                                                    const SizedBox(
                                                       width: 20,
                                                     ),
-                                                    Text(
+                                                    const Text(
                                                       "Ciudad: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                     Text(
-                                                      "Mosquera",
-                                                      style: TextStyle(
+                                                      sede.ciudad,
+                                                      style: const TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding: EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
-                                                    Icon(
+                                                    const Icon(
                                                       CupertinoIcons.map_fill,
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    SizedBox(
+                                                    const SizedBox(
                                                       width: 20,
                                                     ),
-                                                    Text(
+                                                    const Text(
                                                       "Departamento: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                     Text(
-                                                      "Cundinamarca",
-                                                      style: TextStyle(
+                                                      sede.departamento,
+                                                      style: const TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding: EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
-                                                    Icon(
+                                                    const Icon(
                                                       CupertinoIcons.globe,
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    SizedBox(
+                                                    const SizedBox(
                                                       width: 20,
                                                     ),
-                                                    Text(
+                                                    const Text(
                                                       "Regional: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                     Text(
-                                                      "Cundinamarca",
-                                                      style: TextStyle(
+                                                      sede.regional,
+                                                      style: const TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding: EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
-                                                    Icon(
+                                                    const Icon(
                                                       Icons.location_on_sharp,
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    SizedBox(
+                                                    const SizedBox(
                                                       width: 20,
                                                     ),
-                                                    Text(
+                                                    const Text(
                                                       "Dirección: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                     Text(
-                                                      "Km 7 vía Mosquera-Bogotá",
-                                                      style: TextStyle(
+                                                      sede.direccion,
+                                                      style: const TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding: EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
-                                                    Icon(
+                                                    const Icon(
                                                       Icons.call_rounded,
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    SizedBox(
+                                                    const SizedBox(
                                                       width: 20,
                                                     ),
-                                                    Text(
+                                                    const Text(
                                                       "Telefono 1: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                     Text(
-                                                      "1234567890",
-                                                      style: TextStyle(
+                                                      sede.telefono1,
+                                                      style: const TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding: EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
-                                                    Icon(
+                                                    const Icon(
                                                       Icons.call_rounded,
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    SizedBox(
+                                                    const SizedBox(
                                                       width: 20,
                                                     ),
-                                                    Text(
+                                                    const Text(
                                                       "Telefono 2: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                     Text(
-                                                      "1234567890",
-                                                      style: TextStyle(
+                                                      sede.telefono2,
+                                                      style: const TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Padding(
-                                                padding: EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Row(
                                                   children: [
-                                                    Icon(
+                                                    const Icon(
                                                       Icons.email_outlined,
                                                       size: 30,
                                                       color: botonOscuro,
                                                     ),
-                                                    SizedBox(
+                                                    const SizedBox(
                                                       width: 20,
                                                     ),
-                                                    Text(
+                                                    const Text(
                                                       "Correo electronico: ",
                                                       style: TextStyle(
                                                         fontSize: 16.0,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                     Text(
-                                                      "senacba@gmail.com",
-                                                      style: TextStyle(
+                                                      sede.correo,
+                                                      style: const TextStyle(
                                                         fontSize: 16.0,
                                                         color: Colors.grey,
-                                                        fontFamily: 'Calibri-Bold',
+                                                        fontFamily:
+                                                            'Calibri-Bold',
                                                       ),
                                                     ),
                                                   ],

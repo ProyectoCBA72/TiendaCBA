@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
 
+import 'Tienda/tiendaController.dart';
+
 class AppState extends ChangeNotifier {
   UsuarioModel? _usuarioAutenticado;
 
@@ -60,8 +62,11 @@ class AppProvider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => AppState(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => AppState()),
+        ChangeNotifierProvider(create: (context) => Tiendacontroller()),
+      ],
       child: child,
     );
   }

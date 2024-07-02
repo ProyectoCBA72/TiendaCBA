@@ -37,7 +37,7 @@ class _VisitadoDetailsState extends State<VisitadoDetails> {
       final fechaVisita = DateTime.parse(visita.fechaVista);
       if (now.difference(fechaVisita).inDays >= 2) {
         // delete visitado
-        final url = "$sourceApi/api/favoritos/${visita.id}/";
+        final url = "$sourceApi/api/visitados/${visita.id}/";
 
         final headers = {
           'Content-Type': 'application/json',

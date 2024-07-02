@@ -9,8 +9,12 @@ import 'package:tienda_app/Home/productoCard.dart';
 import 'package:tienda_app/Home/profileCard.dart';
 import 'package:tienda_app/Home/sedeCard.dart';
 import 'package:tienda_app/Home/senaSection.dart';
+import 'package:tienda_app/Models/anuncioModel.dart';
+import 'package:tienda_app/Models/imagenAnuncioModel.dart';
 import 'package:tienda_app/Models/imagenProductoModel.dart';
+import 'package:tienda_app/Models/imagenSedeModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/Models/sedeModel.dart';
 import 'package:tienda_app/Tienda/tiendaController.dart';
 import 'package:tienda_app/Tienda/tiendaScreen.dart';
 import 'package:tienda_app/constantsDesign.dart';
@@ -29,7 +33,7 @@ class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   bool secundaria = false;
 
-  late Future<List<dynamic>> _productosFuture;
+  late Future<List<dynamic>> _datosFuture;
 
   // Lista de URLs de imágenes
   final List<String> imageUrls = [
@@ -49,7 +53,7 @@ class _HomePageState extends State<HomePage>
   void initState() {
     super.initState();
 
-    _productosFuture = _fetchData();
+    _datosFuture = _fetchData();
 
     // Iniciar el ciclo de cambio de imágenes
     startImageSlideShow();
@@ -82,7 +86,14 @@ class _HomePageState extends State<HomePage>
   }
 
   Future<List<dynamic>> _fetchData() {
-    return Future.wait([getImagenProductos(), getProductos()]);
+    return Future.wait([
+      getImagenProductos(),
+      getProductos(),
+      getImagenSedes(),
+      getSedes(),
+      getAnuncios(),
+      getImagenesAnuncio(),
+    ]);
   }
 
   @override
@@ -317,11 +328,116 @@ class _HomePageState extends State<HomePage>
                           ),
                           SizedBox(
                             height: 300,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: 10,
-                              itemBuilder: (context, index) {
-                                return const AnuncioCard();
+                            child: FutureBuilder(
+                              future: _datosFuture,
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<List<dynamic>>
+                                      snapshotAnuncios) {
+                                if (snapshotAnuncios.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else if (snapshotAnuncios.hasError) {
+                                  return Center(
+                                    child: Text(
+                                      'Error al cargar datos: ${snapshotAnuncios.error}',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.white,
+                                        shadows: [
+                                          Shadow(
+                                            color: Colors.black.withOpacity(
+                                                0.5), // Color y opacidad de la sombra
+                                            offset: const Offset(2,
+                                                2), // Desplazamiento de la sombra (horizontal, vertical)
+                                            blurRadius:
+                                                3, // Radio de desenfoque de la sombra
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                } else if (snapshotAnuncios.data!.isEmpty) {
+                                  return Center(
+                                    child: Text(
+                                      'No hay anuncios disponibles en este momento',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.white,
+                                        shadows: [
+                                          Shadow(
+                                            color: Colors.black.withOpacity(
+                                                0.5), // Color y opacidad de la sombra
+                                            offset: const Offset(2,
+                                                2), // Desplazamiento de la sombra (horizontal, vertical)
+                                            blurRadius:
+                                                3, // Radio de desenfoque de la sombra
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  final List<AnuncioModel> anuncios =
+                                      snapshotAnuncios.data![4];
+
+                                  final List<ImagenAnuncioModel>
+                                      imagenesAnuncios =
+                                      snapshotAnuncios.data![5];
+                                  // Filatramos todos los anuncios en funcion de si esta activo o ya paso el dia.
+                                  final anunciosDisponibles =
+                                      anuncios.where((anuncio) {
+                                    final now = DateTime.now();
+                                    final fechaAnuncio =
+                                        DateTime.parse(anuncio.fecha);
+                                    return fechaAnuncio.isAfter(now) ||
+                                        fechaAnuncio.day == now.day;
+                                  }).toList();
+
+                                  if (anunciosDisponibles.isEmpty) {
+                                    return Center(
+                                      child: Text(
+                                        'No hay anuncios disponibles en este momento',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.white,
+                                          shadows: [
+                                            Shadow(
+                                              color: Colors.black.withOpacity(
+                                                  0.5), // Color y opacidad de la sombra
+                                              offset: const Offset(2,
+                                                  2), // Desplazamiento de la sombra (horizontal, vertical)
+                                              blurRadius:
+                                                  3, // Radio de desenfoque de la sombra
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    return ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: anunciosDisponibles.length,
+                                      itemBuilder: (context, index) {
+                                        AnuncioModel anuncio =
+                                            anunciosDisponibles[index];
+
+                                        List<String> imagesAnun =
+                                            imagenesAnuncios
+                                                .where((imagen) =>
+                                                    imagen.anuncio.id ==
+                                                    anuncio.id)
+                                                .map((imagen) => imagen.imagen)
+                                                .toList();
+                                        return AnuncioCard(
+                                          anuncio: anuncio,
+                                          images: imagesAnun,
+                                        );
+                                      },
+                                    );
+                                  }
+                                }
                               },
                             ),
                           ),
@@ -350,7 +466,7 @@ class _HomePageState extends State<HomePage>
                           SizedBox(
                             height: 300,
                             child: FutureBuilder(
-                              future: _productosFuture,
+                              future: _datosFuture,
                               builder: (BuildContext context,
                                   AsyncSnapshot<List<dynamic>> snapshot) {
                                 if (snapshot.connectionState ==
@@ -406,14 +522,12 @@ class _HomePageState extends State<HomePage>
                                       ),
                                     );
                                   }
-
                                   List<ProductoModel> productosFiltrados =
                                       productos
                                           .where((producto) =>
                                               producto.destacado &&
                                               producto.estado)
                                           .toList();
-
                                   return ListView.builder(
                                     scrollDirection: Axis.horizontal,
                                     itemCount: productosFiltrados.length,
@@ -425,7 +539,6 @@ class _HomePageState extends State<HomePage>
                                               imagen.producto.id == producto.id)
                                           .map((imagen) => imagen.imagen)
                                           .toList();
-
                                       return ProductoCard(
                                         imagenes: imagenesProducto,
                                         producto: producto,
@@ -472,11 +585,54 @@ class _HomePageState extends State<HomePage>
                           ),
                           SizedBox(
                             height: 300,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: 10,
-                              itemBuilder: (context, index) {
-                                return const SedeCard();
+                            child: FutureBuilder(
+                              future: _datosFuture,
+                              builder: (context, snapshotSedes) {
+                                if (snapshotSedes.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else if (snapshotSedes.data!.isEmpty) {
+                                  return const Center(
+                                    child: Text(
+                                      'Sin sedes',
+                                      style: TextStyle(fontSize: 24),
+                                    ),
+                                  );
+                                } else if (snapshotSedes.hasError) {
+                                  return Center(
+                                    child: Text(
+                                      'Ocurrio un error por favor reportelo ${snapshotSedes.error}',
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
+                                  );
+                                } else {
+                                  // Lista de todas la sedes
+                                  final List<SedeModel> allsedes =
+                                      snapshotSedes.data![3];
+                                  final List<ImagenSedeModel> allImagesSedes =
+                                      snapshotSedes.data![2];
+                                  return ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: allsedes.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      // sede que vamos a contruir
+                                      SedeModel sede = allsedes[index];
+                                      //Buscamos las imagenes de la sede en base a la sede actual (index)
+                                      List<String> imagesSede = allImagesSedes
+                                          .where((imagen) =>
+                                              imagen.sede.id == sede.id)
+                                          .map((imagen) => imagen.imagen)
+                                          .toList();
+                                      return SedeCard(
+                                        sede: sede,
+                                        imagenes: imagesSede,
+                                      );
+                                    },
+                                  );
+                                }
                               },
                             ),
                           ),
@@ -513,7 +669,6 @@ class _HomePageState extends State<HomePage>
                   ),
                 ),
               ),
-
             // Iconos en la parte superior derecha
             Positioned(
               top: 40,

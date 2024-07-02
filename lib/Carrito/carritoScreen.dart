@@ -31,7 +31,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
             width: double.infinity,
             height: double.infinity,
           ),
-          
+
           Positioned(
             top: 40,
             left: 20,

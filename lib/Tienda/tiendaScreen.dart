@@ -4,6 +4,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:tienda_app/Auth/authScreen.dart';
+import 'package:tienda_app/Buscador/searchDelegate.dart';
 import 'package:tienda_app/Carrito/carritoScreen.dart';
 import 'package:tienda_app/Home/homePage.dart';
 import 'package:tienda_app/Home/profileCard.dart';
@@ -18,7 +19,6 @@ import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/provider.dart';
 import 'package:tienda_app/responsive.dart';
 import 'package:flutter/material.dart';
-
 import '../Models/auxPedidoModel.dart';
 
 class TiendaScreen extends StatefulWidget {
@@ -29,12 +29,22 @@ class TiendaScreen extends StatefulWidget {
 }
 
 class _TiendaScreenState extends State<TiendaScreen> {
+  late Future<List<dynamic>> _future;
+
   int _count = 0;
 
   @override
   void initState() {
     super.initState();
     _countPedidos();
+    _future = _fetchData();
+  }
+
+  Future<List<dynamic>> _fetchData() async {
+    return Future.wait([
+      getProductos(),
+      getImagenProductos(),
+    ]);
   }
 
   Future _countPedidos() async {
@@ -67,7 +77,6 @@ class _TiendaScreenState extends State<TiendaScreen> {
               pedido.estado == "PENDIENTE" &&
               pedido.pedidoConfirmado == false)
           .firstOrNull;
-
       if (pedidoPendiente != null) {
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => const CarritoScreen()));
@@ -83,7 +92,6 @@ class _TiendaScreenState extends State<TiendaScreen> {
   Widget build(BuildContext context) {
     return Consumer<AppState>(builder: (context, appState, _) {
       final usuarioAutenticado = appState.usuarioAutenticado;
-
       return Consumer<Tiendacontroller>(
           builder: (context, tiendaController, _) {
         final count = tiendaController.count;
@@ -104,6 +112,7 @@ class _TiendaScreenState extends State<TiendaScreen> {
                         );
                       },
                       child: Container(
+                        padding: const EdgeInsets.all(3),
                         width: 50,
                         height: 50,
                         decoration: const BoxDecoration(
@@ -130,7 +139,12 @@ class _TiendaScreenState extends State<TiendaScreen> {
                               // Contenedor que envuelve un botón de búsqueda.
                               color: primaryColor,
                               child: IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    showSearch(
+                                      context: context,
+                                      delegate: SearchProductoDelegate(_future),
+                                    );
+                                  },
                                   icon: const Icon(
                                     Icons.search,
                                     color: Colors.white,
@@ -141,23 +155,26 @@ class _TiendaScreenState extends State<TiendaScreen> {
                       Stack(
                         children: [
                           ClipRRect(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(50)),
-                              child: Container(
-                                  // Contenedor que envuelve un botón de búsqueda.
-                                  color: primaryColor,
-                                  child: IconButton(
-                                      onPressed: () {
-                                        if (usuarioAutenticado != null) {
-                                          openCarScreen(usuarioAutenticado);
-                                        } else {
-                                          _InicioSesion(context);
-                                        }
-                                      },
-                                      icon: const Icon(
-                                        Icons.shopping_cart,
-                                        color: Colors.white,
-                                      )))),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(50)),
+                            child: Container(
+                              // Contenedor que envuelve un botón de búsqueda.
+                              color: primaryColor,
+                              child: IconButton(
+                                onPressed: () {
+                                  if (usuarioAutenticado != null) {
+                                    openCarScreen(usuarioAutenticado);
+                                  } else {
+                                    _InicioSesion(context);
+                                  }
+                                },
+                                icon: const Icon(
+                                  Icons.shopping_cart,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
                           Positioned(
                             right: 0,
                             top: 0,
@@ -182,17 +199,20 @@ class _TiendaScreenState extends State<TiendaScreen> {
                       const SizedBox(width: 20),
                     if (!Responsive.isMobile(context))
                       ClipRRect(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(50)),
-                          child: Container(
-                              // Contenedor que envuelve un botón de búsqueda.
-                              color: primaryColor,
-                              child: IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(
-                                    Icons.chat,
-                                    color: Colors.white,
-                                  )))),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(50)),
+                        child: Container(
+                          // Contenedor que envuelve un botón de búsqueda.
+                          color: primaryColor,
+                          child: IconButton(
+                            onPressed: () {},
+                            icon: const Icon(
+                              Icons.chat,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
                     if (Responsive.isMobile(context))
                       SpeedDial(
                         icon: Icons.add,
@@ -201,45 +221,45 @@ class _TiendaScreenState extends State<TiendaScreen> {
                         children: [
                           SpeedDialChild(
                             child: ClipRRect(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(50)),
-                                child: Container(
-                                    // Contenedor que envuelve un botón de búsqueda.
-                                    color: primaryColor,
-                                    child: IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(
-                                          Icons.search,
-                                          color: Colors.white,
-                                        )))),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(50)),
+                              child: Container(
+                                // Contenedor que envuelve un botón de búsqueda.
+                                color: primaryColor,
+                                child: IconButton(
+                                  onPressed: () {},
+                                  icon: const Icon(
+                                    Icons.search,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                           SpeedDialChild(
                             child: Stack(
                               children: [
                                 ClipRRect(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(50)),
-                                    child: Container(
-                                        // Contenedor que envuelve un botón de búsqueda.
-                                        color: primaryColor,
-                                        child: IconButton(
-                                            onPressed: () {
-                                              if (usuarioAutenticado != null) {
-                                                if (usuarioAutenticado !=
-                                                    null) {
-                                                  openCarScreen(
-                                                      usuarioAutenticado);
-                                                } else {
-                                                  _InicioSesion(context);
-                                                }
-                                              } else {
-                                                _InicioSesion(context);
-                                              }
-                                            },
-                                            icon: const Icon(
-                                              Icons.shopping_cart,
-                                              color: Colors.white,
-                                            )))),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(50)),
+                                  child: Container(
+                                    // Contenedor que envuelve un botón de búsqueda.
+                                    color: primaryColor,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        if (usuarioAutenticado != null) {
+                                          openCarScreen(usuarioAutenticado);
+                                        } else {
+                                          _InicioSesion(context);
+                                        }
+                                      },
+                                      icon: const Icon(
+                                        Icons.shopping_cart,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                                 Positioned(
                                   right: 0,
                                   top: 0,
@@ -263,17 +283,20 @@ class _TiendaScreenState extends State<TiendaScreen> {
                           ),
                           SpeedDialChild(
                             child: ClipRRect(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(50)),
-                                child: Container(
-                                    // Contenedor que envuelve un botón de búsqueda.
-                                    color: primaryColor,
-                                    child: IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(
-                                          Icons.chat,
-                                          color: Colors.white,
-                                        )))),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(50)),
+                              child: Container(
+                                // Contenedor que envuelve un botón de búsqueda.
+                                color: primaryColor,
+                                child: IconButton(
+                                  onPressed: () {},
+                                  icon: const Icon(
+                                    Icons.chat,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
