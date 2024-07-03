@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lider/unidadCardLider.dart';
 import 'package:tienda_app/Models/unidadProduccionModel.dart';
@@ -128,6 +127,10 @@ class CardsUnidadLider extends StatelessWidget {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
+                  } else if (snapshot.hasError) {
+                    return Text('Error al cargar unidades: ${snapshot.error}');
+                  } else if (snapshot.data == null) {
+                    return const Text('No se encontraron unidades');
                   } else {
                     List<UnidadProduccionModel> unidadesProduccion =
                         snapshot.data!;

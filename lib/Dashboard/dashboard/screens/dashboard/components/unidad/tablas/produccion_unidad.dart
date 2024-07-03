@@ -3,28 +3,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:tienda_app/Dashboard/listas/tablasLider.dart';
+import 'package:tienda_app/Models/produccionModel.dart';
+import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 
 class ProduccionUnidad extends StatefulWidget {
-  const ProduccionUnidad({super.key});
+  final List<ProduccionModel> producciones;
+  const ProduccionUnidad({super.key, required this.producciones});
 
   @override
   State<ProduccionUnidad> createState() => _ProduccionUnidadState();
 }
 
 class _ProduccionUnidadState extends State<ProduccionUnidad> {
-  List<ProduccionLiderClase> _producciones = [];
+  List<ProduccionModel> _producciones = [];
+  List<ProductoModel> listaProductos = [];
 
   late ProduccionUnidadDataGridSource _dataGridSource;
 
   @override
   void initState() {
     super.initState();
-    _producciones = produccionLiderList;
-    _dataGridSource =
-        ProduccionUnidadDataGridSource(producciones: _producciones);
+    _dataGridSource = ProduccionUnidadDataGridSource(
+        producciones: _producciones, listaProductos: listaProductos);
+    _producciones = widget.producciones;
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    List<ProductoModel> productosCargados = await getProductos();
+
+    listaProductos = productosCargados;
+
+    // Ahora inicializa _dataGridSource después de cargar los datos
+    _dataGridSource = ProduccionUnidadDataGridSource(
+        producciones: _producciones, listaProductos: listaProductos);
   }
 
   @override
@@ -250,24 +264,38 @@ class _ProduccionUnidadState extends State<ProduccionUnidad> {
 }
 
 class ProduccionUnidadDataGridSource extends DataGridSource {
+  String productoNombre(int productoId, List<ProductoModel> productos) {
+    String productName = "";
+
+    for (var producto in productos) {
+      if (producto.id == productoId) {
+        productName = producto.nombre;
+        break;
+      }
+    }
+
+    return productName;
+  }
+
   ProduccionUnidadDataGridSource(
-      {required List<ProduccionLiderClase> producciones}) {
+      {required List<ProduccionModel> producciones,
+      required List<ProductoModel> listaProductos}) {
     _produccionData = producciones.map<DataGridRow>((produccion) {
       return DataGridRow(cells: [
-        DataGridCell<String>(columnName: 'Número', value: produccion.numero),
+        DataGridCell<int>(columnName: 'Número', value: produccion.numero),
         DataGridCell<String>(
             columnName: 'Unidad Producción',
-            value: produccion.unidadProduccion),
+            value: produccion.unidadProduccion.nombre),
         DataGridCell<String>(
-            columnName: 'Producto', value: produccion.producto),
-        DataGridCell<String>(
-            columnName: 'Cantidad', value: produccion.cantidad),
+            columnName: 'Producto',
+            value: productoNombre(produccion.producto, productos)),
+        DataGridCell<int>(columnName: 'Cantidad', value: produccion.cantidad),
         DataGridCell<String>(
             columnName: 'Fecha Producción', value: produccion.fechaProduccion),
         DataGridCell<String>(
             columnName: 'Fecha Vencimiento',
             value: produccion.fechaVencimiento),
-        DataGridCell<String>(
+        DataGridCell<int>(
             columnName: 'Costo Producción', value: produccion.costoProduccion),
         DataGridCell<String>(
             columnName: 'Fecha Despacho', value: produccion.fechaDespacho),
@@ -338,8 +366,10 @@ class ProduccionUnidadDataGridSource extends DataGridSource {
           child: (row.getCells()[i].value is Widget)
               ? row.getCells()[i].value
               : Text(i == 6
-                  ? "\$${row.getCells()[i].value}"
-                  : row.getCells()[i].value.toString()),
+                  ? "\$${formatter.format(row.getCells()[i].value)}"
+                  : i == 4 || i == 5 || i == 7
+                      ? "${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).day)}-${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).month)}-${DateTime.parse(row.getCells()[i].value.toString()).year.toString()} ${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).hour)}:${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).minute)}"
+                      : row.getCells()[i].value.toString()),
         ),
     ]);
   }

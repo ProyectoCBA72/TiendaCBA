@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lider/card_pedido_lider.dart';
-import 'package:tienda_app/Dashboard/listas/CardsPedidosLider.dart';
+import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/CardsPedidosClase.dart';
 import 'package:tienda_app/Models/pedidoModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
@@ -115,9 +115,9 @@ class FileInfoCardPedidoGridView extends StatelessWidget {
                       for (var r = 0; r < snapshotPedido.data!.length; r++) {
                         if (snapshotPedido.data![r].puntoVenta ==
                                 snapshotPunto.data![p].id &&
-                            snapshotPunto.data![p].sede == usuario.sede) {
-                          if (snapshotPedido.data![r].estado == "PENDIENTE" &&
-                              snapshotPedido.data![r].pedidoConfirmado) {
+                            snapshotPunto.data![p].sede == usuario.sede &&
+                            snapshotPedido.data![r].pedidoConfirmado) {
+                          if (snapshotPedido.data![r].estado == "PENDIENTE") {
                             pedidosPendientes++;
                           } else if (snapshotPedido.data![r].estado ==
                               "CANCELADO") {
@@ -135,28 +135,28 @@ class FileInfoCardPedidoGridView extends StatelessWidget {
 
                     // Creación de la lista de widgets de PedidoLider con los datos calculados
                     List pedidosCardLider = [
-                      PedidoLider(
+                      PedidoCardClase(
                         title: "Pedidos",
                         svgSrc: "assets/icons/pedido.svg",
                         totalReservas: pedidos.toString(),
                         color: primaryColor,
                         percentage: pedidos,
                       ),
-                      PedidoLider(
+                      PedidoCardClase(
                         title: "Entregados",
                         svgSrc: "assets/icons/check.svg",
                         totalReservas: pedidosEntregados.toString(),
                         color: Colors.green,
                         percentage: pedidosEntregados,
                       ),
-                      PedidoLider(
+                      PedidoCardClase(
                         title: "Cancelados",
                         svgSrc: "assets/icons/cancel.svg",
                         totalReservas: pedidosCancelados.toString(),
                         color: Colors.red,
                         percentage: pedidosCancelados,
                       ),
-                      PedidoLider(
+                      PedidoCardClase(
                         title: "Pendientes",
                         svgSrc: "assets/icons/pendiente.svg",
                         totalReservas: pedidosPendientes.toString(),
@@ -167,7 +167,8 @@ class FileInfoCardPedidoGridView extends StatelessWidget {
 
                     // Construcción de la cuadrícula con los widgets de PedidoLider
                     return GridView.builder(
-                      physics: const NeverScrollableScrollPhysics(), // Evita el scroll de la cuadrícula
+                      physics:
+                          const NeverScrollableScrollPhysics(), // Evita el scroll de la cuadrícula
                       shrinkWrap: true,
                       itemCount: pedidosCardLider.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

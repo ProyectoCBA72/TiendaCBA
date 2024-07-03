@@ -3,26 +3,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:tienda_app/Dashboard/listas/tablasLider.dart';
+import 'package:tienda_app/Models/boletaModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
 class EventosUnidad extends StatefulWidget {
-  const EventosUnidad({super.key});
+  final List<BoletaModel> boletas;
+  const EventosUnidad({super.key, required this.boletas});
 
   @override
   State<EventosUnidad> createState() => _EventosUnidadState();
 }
 
 class _EventosUnidadState extends State<EventosUnidad> {
-  List<EventosLiderClase> _eventos = [];
+  List<BoletaModel> _eventos = [];
+  List<UsuarioModel> listaUsuarios = [];
 
   late EventosUnidadDataGridSource _dataGridSource;
 
   @override
   void initState() {
     super.initState();
-    _eventos = eventoLiderList;
-    _dataGridSource = EventosUnidadDataGridSource(eventos: _eventos);
+    _dataGridSource = EventosUnidadDataGridSource(
+        eventos: _eventos, listaUsuarios: listaUsuarios);
+    _eventos = widget.boletas;
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    List<UsuarioModel> usuariosCargados = await getUsuarios();
+
+    listaUsuarios = usuariosCargados;
+
+    // Ahora inicializa _dataGridSource después de cargar los datos
+    _dataGridSource = EventosUnidadDataGridSource(
+        eventos: _eventos, listaUsuarios: listaUsuarios);
   }
 
   @override
@@ -204,21 +219,105 @@ class _EventosUnidadState extends State<EventosUnidad> {
 }
 
 class EventosUnidadDataGridSource extends DataGridSource {
-  EventosUnidadDataGridSource({required List<EventosLiderClase> eventos}) {
+  String nombreUsuarioEvento(int usuarioId, List<UsuarioModel> usuarios) {
+    String nombre = "";
+
+    for (var usuario in usuarios) {
+      if (usuario.id == usuarioId) {
+        nombre = "${usuario.nombres} ${usuario.apellidos}";
+      }
+    }
+
+    return nombre;
+  }
+
+  String tipoDocumentoEvento(int usuarioId, List<UsuarioModel> usuarios) {
+    String tipoDocumento = "";
+
+    for (var usuario in usuarios) {
+      if (usuario.id == usuarioId) {
+        tipoDocumento = usuario.tipoDocumento;
+      }
+    }
+
+    return tipoDocumento;
+  }
+
+  String numeroDocumentoEvento(int usuarioId, List<UsuarioModel> usuarios) {
+    String numeroDocumento = "";
+
+    for (var usuario in usuarios) {
+      if (usuario.id == usuarioId) {
+        numeroDocumento = usuario.numeroDocumento;
+      }
+    }
+
+    return numeroDocumento;
+  }
+
+  String correoEvento(int usuarioId, List<UsuarioModel> usuarios) {
+    String correo = "";
+
+    for (var usuario in usuarios) {
+      if (usuario.id == usuarioId) {
+        correo = usuario.correoElectronico;
+      }
+    }
+
+    return correo;
+  }
+
+  String telefonoFijoEvento(int usuarioId, List<UsuarioModel> usuarios) {
+    String telefonoFijo = "";
+
+    for (var usuario in usuarios) {
+      if (usuario.id == usuarioId) {
+        telefonoFijo = usuario.telefono;
+      }
+    }
+
+    return telefonoFijo;
+  }
+
+  String telefonoCelularEvento(int usuarioId, List<UsuarioModel> usuarios) {
+    String telefonoCelular = "";
+
+    for (var usuario in usuarios) {
+      if (usuario.id == usuarioId) {
+        telefonoCelular = usuario.telefonoCelular;
+      }
+    }
+
+    return telefonoCelular;
+  }
+
+  EventosUnidadDataGridSource(
+      {required List<BoletaModel> eventos,
+      required final List<UsuarioModel> listaUsuarios}) {
     _eventoData = eventos.map<DataGridRow>((evento) {
       return DataGridRow(cells: [
-        DataGridCell<String>(columnName: 'Evento', value: evento.titulo),
-        DataGridCell<String>(columnName: 'Fecha', value: evento.fecha),
-        DataGridCell<String>(columnName: 'Usuario', value: evento.usuario),
         DataGridCell<String>(
-            columnName: 'Tipo Documento', value: evento.tipoDocumento),
+            columnName: 'Evento', value: evento.anuncio.titulo),
         DataGridCell<String>(
-            columnName: 'Número Documento', value: evento.documento),
-        DataGridCell<String>(columnName: 'Correo', value: evento.correo),
+            columnName: 'Fecha', value: evento.anuncio.fechaEvento),
         DataGridCell<String>(
-            columnName: 'Teléfono Fijo', value: evento.telefono1),
+            columnName: 'Usuario',
+            value: nombreUsuarioEvento(evento.usuario, listaUsuarios)),
         DataGridCell<String>(
-            columnName: 'Teléfono Celular', value: evento.telefono2),
+            columnName: 'Tipo Documento',
+            value: tipoDocumentoEvento(evento.usuario, listaUsuarios)),
+        DataGridCell<String>(
+            columnName: 'Número Documento',
+            value: numeroDocumentoEvento(evento.usuario, listaUsuarios)),
+        DataGridCell<String>(
+            columnName: 'Correo',
+            value: correoEvento(evento.usuario, listaUsuarios)),
+        DataGridCell<String>(
+            columnName: 'Teléfono Fijo',
+            value: telefonoFijoEvento(evento.usuario, listaUsuarios)),
+        DataGridCell<String>(
+            columnName: 'Teléfono Celular',
+            value: telefonoCelularEvento(evento.usuario, listaUsuarios)),
         DataGridCell<Widget>(
             columnName: 'Eliminar',
             value: ElevatedButton(
@@ -267,7 +366,9 @@ class EventosUnidadDataGridSource extends DataGridSource {
           padding: const EdgeInsets.all(8.0),
           child: (row.getCells()[i].value is Widget)
               ? row.getCells()[i].value
-              : Text(row.getCells()[i].value.toString()),
+              : Text(i == 1
+                  ? "${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).day)}-${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).month)}-${DateTime.parse(row.getCells()[i].value.toString()).year.toString()} ${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).hour)}:${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).minute)}"
+                  : row.getCells()[i].value.toString()),
         ),
     ]);
   }

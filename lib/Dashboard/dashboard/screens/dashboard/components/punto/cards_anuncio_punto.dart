@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/anuncioCardPunto.dart';
 import 'package:tienda_app/Models/anuncioModel.dart';
 import 'package:tienda_app/Models/imagenAnuncioModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 
 // Vista donde se llamaran las cards superiores de conteo de reservas y las organiza que se adapten a todos los dispositivos
 
 class CardsAnuncioPunto extends StatelessWidget {
+  final UsuarioModel usuario;
   const CardsAnuncioPunto({
     super.key,
+    required this.usuario,
   });
 
   Future<List<dynamic>> futureData() async {
@@ -125,34 +128,59 @@ class CardsAnuncioPunto extends StatelessWidget {
           height: 300,
           child: FutureBuilder(
             future: futureData(),
-            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            builder:
+                (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
-              } else {
-                // creamos las instancias con los datos del futuro creado en la parte superior.
-                final List<AnuncioModel> anuncios = snapshot.data![0];
-                final List<ImagenAnuncioModel> allImagesAnuncio =
-                    snapshot.data![1];
-
-                // retornamos el contructor pasando la lista de imagenes y una instancia de la lista.
-                return ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: anuncios.length,
-                  itemBuilder: (context, index) {
-                    final anuncio = anuncios[index];
-                    // crear una lista con las urls de las imagenes relacionadas a cada uno de los anuncios.
-                    List<String> images = allImagesAnuncio
-                        .where((imagen) => imagen.anuncio.id == anuncio.id)
-                        .map((images) => images.imagen)
-                        .toList();
-                    return AnuncioCardPunto(
-                      images: images,
-                      anuncio: anuncio,
-                    );
-                  },
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text('Ocurrio un error: ${snapshot.error} '),
                 );
+              } else {
+                List<AnuncioModel> allAnuncios = snapshot.data![0];
+                List<ImagenAnuncioModel> allImagesAnuncios = snapshot.data![1];
+                if (allAnuncios.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'No hay anuncios',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  );
+                } else {
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: allAnuncios.length,
+                    itemBuilder: (context, index) {
+                      if (allAnuncios[index].usuario.sede == usuario.sede) {
+                        AnuncioModel anuncio = allAnuncios[index];
+                        List<String> imagesAnuncio = allImagesAnuncios
+                            .where((imagen) => imagen.anuncio.id == anuncio.id)
+                            .map((imagen) => imagen.imagen)
+                            .toList();
+
+                        return AnuncioCardPunto(
+                          images: imagesAnuncio,
+                          anuncio: anuncio,
+                        );
+                      } else {
+                        return const Center(
+                          child: Text(
+                            'No hay anuncios para mostrar en esta sede',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  );
+                }
               }
             },
           ),

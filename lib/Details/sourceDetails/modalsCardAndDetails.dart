@@ -13,7 +13,7 @@ void modalCompartirWhatsapp(
     builder: (context) {
       return AlertDialog(
         title: const Text(
-          'Va a compartir via whatsapp la información de uno de nuestros producto ',
+          '¿Quiere compartir la información de este producto vía WhatsApp?',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
@@ -21,7 +21,7 @@ void modalCompartirWhatsapp(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             const Text(
-                "Por favor ingrese el numero de telefono de la persona."),
+                "Por favor, ingrese el número de teléfono celular de la persona con la cual desea compartir este producto."),
             const SizedBox(
               height: 10,
             ),
@@ -63,7 +63,7 @@ void modalCompartirWhatsapp(
                         borderSide: const BorderSide(color: Colors.white),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      hintText: 'Telefono',
+                      hintText: 'Teléfono',
                       hintStyle: const TextStyle(color: Colors.black),
                       fillColor: Colors.grey[200],
                       filled: true,
@@ -72,7 +72,7 @@ void modalCompartirWhatsapp(
                     // Validación del campo
                     validator: (String? value) {
                       if (value == null || value.isEmpty) {
-                        return 'El telefono es obligatorio';
+                        return 'El teléfono es obligatorio';
                       }
                       return null;
                     },
@@ -90,7 +90,7 @@ void modalCompartirWhatsapp(
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: Text('Cancelar')),
+                  child: const Text('Cancelar')),
               ElevatedButton(
                   onPressed: () async {
                     // vincular whatsapp

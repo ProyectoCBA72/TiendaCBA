@@ -132,6 +132,10 @@ class _CardsPuntoLiderState extends State<CardsPuntoLider> {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
+                  } else if (snapshot.hasError) {
+                    return Text('Error al cargar puntos: ${snapshot.error}');
+                  } else if (snapshot.data == null) {
+                    return const Text('No se encontraron puntos');
                   } else {
                     List<PuntoVentaModel> puntosVenta = snapshot.data!;
                     List<PuntoVentaModel> puntosVentaSede = puntosVenta

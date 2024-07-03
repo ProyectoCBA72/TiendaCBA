@@ -3,26 +3,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:tienda_app/Dashboard/listas/tablasLider.dart';
+import 'package:tienda_app/Models/inventarioModel.dart';
+import 'package:tienda_app/Models/produccionModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
 class BodegaLider extends StatefulWidget {
-  const BodegaLider({super.key});
+  final List<InventarioModel> inventarioLista;
+  const BodegaLider({super.key, required this.inventarioLista});
 
   @override
   State<BodegaLider> createState() => _BodegaLiderState();
 }
 
 class _BodegaLiderState extends State<BodegaLider> {
-  List<BodegaLiderClase> _bodegas = [];
+  List<InventarioModel> _bodegas = [];
+  List<ProduccionModel> listaProducciones = [];
 
   late BodegaLiderDataGridSource _dataGridSource;
 
   @override
   void initState() {
     super.initState();
-    _bodegas = bodegaLiderList;
-    _dataGridSource = BodegaLiderDataGridSource(bodegas: _bodegas);
+    _dataGridSource = BodegaLiderDataGridSource(
+        bodegas: _bodegas, listaProducciones: listaProducciones);
+    _bodegas = widget.inventarioLista;
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    List<ProduccionModel> produccionesCargadas = await getProducciones();
+
+    listaProducciones = produccionesCargadas;
+
+    // Ahora inicializa _dataGridSource después de cargar los datos
+    _dataGridSource = BodegaLiderDataGridSource(
+        bodegas: _bodegas, listaProducciones: listaProducciones);
   }
 
   @override
@@ -196,24 +211,74 @@ class _BodegaLiderState extends State<BodegaLider> {
 }
 
 class BodegaLiderDataGridSource extends DataGridSource {
-  BodegaLiderDataGridSource({required List<BodegaLiderClase> bodegas}) {
+  String numeroProduccionInventario(
+      int produccionId, List<ProduccionModel> producciones) {
+    String produccionNumero = "";
+
+    for (var produccion in producciones) {
+      if (produccion.id == produccionId) {
+        produccionNumero = produccion.numero.toString();
+        break;
+      }
+    }
+
+    return produccionNumero;
+  }
+
+  String unidadProduccionInventario(
+      int produccionId, List<ProduccionModel> producciones) {
+    String produccionUnidad = "";
+
+    for (var produccion in producciones) {
+      if (produccion.id == produccionId) {
+        produccionUnidad = produccion.unidadProduccion.nombre;
+        break;
+      }
+    }
+
+    return produccionUnidad;
+  }
+
+  String cantidadProduccionInventario(
+      int produccionId, List<ProduccionModel> producciones) {
+    String produccionCantidad = "";
+
+    for (var produccion in producciones) {
+      if (produccion.id == produccionId) {
+        produccionCantidad = produccion.cantidad.toString();
+        break;
+      }
+    }
+
+    return produccionCantidad;
+  }
+
+  BodegaLiderDataGridSource(
+      {required List<InventarioModel> bodegas,
+      required List<ProduccionModel> listaProducciones}) {
     _bodegaData = bodegas.map<DataGridRow>((bodega) {
       return DataGridRow(cells: [
-        DataGridCell<String>(columnName: 'Producto', value: bodega.producto),
         DataGridCell<String>(
-            columnName: 'Número Producción', value: bodega.numeroProduccion),
+            columnName: 'Producto', value: bodega.bodega.producto.nombre),
         DataGridCell<String>(
-            columnName: 'Unidad Producción', value: bodega.unidadProduccion),
+            columnName: 'Número Producción',
+            value: numeroProduccionInventario(
+                bodega.produccion, listaProducciones)),
         DataGridCell<String>(
-            columnName: 'Cantidad Enviada', value: bodega.cantidadEnviada),
+            columnName: 'Unidad Producción',
+            value: unidadProduccionInventario(
+                bodega.produccion, listaProducciones)),
         DataGridCell<String>(
-            columnName: 'Cantidad Llegada', value: bodega.cantidadLlegada),
+            columnName: 'Cantidad Enviada',
+            value: cantidadProduccionInventario(
+                bodega.produccion, listaProducciones)),
+        DataGridCell<int>(columnName: 'Cantidad Llegada', value: bodega.stock),
+        DataGridCell<int>(
+            columnName: 'Cantidad Bodega', value: bodega.bodega.cantidad),
         DataGridCell<String>(
-            columnName: 'Cantidad Bodega', value: bodega.cantidadBodega),
+            columnName: 'Fecha Inventario', value: bodega.fecha),
         DataGridCell<String>(
-            columnName: 'Fecha Inventario', value: bodega.fechaInventario),
-        DataGridCell<String>(
-            columnName: 'Punto Venta', value: bodega.puntoVenta),
+            columnName: 'Punto Venta', value: bodega.bodega.puntoVenta.nombre),
       ]);
     }).toList();
   }
@@ -254,7 +319,9 @@ class BodegaLiderDataGridSource extends DataGridSource {
           alignment: Alignment.centerLeft,
           child: (row.getCells()[i].value is Widget)
               ? row.getCells()[i].value
-              : Text(row.getCells()[i].value.toString()),
+              : Text(i == 6
+                  ? "${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).day)}-${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).month)}-${DateTime.parse(row.getCells()[i].value.toString()).year.toString()} ${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).hour)}:${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).minute)}"
+                  : row.getCells()[i].value.toString()),
         ),
     ]);
   }

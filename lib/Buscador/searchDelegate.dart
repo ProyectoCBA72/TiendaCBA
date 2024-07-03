@@ -15,7 +15,7 @@ class SearchProductoDelegate extends SearchDelegate {
 //  creamos un futuro para traer los datos al tiempo.
   Future<List<dynamic>> fechData() {
     return Future.wait([
-      getProductos(),
+      getProductos(),   
       getImagenProductos(),
     ]);
   }
@@ -40,13 +40,11 @@ class SearchProductoDelegate extends SearchDelegate {
       primaryColor: Colors.white,
       textTheme: const TextTheme(),
       inputDecorationTheme: const InputDecorationTheme(
-        
-        contentPadding: EdgeInsets.all(12),
-        hintStyle: TextStyle(
-          color: Colors.grey, // Cambia el color del hint text
-        ),
-        border: InputBorder.none
-      ),
+          contentPadding: EdgeInsets.all(12),
+          hintStyle: TextStyle(
+            color: Colors.grey, // Cambia el color del hint text
+          ),
+          border: InputBorder.none),
     );
   }
 
@@ -77,7 +75,7 @@ class SearchProductoDelegate extends SearchDelegate {
   Widget _buildFutureBuilder(BuildContext context) {
     return FutureBuilder(
       // future: datosFuture, // al ser asi las imagenes se mezclan por alguna razon.
-      future: fechData(),  // en este caso funciona pero se demora un poco mas.
+      future: fechData(), // en este caso funciona pero se demora un poco mas.
       builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(

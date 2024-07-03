@@ -261,7 +261,7 @@ class _VerificationScreenRegisterState
                                             focusNode: _focusNodes[index],
                                             textAlign: TextAlign.center,
                                             style: const TextStyle(
-                                                fontSize: 23,
+                                                fontSize: 35,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.black),
                                             decoration: InputDecoration(
@@ -278,7 +278,7 @@ class _VerificationScreenRegisterState
                                               fillColor: Colors.white,
                                               hintText: '*',
                                               hintStyle: const TextStyle(
-                                                  fontSize: 24,
+                                                  fontSize: 35,
                                                   color: Colors.black),
                                             ),
                                             maxLength: 1,
@@ -513,7 +513,7 @@ class _VerificationScreenRegisterState
                                                         _focusNodes[index],
                                                     textAlign: TextAlign.center,
                                                     style: const TextStyle(
-                                                        fontSize: 23,
+                                                        fontSize: 35,
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors.black),
@@ -537,7 +537,7 @@ class _VerificationScreenRegisterState
                                                       hintText: '*',
                                                       hintStyle:
                                                           const TextStyle(
-                                                              fontSize: 24,
+                                                              fontSize: 35,
                                                               color:
                                                                   Colors.black),
                                                     ),

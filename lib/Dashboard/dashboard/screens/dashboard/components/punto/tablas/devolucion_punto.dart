@@ -3,28 +3,50 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:tienda_app/Dashboard/listas/tablasLider.dart';
+import 'package:tienda_app/Models/auxPedidoModel.dart';
+import 'package:tienda_app/Models/devolucionesModel.dart';
+import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 
 class DevolucionPunto extends StatefulWidget {
-  const DevolucionPunto({super.key});
+  final List<AuxPedidoModel> auxPedido;
+  const DevolucionPunto({super.key, required this.auxPedido});
 
   @override
   State<DevolucionPunto> createState() => _DevolucionPuntoState();
 }
 
 class _DevolucionPuntoState extends State<DevolucionPunto> {
-  List<DevolucionLiderClase> _devoluciones = [];
+  List<AuxPedidoModel> _devoluciones = [];
+  List<ProductoModel> listaProductos = [];
+  List<DevolucionesModel> listaDevoluciones = [];
 
   late DevolucionPuntoDataGridSource _dataGridSource;
 
   @override
   void initState() {
     super.initState();
-    _devoluciones = devolucionLiderList;
-    _dataGridSource =
-        DevolucionPuntoDataGridSource(devoluciones: _devoluciones);
+    _dataGridSource = DevolucionPuntoDataGridSource(
+        devoluciones: _devoluciones,
+        listaProductos: listaProductos,
+        listaDevoluciones: listaDevoluciones);
+    _devoluciones = widget.auxPedido;
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    List<ProductoModel> productosCargados = await getProductos();
+    List<DevolucionesModel> devolucionesCargadas = await getDevoluciones();
+
+    listaProductos = productosCargados;
+    listaDevoluciones = devolucionesCargadas;
+
+    // Ahora inicializa _dataGridSource después de cargar los datos
+    _dataGridSource = DevolucionPuntoDataGridSource(
+        devoluciones: _devoluciones,
+        listaProductos: listaProductos,
+        listaDevoluciones: listaDevoluciones);
   }
 
   @override
@@ -146,7 +168,7 @@ class _DevolucionPuntoState extends State<DevolucionPunto> {
           const SizedBox(
             height: defaultPadding,
           ),
-                    if (!Responsive.isMobile(context))
+          if (!Responsive.isMobile(context))
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -219,27 +241,123 @@ class _DevolucionPuntoState extends State<DevolucionPunto> {
 }
 
 class DevolucionPuntoDataGridSource extends DataGridSource {
-  DevolucionPuntoDataGridSource(
-      {required List<DevolucionLiderClase> devoluciones}) {
+  String numeroVentaDevolucion(
+      int numeroPedido, List<DevolucionesModel> devoluciones) {
+    String numeroVenta = "";
+
+    for (var devolucion in devoluciones) {
+      if (devolucion.factura.pedido.numeroPedido == numeroPedido) {
+        numeroVenta = devolucion.factura.numero.toString();
+      }
+    }
+
+    return numeroVenta;
+  }
+
+  String productoNombre(int productoAxiliar, List<ProductoModel> productos) {
+    String productName = "";
+
+    for (var producto in productos) {
+      if (producto.id == productoAxiliar) {
+        productName = producto.nombre;
+        break;
+      }
+    }
+
+    return productName;
+  }
+
+  String fechaVentaDevolucion(
+      int numeroPedido, List<DevolucionesModel> devoluciones) {
+    String fechaVenta = "";
+
+    for (var devolucion in devoluciones) {
+      if (devolucion.factura.pedido.numeroPedido == numeroPedido) {
+        fechaVenta = devolucion.factura.fecha;
+      }
+    }
+
+    return fechaVenta;
+  }
+
+  String medioVentaDevolucion(
+      int numeroPedido, List<DevolucionesModel> devoluciones) {
+    String medioVenta = "";
+
+    for (var devolucion in devoluciones) {
+      if (devolucion.factura.pedido.numeroPedido == numeroPedido) {
+        medioVenta = devolucion.factura.medioPago.nombre;
+      }
+    }
+
+    return medioVenta;
+  }
+
+  String fechaDevolucion(
+      int numeroPedido, List<DevolucionesModel> devoluciones) {
+    String fechaDevolucion = "";
+
+    for (var devolucion in devoluciones) {
+      if (devolucion.factura.pedido.numeroPedido == numeroPedido) {
+        fechaDevolucion = devolucion.fecha;
+      }
+    }
+
+    return fechaDevolucion;
+  }
+
+  bool estadoDevolucion(
+      int numeroPedido, List<DevolucionesModel> devoluciones) {
+    bool estadoDevolucion = false;
+
+    for (var devolucion in devoluciones) {
+      if (devolucion.factura.pedido.numeroPedido == numeroPedido) {
+        estadoDevolucion = devolucion.estado;
+      }
+    }
+
+    return estadoDevolucion;
+  }
+
+  DevolucionPuntoDataGridSource({
+    required List<AuxPedidoModel> devoluciones,
+    required List<ProductoModel> listaProductos,
+    required List<DevolucionesModel> listaDevoluciones,
+  }) {
     _devolucionData = devoluciones.map<DataGridRow>((devolucion) {
       return DataGridRow(cells: [
         DataGridCell<String>(
-            columnName: 'Número Venta', value: devolucion.numeroVenta),
-        DataGridCell<String>(columnName: 'Usuario', value: devolucion.usuario),
+            columnName: 'Número Venta',
+            value: numeroVentaDevolucion(
+                devolucion.pedido.numeroPedido, listaDevoluciones)),
         DataGridCell<String>(
-            columnName: 'Número Pedido', value: devolucion.numeroPedido),
+            columnName: 'Usuario',
+            value:
+                "${devolucion.pedido.usuario.nombres} ${devolucion.pedido.usuario.apellidos}"),
+        DataGridCell<int>(
+            columnName: 'Número Pedido', value: devolucion.pedido.numeroPedido),
         DataGridCell<String>(
-            columnName: 'Producto', value: devolucion.producto),
+            columnName: 'Producto',
+            value: productoNombre(devolucion.producto, listaProductos)),
         DataGridCell<String>(
-            columnName: 'Fecha Venta', value: devolucion.fechaVenta),
+            columnName: 'Fecha Venta',
+            value: fechaVentaDevolucion(
+                devolucion.pedido.numeroPedido, listaDevoluciones)),
+        DataGridCell<int>(columnName: 'Valor Pedido', value: devolucion.precio),
         DataGridCell<String>(
-            columnName: 'Valor Pedido', value: devolucion.valorPedido),
+            columnName: 'Medio Pago',
+            value: medioVentaDevolucion(
+                devolucion.pedido.numeroPedido, listaDevoluciones)),
         DataGridCell<String>(
-            columnName: 'Medio Pago', value: devolucion.medioPago),
+            columnName: 'Fecha Devolución',
+            value: fechaDevolucion(
+                devolucion.pedido.numeroPedido, listaDevoluciones)),
         DataGridCell<String>(
-            columnName: 'Fecha Devolución', value: devolucion.fecha),
-        DataGridCell<String>(
-            columnName: 'Estado Devolución', value: devolucion.estado),
+            columnName: 'Estado Devolución',
+            value: estadoDevolucion(
+                    devolucion.pedido.numeroPedido, listaDevoluciones)
+                ? "Cancelado"
+                : "Pendiente"),
       ]);
     }).toList();
   }
@@ -280,7 +398,11 @@ class DevolucionPuntoDataGridSource extends DataGridSource {
           padding: const EdgeInsets.all(8.0),
           child: (row.getCells()[i].value is Widget)
               ? row.getCells()[i].value
-              : Text(i == 5?"\$${row.getCells()[i].value}":row.getCells()[i].value.toString()),
+              : Text(i == 5
+                  ? "\$${formatter.format(row.getCells()[i].value)}"
+                  : i == 4 || i == 7
+                      ? "${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).day)}-${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).month)}-${DateTime.parse(row.getCells()[i].value.toString()).year.toString()} ${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).hour)}:${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).minute)}"
+                      : row.getCells()[i].value.toString()),
         ),
     ]);
   }

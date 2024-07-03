@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tienda_app/Models/imagenProductoModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/Models/visitadoModel.dart';
 import 'package:tienda_app/cardProducts.dart';
 import 'package:tienda_app/constantsDesign.dart';
@@ -14,8 +15,11 @@ import '../../../../../source.dart';
 
 // Contenedor el cual almacenará las cards de los sitios favoritos del usuario
 class VisitadoDetails extends StatefulWidget {
+  final UsuarioModel usuario;
+
   const VisitadoDetails({
     super.key,
+    required this.usuario,
   });
 
   @override
@@ -26,16 +30,17 @@ class _VisitadoDetailsState extends State<VisitadoDetails> {
   @override
   void initState() {
     super.initState();
-    deleteVisitos2Days();
+    deleteVisitos2Days(widget.usuario);
   }
 
-  Future deleteVisitos2Days() async {
+  Future<void> deleteVisitos2Days(UsuarioModel usuario) async {
     final visitados = await getVisitados();
     final now = DateTime.now();
 
     for (var visita in visitados) {
       final fechaVisita = DateTime.parse(visita.fechaVista);
-      if (now.difference(fechaVisita).inDays >= 2) {
+      if (now.difference(fechaVisita).inDays >= 2 &&
+          visita.usuario == usuario.id) {
         // delete visitado
         final url = "$sourceApi/api/visitados/${visita.id}/";
 
@@ -43,14 +48,10 @@ class _VisitadoDetailsState extends State<VisitadoDetails> {
           'Content-Type': 'application/json',
         };
 
-        final response = await http.delete(
+        await http.delete(
           Uri.parse(url),
           headers: headers,
         );
-
-        if (response.statusCode == 204) {
-          print('Datos eliminados correctamente');
-        }
       }
     }
   }
@@ -104,6 +105,10 @@ class _VisitadoDetailsState extends State<VisitadoDetails> {
                               return const Center(
                                 child: CircularProgressIndicator(),
                               );
+                            } else if (snapshotImagenes.hasError) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
                             } else {
                               final allImages = snapshotImagenes.data!;
                               // Traemos todos los productos
@@ -128,7 +133,13 @@ class _VisitadoDetailsState extends State<VisitadoDetails> {
                                         } else if (!snapshot.hasData ||
                                             snapshot.data!.isEmpty) {
                                           return const Center(
-                                            child: Text('No hay Visitados'),
+                                            child: Text(
+                                                'No hay productos visitados'),
+                                          );
+                                        } else if (snapshot.hasError) {
+                                          return Center(
+                                            child: Text(
+                                                'Error al cargar productos visitados: ${snapshot.error}'),
                                           );
                                         } else {
                                           // Todos los productos

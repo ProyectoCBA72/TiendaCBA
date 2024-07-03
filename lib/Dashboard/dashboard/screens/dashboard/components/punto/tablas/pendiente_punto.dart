@@ -42,17 +42,15 @@ class _PendientePuntoState extends State<PendientePunto> {
     List<ProductoModel> productosCargados = await getProductos();
     List<PuntoVentaModel> puntosCargados = await getPuntosVenta();
 
-    setState(() {
-      listaProductos = productosCargados;
-      listaPuntosVenta = puntosCargados;
+    listaProductos = productosCargados;
+    listaPuntosVenta = puntosCargados;
 
-      // Ahora inicializa _dataGridSource después de cargar los datos
-      _dataGridSource = PendientePuntoDataGridSource(
-        pedidos: _pedidos,
-        listaProductos: listaProductos,
-        listaPuntosVenta: listaPuntosVenta,
-      );
-    });
+    // Ahora inicializa _dataGridSource después de cargar los datos
+    _dataGridSource = PendientePuntoDataGridSource(
+      pedidos: _pedidos,
+      listaProductos: listaProductos,
+      listaPuntosVenta: listaPuntosVenta,
+    );
   }
 
   @override

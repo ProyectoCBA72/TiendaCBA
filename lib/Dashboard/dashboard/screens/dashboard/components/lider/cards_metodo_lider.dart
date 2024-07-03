@@ -122,6 +122,10 @@ class CardsMetodoLider extends StatelessWidget {
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
+              } else if (snapshot.hasError) {
+                return Text('Error al cargar metodos: ${snapshot.error}');
+              } else if (snapshot.data == null) {
+                return const Text('No se encontraron metodos');
               } else {
                 final mediosPago = snapshot.data!;
                 return ListView.builder(

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
-
-import 'Tienda/tiendaController.dart';
+import 'package:tienda_app/Tienda/tiendaController.dart';
 
 class AppState extends ChangeNotifier {
   UsuarioModel? _usuarioAutenticado;
@@ -41,7 +40,7 @@ class AppState extends ChangeNotifier {
 
     final usuarios = await getUsuarios();
 
-        // Validar si el usuario almacenado está en la lista de usuarios
+    // Validar si el usuario almacenado está en la lista de usuarios
     if (usuarioId != null) {
       for (var usuario in usuarios) {
         if (usuario.id == usuarioId) {
@@ -53,7 +52,6 @@ class AppState extends ChangeNotifier {
     }
   }
 }
-
 
 class AppProvider extends StatelessWidget {
   final Widget child;

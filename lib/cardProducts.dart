@@ -570,10 +570,10 @@ class _CardProductsState extends State<CardProducts> {
                                             const SizedBox(height: 5),
                                             Text(
                                               _isOnSale
-                                                  ? formatter.format(
-                                                      producto.precioOferta)
-                                                  : formatter
-                                                      .format(producto.precio),
+                                                  ? "\$${formatter.format(
+                                                      producto.precioOferta)}"
+                                                  : "\$${formatter
+                                                      .format(producto.precio)}",
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 color: _isOnSale

@@ -1,19 +1,26 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, unnecessary_null_comparison
+
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:tienda_app/Models/inventarioModel.dart';
+import 'package:tienda_app/Models/produccionModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
-import 'package:tienda_app/responsive.dart';
 
 class ReporteRecibidoAgnoUnidad extends StatelessWidget {
+  final UsuarioModel usuario;
   const ReporteRecibidoAgnoUnidad({
     super.key,
+    required this.usuario,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Título del reporte
         Text(
           "Producciones recibidas por año",
           style: Theme.of(context)
@@ -22,62 +29,50 @@ class ReporteRecibidoAgnoUnidad extends StatelessWidget {
               .copyWith(fontFamily: 'Calibri-Bold'),
         ),
         const SizedBox(height: defaultPadding),
+        // Contenedor principal para el gráfico
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: SizedBox(
             height: 300,
             width: MediaQuery.of(context).size.width,
-            child: SfCartesianChart(
-              tooltipBehavior: TooltipBehavior(enable: true),
-              legend: Legend(isVisible: Responsive.isMobile(context) ? false : true),
-              primaryXAxis: const CategoryAxis(
-                title: AxisTitle(text: 'Año'),
-              ),
-              primaryYAxis: const NumericAxis(
-                title: AxisTitle(text: 'Cantidad de Producciones'),
-              ),
-              series: <CartesianSeries>[
-                FastLineSeries<ProduccionAgnoDataUnidad, String>(
-                  name: 'Cárnicos',
-                  dataSource: _getProduccionDataAgno('Cárnicos'),
-                  xValueMapper: (ProduccionAgnoDataUnidad data, _) => data.agno,
-                  yValueMapper: (ProduccionAgnoDataUnidad data, _) =>
-                      data.cantidad,
-                  color: Colors.red,
-                ),
-                FastLineSeries<ProduccionAgnoDataUnidad, String>(
-                  name: 'Lácteos',
-                  dataSource: _getProduccionDataAgno('Lácteos'),
-                  xValueMapper: (ProduccionAgnoDataUnidad data, _) => data.agno,
-                  yValueMapper: (ProduccionAgnoDataUnidad data, _) =>
-                      data.cantidad,
-                  color: Colors.blue,
-                ),
-                FastLineSeries<ProduccionAgnoDataUnidad, String>(
-                  name: 'Apicultura',
-                  dataSource: _getProduccionDataAgno('Apicultura'),
-                  xValueMapper: (ProduccionAgnoDataUnidad data, _) => data.agno,
-                  yValueMapper: (ProduccionAgnoDataUnidad data, _) =>
-                      data.cantidad,
-                  color: Colors.green,
-                ),
-                FastLineSeries<ProduccionAgnoDataUnidad, String>(
-                  name: 'Porcicultura',
-                  dataSource: _getProduccionDataAgno('Porcicultura'),
-                  xValueMapper: (ProduccionAgnoDataUnidad data, _) => data.agno,
-                  yValueMapper: (ProduccionAgnoDataUnidad data, _) =>
-                      data.cantidad,
-                  color: Colors.orange,
-                ),
-                FastLineSeries<ProduccionAgnoDataUnidad, String>(
-                  name: 'Hortalizas',
-                  dataSource: _getProduccionDataAgno('Hortalizas'),
-                  xValueMapper: (ProduccionAgnoDataUnidad data, _) => data.agno,
-                  yValueMapper: (ProduccionAgnoDataUnidad data, _) =>
-                      data.cantidad,
-                  color: Colors.purple,
-                ),
-              ],
+            // Usando FutureBuilder para manejar la carga de datos asíncrona
+            child: FutureBuilder(
+              future: Future.wait([getProducciones(), getInventario()]),
+              builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+                // Mostrar indicador de carga mientras los datos se cargan
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                  // Mostrar mensaje de error si ocurre algún problema al cargar los datos
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Error al cargar datos: ${snapshot.error}'),
+                  );
+                } else {
+                  // Cuando los datos están disponibles, procesarlos
+                  List<ProduccionModel> producciones = snapshot.data![0];
+                  List<InventarioModel> inventarios = snapshot.data![1];
+
+                  // Filtrar y agrupar los datos por año y unidad de producción
+                  Map<String, Map<String, double>> data =
+                      _processData(producciones, inventarios, usuario);
+
+                  // Crear el gráfico con los datos procesados
+                  return SfCartesianChart(
+                    tooltipBehavior: TooltipBehavior(enable: true),
+                    legend: const Legend(
+                        isVisible: true),
+                    primaryXAxis: const CategoryAxis(
+                      title: AxisTitle(text: 'Año'),
+                    ),
+                    primaryYAxis: const NumericAxis(
+                      title: AxisTitle(text: 'Cantidad de Producciones'),
+                    ),
+                    series: _buildSeries(data),
+                  );
+                }
+              },
             ),
           ),
         ),
@@ -85,40 +80,91 @@ class ReporteRecibidoAgnoUnidad extends StatelessWidget {
     );
   }
 
-  List<ProduccionAgnoDataUnidad> _getProduccionDataAgno(String tipoProduccion) {
-    // Aquí puedes definir tus datos. Este es un ejemplo de datos simulados.
-    final data = {
-      'Cárnicos': [
-        ProduccionAgnoDataUnidad('2022', 30),
-        ProduccionAgnoDataUnidad('2023', 28),
-        ProduccionAgnoDataUnidad('2024', 34),
-      ],
-      'Lácteos': [
-        ProduccionAgnoDataUnidad('2022', 20),
-        ProduccionAgnoDataUnidad('2023', 24),
-        ProduccionAgnoDataUnidad('2024', 22),
-      ],
-      'Apicultura': [
-        ProduccionAgnoDataUnidad('2022', 10),
-        ProduccionAgnoDataUnidad('2023', 12),
-        ProduccionAgnoDataUnidad('2024', 14),
-      ],
-      'Porcicultura': [
-        ProduccionAgnoDataUnidad('2022', 15),
-        ProduccionAgnoDataUnidad('2023', 18),
-        ProduccionAgnoDataUnidad('2024', 20),
-      ],
-      'Hortalizas': [
-        ProduccionAgnoDataUnidad('2022', 25),
-        ProduccionAgnoDataUnidad('2023', 27),
-        ProduccionAgnoDataUnidad('2024', 29),
-      ],
-    };
+  // Función para procesar y agrupar los datos por año y unidad de producción
+  Map<String, Map<String, double>> _processData(
+      List<ProduccionModel> producciones,
+      List<InventarioModel> inventarios,
+      UsuarioModel usuario) {
+    Map<String, Map<String, double>> data = {};
 
-    return data[tipoProduccion] ?? [];
+    // Obtener el año actual
+    final currentYear = DateTime.now().year;
+    // Definir los años de interés (últimos tres años incluyendo el actual)
+    final pastYears = [currentYear - 2, currentYear - 1, currentYear];
+
+    // Recorrer todos los inventarios
+    for (var inventario in inventarios) {
+      // Convertir la fecha del inventario a un objeto DateTime
+      final inventarioDate = DateTime.parse(inventario.fecha);
+      // Obtener el año del inventario
+      final inventarioYear = inventarioDate.year;
+
+      // Verificar si el año del inventario está dentro de los años de interés
+      if (pastYears.contains(inventarioYear)) {
+        // Encontrar la producción correspondiente al inventario
+        final produccion = producciones.firstWhere((prod) =>
+            prod.id == inventario.produccion &&
+            prod.unidadProduccion.id == usuario.unidadProduccion &&
+            prod.estado == "RECIBIDO");
+        if (produccion != null) {
+          // Obtener el nombre de la unidad de producción
+          final unidadProduccion = produccion.unidadProduccion.nombre;
+
+          // Inicializar la entrada en el mapa si no existe
+          if (!data.containsKey(unidadProduccion)) {
+            data[unidadProduccion] = {
+              for (var year in pastYears) year.toString(): 0
+            };
+          }
+
+          // Incrementar el contador de producciones para el año correspondiente
+          data[unidadProduccion]![inventarioYear.toString()] =
+              (data[unidadProduccion]![inventarioYear.toString()] ?? 0) + 1;
+        }
+      }
+    }
+
+    return data;
+  }
+
+  // Función para construir las series del gráfico a partir de los datos procesados
+  List<FastLineSeries<ProduccionAgnoDataUnidad, String>> _buildSeries(
+      Map<String, Map<String, double>> data) {
+    List<FastLineSeries<ProduccionAgnoDataUnidad, String>> series = [];
+
+    // Recorrer los datos agrupados por unidad de producción y año
+    data.forEach((unidadProduccion, yearlyData) {
+      series.add(
+        FastLineSeries<ProduccionAgnoDataUnidad, String>(
+          name: unidadProduccion,
+          // Convertir los datos anuales en una lista de objetos ProduccionAgnoDataUnidad
+          dataSource: yearlyData.entries
+              .map((entry) => ProduccionAgnoDataUnidad(entry.key, entry.value))
+              .toList(),
+          xValueMapper: (ProduccionAgnoDataUnidad data, _) => data.agno,
+          yValueMapper: (ProduccionAgnoDataUnidad data, _) => data.cantidad,
+          color: _getColor(),
+        ),
+      );
+    });
+
+    return series;
   }
 }
 
+// Función para obtener el color de la serie (aleatorio)
+Color _getColor() {
+  final random = Random();
+  final hue = random.nextDouble() * 360; // Generar tono aleatorio
+  final saturation =
+      random.nextDouble() * (0.5 - 0.2) + 0.2; // Saturation entre 0.2 y 0.5
+  final value =
+      random.nextDouble() * (0.9 - 0.5) + 0.5; // Value entre 0.5 y 0.9
+
+  return HSVColor.fromAHSV(1.0, hue, saturation, value).toColor();
+}
+
+// Clase para representar los datos del gráfico, con el año y la cantidad de producciones
 class ProduccionAgnoDataUnidad {
   ProduccionAgnoDataUnidad(this.agno, this.cantidad);
 

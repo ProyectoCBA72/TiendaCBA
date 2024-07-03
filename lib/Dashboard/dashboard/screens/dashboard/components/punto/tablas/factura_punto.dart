@@ -3,27 +3,50 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:tienda_app/Dashboard/listas/tablasLider.dart';
+import 'package:tienda_app/Models/auxPedidoModel.dart';
+import 'package:tienda_app/Models/facturaModel.dart';
+import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 
 class FacturaPunto extends StatefulWidget {
-  const FacturaPunto({super.key});
+  final List<AuxPedidoModel> auxPedido;
+  const FacturaPunto({super.key, required this.auxPedido});
 
   @override
   State<FacturaPunto> createState() => _FacturaPuntoState();
 }
 
 class _FacturaPuntoState extends State<FacturaPunto> {
-  List<FacturaLiderClase> _facturas = [];
+  List<AuxPedidoModel> _facturas = [];
+  List<ProductoModel> listaProductos = [];
+  List<FacturaModel> listaFacturas = [];
 
   late FacturaPuntoDataGridSource _dataGridSource;
 
   @override
   void initState() {
     super.initState();
-    _facturas = facturaLiderList;
-    _dataGridSource = FacturaPuntoDataGridSource(facturas: _facturas);
+    _dataGridSource = FacturaPuntoDataGridSource(
+        facturas: _facturas,
+        listaProductos: listaProductos,
+        listaFacturas: listaFacturas);
+    _facturas = widget.auxPedido;
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    List<ProductoModel> productosCargados = await getProductos();
+    List<FacturaModel> facturasCargadas = await getFacturas();
+
+    listaProductos = productosCargados;
+    listaFacturas = facturasCargadas;
+
+    // Ahora inicializa _dataGridSource después de cargar los datos
+    _dataGridSource = FacturaPuntoDataGridSource(
+        facturas: _facturas,
+        listaProductos: listaProductos,
+        listaFacturas: listaFacturas);
   }
 
   @override
@@ -202,19 +225,84 @@ class _FacturaPuntoState extends State<FacturaPunto> {
 }
 
 class FacturaPuntoDataGridSource extends DataGridSource {
-  FacturaPuntoDataGridSource({required List<FacturaLiderClase> facturas}) {
+  String numeroVentaFactura(int numeroPedido, List<FacturaModel> facturas) {
+    String numeroVenta = "";
+
+    for (var factura in facturas) {
+      if (factura.pedido.numeroPedido == numeroPedido) {
+        numeroVenta = factura.numero.toString();
+      }
+    }
+
+    return numeroVenta;
+  }
+
+  String productoNombre(int productoAxiliar, List<ProductoModel> productos) {
+    String productName = "";
+
+    for (var producto in productos) {
+      if (producto.id == productoAxiliar) {
+        productName = producto.nombre;
+        break;
+      }
+    }
+
+    return productName;
+  }
+
+  String fechaVentaFactura(int numeroPedido, List<FacturaModel> facturas) {
+    String fechaVenta = "";
+
+    for (var factura in facturas) {
+      if (factura.pedido.numeroPedido == numeroPedido) {
+        fechaVenta = factura.fecha;
+      }
+    }
+
+    return fechaVenta;
+  }
+
+  String medioVentaFactura(int numeroPedido, List<FacturaModel> facturas) {
+    String medioVenta = "";
+
+    for (var factura in facturas) {
+      if (factura.pedido.numeroPedido == numeroPedido) {
+        medioVenta = factura.medioPago.nombre;
+      }
+    }
+
+    return medioVenta;
+  }
+
+  FacturaPuntoDataGridSource({
+    required List<AuxPedidoModel> facturas,
+    required List<ProductoModel> listaProductos,
+    required List<FacturaModel> listaFacturas,
+  }) {
     _facturaData = facturas.map<DataGridRow>((factura) {
       return DataGridRow(cells: [
-        DataGridCell<String>(columnName: 'Número', value: factura.numero),
-        DataGridCell<String>(columnName: 'Usuario', value: factura.usuario),
         DataGridCell<String>(
-            columnName: 'Número Pedido', value: factura.numeroPedido),
-        DataGridCell<String>(columnName: 'Producto', value: factura.producto),
-        DataGridCell<String>(columnName: 'Fecha Venta', value: factura.fecha),
+            columnName: 'Número',
+            value:
+                numeroVentaFactura(factura.pedido.numeroPedido, listaFacturas)),
         DataGridCell<String>(
-            columnName: 'Valor Pedido', value: factura.valorPedido),
+            columnName: 'Usuario',
+            value:
+                "${factura.pedido.usuario.nombres} ${factura.pedido.usuario.apellidos}"),
+        DataGridCell<int>(
+            columnName: 'Número Pedido', value: factura.pedido.numeroPedido),
         DataGridCell<String>(
-            columnName: 'Medio Pago', value: factura.medioPago),
+            columnName: 'Producto',
+            value: productoNombre(factura.producto, listaProductos)),
+        DataGridCell<String>(
+            columnName: 'Fecha Venta',
+            value:
+                fechaVentaFactura(factura.pedido.numeroPedido, listaFacturas)),
+        DataGridCell<int>(columnName: 'Valor Pedido', value: factura.precio),
+        DataGridCell<String>(
+            columnName: 'Medio Pago',
+            value:
+                medioVentaFactura(factura.pedido.numeroPedido, listaFacturas)),
       ]);
     }).toList();
   }
@@ -255,7 +343,11 @@ class FacturaPuntoDataGridSource extends DataGridSource {
           padding: const EdgeInsets.all(8.0),
           child: (row.getCells()[i].value is Widget)
               ? row.getCells()[i].value
-              : Text(i == 5?"\$${row.getCells()[i].value}":row.getCells()[i].value.toString()),
+              : Text(i == 5
+                  ? "\$${formatter.format(row.getCells()[i].value)}"
+                  : i == 4
+                      ? "${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).day)}-${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).month)}-${DateTime.parse(row.getCells()[i].value.toString()).year.toString()} ${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).hour)}:${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).minute)}"
+                      : row.getCells()[i].value.toString()),
         ),
     ]);
   }

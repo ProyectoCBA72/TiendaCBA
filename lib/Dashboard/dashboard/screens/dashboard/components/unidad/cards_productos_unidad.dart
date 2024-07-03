@@ -167,7 +167,7 @@ class CardsProductoUnidad extends StatelessWidget {
                     } else {
                       return const Center(
                         child: Text(
-                          'No hay productos para mostrar en esta únidad',
+                          'No hay productos para mostrar en esta unidad',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,

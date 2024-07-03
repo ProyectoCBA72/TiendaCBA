@@ -732,6 +732,7 @@ class _HomePageState extends State<HomePage>
                         });
                       },
                       child: Container(
+                        padding: const EdgeInsets.all(3),
                         width: 50,
                         height: 50,
                         decoration: BoxDecoration(

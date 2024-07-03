@@ -117,8 +117,9 @@ ThemeData lightTheme = ThemeData(
           color: primaryColor), // Color del borde cuando no está enfocado
     ),
     focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: primaryColor), // Color del borde cuando está enfocado
-        ),
+      borderSide: BorderSide(
+          color: primaryColor), // Color del borde cuando está enfocado
+    ),
   ),
 );
 
@@ -130,12 +131,11 @@ NumberFormat formatter = NumberFormat.currency(
 
 String twoDigits(int n) => n.toString().padLeft(2, '0');
 
-
 // formato para las fechas para no estar a cada rato haciendolo
 String formatFechaHora(String fechaString) {
   try {
     DateTime fecha = DateTime.parse(fechaString);
-    return '${fecha.day}/${fecha.month}/${fecha.year} ${fecha.hour}:${fecha.minute}';
+    return '${twoDigits(fecha.day)}-${twoDigits(fecha.month)}-${fecha.year} ${twoDigits(fecha.hour)}:${twoDigits(fecha.minute)}';
   } catch (e) {
     return 'Fecha inválida';
   }

@@ -1,6 +1,7 @@
 // ignore_for_file: use_full_hex_values_for_flutter_colors, file_names
 
 import 'package:provider/provider.dart';
+import 'package:tienda_app/Dashboard/controllers/MenuAppController.dart';
 import 'package:tienda_app/Models/imagenUsuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/provider.dart';
@@ -8,7 +9,6 @@ import 'package:tienda_app/responsive.dart';
 import 'package:flutter/material.dart';
 
 import '../Auth/authScreen.dart';
-import '../Dashboard/controllers/MenuAppController.dart';
 import '../Dashboard/dashboard/screens/main/main_screen_usuario.dart';
 
 class ProfileCard extends StatefulWidget {
@@ -45,8 +45,7 @@ class _ProfileCardState extends State<ProfileCard> {
                   builder: (context) => MultiProvider(
                     providers: [
                       ChangeNotifierProvider(
-                        create: (context) => MenuAppController(),
-                      ),
+                          create: (context) => MenuAppController()),
                     ],
                     child: const MainScreenUsuario(),
                   ),

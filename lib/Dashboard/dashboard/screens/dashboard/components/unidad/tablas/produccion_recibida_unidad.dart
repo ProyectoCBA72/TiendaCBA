@@ -3,11 +3,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:tienda_app/Dashboard/listas/tablasLider.dart';
+import 'package:tienda_app/Models/inventarioModel.dart';
+import 'package:tienda_app/Models/produccionModel.dart';
+import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
 class ProduccionRecibidaUnidad extends StatefulWidget {
-  const ProduccionRecibidaUnidad({super.key});
+  final List<ProduccionModel> producciones;
+  const ProduccionRecibidaUnidad({super.key, required this.producciones});
 
   @override
   State<ProduccionRecibidaUnidad> createState() =>
@@ -15,16 +18,35 @@ class ProduccionRecibidaUnidad extends StatefulWidget {
 }
 
 class _ProduccionRecibidaUnidadState extends State<ProduccionRecibidaUnidad> {
-  List<ProduccionLiderClase> _producciones = [];
+  List<ProduccionModel> _producciones = [];
+  List<ProductoModel> listaProductos = [];
+  List<InventarioModel> listaInventarios = [];
 
   late ProduccionRecibidaUnidadDataGridSource _dataGridSource;
 
   @override
   void initState() {
     super.initState();
-    _producciones = produccionLiderList;
-    _dataGridSource =
-        ProduccionRecibidaUnidadDataGridSource(producciones: _producciones);
+    _dataGridSource = ProduccionRecibidaUnidadDataGridSource(
+        producciones: _producciones,
+        listaProductos: listaProductos,
+        listaInventarios: listaInventarios);
+    _producciones = widget.producciones;
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    List<ProductoModel> productosCargados = await getProductos();
+    List<InventarioModel> inventariosCargados = await getInventario();
+
+    listaProductos = productosCargados;
+    listaInventarios = inventariosCargados;
+
+    // Ahora inicializa _dataGridSource después de cargar los datos
+    _dataGridSource = ProduccionRecibidaUnidadDataGridSource(
+        producciones: _producciones,
+        listaProductos: listaProductos,
+        listaInventarios: listaInventarios);
   }
 
   @override
@@ -222,30 +244,60 @@ class _ProduccionRecibidaUnidadState extends State<ProduccionRecibidaUnidad> {
 }
 
 class ProduccionRecibidaUnidadDataGridSource extends DataGridSource {
+  String productoNombre(int productoId, List<ProductoModel> productos) {
+    String productName = "";
+
+    for (var producto in productos) {
+      if (producto.id == productoId) {
+        productName = producto.nombre;
+        break;
+      }
+    }
+
+    return productName;
+  }
+
+  String fechaInventarioRecibido(
+      int produccionId, List<InventarioModel> inventarios) {
+    String fechaRecibido = "";
+
+    for (var inventario in inventarios) {
+      if (inventario.produccion == produccionId) {
+        fechaRecibido = inventario.fecha;
+      }
+    }
+
+    return fechaRecibido;
+  }
+
   ProduccionRecibidaUnidadDataGridSource(
-      {required List<ProduccionLiderClase> producciones}) {
+      {required List<ProduccionModel> producciones,
+      required List<ProductoModel> listaProductos,
+      required List<InventarioModel> listaInventarios}) {
     _produccionData = producciones.map<DataGridRow>((produccion) {
       return DataGridRow(cells: [
-        DataGridCell<String>(columnName: 'Número', value: produccion.numero),
+        DataGridCell<int>(columnName: 'Número', value: produccion.numero),
         DataGridCell<String>(
             columnName: 'Unidad Producción',
-            value: produccion.unidadProduccion),
+            value: produccion.unidadProduccion.nombre),
         DataGridCell<String>(
-            columnName: 'Producto', value: produccion.producto),
-        DataGridCell<String>(
-            columnName: 'Cantidad', value: produccion.cantidad),
+            columnName: 'Producto',
+            value: productoNombre(produccion.producto, productos)),
+        DataGridCell<int>(columnName: 'Cantidad', value: produccion.cantidad),
         DataGridCell<String>(
             columnName: 'Fecha Producción', value: produccion.fechaProduccion),
         DataGridCell<String>(
             columnName: 'Fecha Vencimiento',
             value: produccion.fechaVencimiento),
-        DataGridCell<String>(
+        DataGridCell<int>(
             columnName: 'Costo Producción', value: produccion.costoProduccion),
         DataGridCell<String>(
             columnName: 'Fecha Despacho', value: produccion.fechaDespacho),
         DataGridCell<String>(
             columnName: 'Estado Producción', value: produccion.estado),
-        const DataGridCell<String>(columnName: 'Fecha Recibido', value: ''),
+        DataGridCell<String>(
+            columnName: 'Fecha Recibido',
+            value: fechaInventarioRecibido(produccion.id, listaInventarios)),
         DataGridCell<Widget>(
             columnName: 'Ver',
             value: ElevatedButton(
@@ -294,7 +346,11 @@ class ProduccionRecibidaUnidadDataGridSource extends DataGridSource {
           padding: const EdgeInsets.all(8.0),
           child: (row.getCells()[i].value is Widget)
               ? row.getCells()[i].value
-              : Text(i == 6?"\$${row.getCells()[i].value}":row.getCells()[i].value.toString()),
+              : Text(i == 6
+                  ? "\$${formatter.format(row.getCells()[i].value)}"
+                  : i == 4 || i == 5 || i == 7 || i == 9
+                      ? "${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).day)}-${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).month)}-${DateTime.parse(row.getCells()[i].value.toString()).year.toString()} ${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).hour)}:${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).minute)}"
+                      : row.getCells()[i].value.toString()),
         ),
     ]);
   }

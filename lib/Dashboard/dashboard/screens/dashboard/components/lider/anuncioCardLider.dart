@@ -7,10 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:tienda_app/Models/anuncioModel.dart';
 
 class AnuncioCardLider extends StatefulWidget {
-  final AnuncioModel anuncio;
   final List<String> images;
+  final AnuncioModel anuncio;
   const AnuncioCardLider(
-      {super.key, required this.anuncio, required this.images});
+      {super.key, required this.images, required this.anuncio});
 
   @override
   _AnuncioCardLiderState createState() => _AnuncioCardLiderState();
@@ -41,13 +41,13 @@ class _AnuncioCardLiderState extends State<AnuncioCardLider> {
     });
   }
 
-  void _loadImages() {
+  void _loadImages() async {
     _images = widget.images;
   }
 
   @override
   Widget build(BuildContext context) {
-    final anuncio = widget.anuncio;
+    final AnuncioModel anuncio = widget.anuncio;
     return Padding(
       padding: const EdgeInsets.all(20),
       child: SizedBox(
@@ -70,7 +70,9 @@ class _AnuncioCardLiderState extends State<AnuncioCardLider> {
               _timer?.cancel();
             }
           },
-          child: AnimatedSwitcher(
+          child: 
+          _images.isNotEmpty ?
+          AnimatedSwitcher(
             duration: const Duration(milliseconds: 500),
             child: FadeTransition(
               key: ValueKey<int>(_currentImageIndex),
@@ -139,7 +141,7 @@ class _AnuncioCardLiderState extends State<AnuncioCardLider> {
                             color: Colors.black54,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child:  Padding(
+                          child: Padding(
                             padding: const EdgeInsets.only(top: 5, left: 6),
                             child: SingleChildScrollView(
                               scrollDirection: Axis.vertical,
@@ -167,7 +169,7 @@ class _AnuncioCardLiderState extends State<AnuncioCardLider> {
                 ),
               ),
             ),
-          ),
+          ): const Text('Este Anuncio no tiene Imagenes'),
         ),
       ),
     );

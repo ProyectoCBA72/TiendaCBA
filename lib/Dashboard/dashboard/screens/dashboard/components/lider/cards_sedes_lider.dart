@@ -127,6 +127,10 @@ class CardsSedeLider extends StatelessWidget {
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
+              } else if (snapshot.hasError) {
+                return Text('Error al cargar sedes: ${snapshot.error}');
+              } else if (snapshot.data == null) {
+                return const Text('No se encontraron sedes');
               } else {
                 List<SedeModel> sedes = snapshot.data![0];
                 List<ImagenSedeModel> allImagesSedes = snapshot.data![1];

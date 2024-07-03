@@ -1,4 +1,4 @@
-// ignore_for_file: file_names, avoid_print
+// ignore_for_file: file_names, avoid_print, unnecessary_null_comparison
 
 import 'dart:convert';
 import 'package:flutter/material.dart';

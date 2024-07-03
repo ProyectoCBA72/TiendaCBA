@@ -8,6 +8,7 @@ import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/provider.dart';
 import 'package:tienda_app/responsive.dart';
+
 import '../../../../../cardProducts.dart';
 
 // Contenedor el cual almacenará las cards de los sitios favoritos del usuario
@@ -67,6 +68,10 @@ class FavoritoDetails extends StatelessWidget {
                               return const Center(
                                 child: CircularProgressIndicator(),
                               );
+                            } else if (snapshotImagenes.hasError) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
                             } else {
                               final allImages = snapshotImagenes.data!;
                               // Traemos todos los productos
@@ -90,7 +95,13 @@ class FavoritoDetails extends StatelessWidget {
                                         } else if (!snapshot.hasData ||
                                             snapshot.data!.isEmpty) {
                                           return const Center(
-                                            child: Text('No hay Favoritos'),
+                                            child: Text(
+                                                'No hay productos favoritos'),
+                                          );
+                                        } else if (snapshot.hasError) {
+                                          return Center(
+                                            child: Text(
+                                                'Error al cargar productos favoritos: ${snapshot.error}'),
                                           );
                                         } else {
                                           final productos =

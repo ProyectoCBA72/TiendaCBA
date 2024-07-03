@@ -3,26 +3,51 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:tienda_app/Dashboard/listas/tablasLider.dart';
+import 'package:tienda_app/Models/auxPedidoModel.dart';
+import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
 class CanceladoUsuario extends StatefulWidget {
-  const CanceladoUsuario({super.key});
+  final List<AuxPedidoModel> auxPedido;
+  const CanceladoUsuario({super.key, required this.auxPedido});
 
   @override
   State<CanceladoUsuario> createState() => _CanceladoUsuarioState();
 }
 
 class _CanceladoUsuarioState extends State<CanceladoUsuario> {
-  List<PedidoLider> _pedidos = [];
+  List<AuxPedidoModel> _pedidos = [];
+  List<ProductoModel> listaProductos = [];
+  List<PuntoVentaModel> listaPuntosVenta = [];
 
   late CanceladoUsuarioDataGridSource _dataGridSource;
 
   @override
   void initState() {
     super.initState();
-    _pedidos = pedidoLiderList;
-    _dataGridSource = CanceladoUsuarioDataGridSource(pedidos: _pedidos);
+    _dataGridSource = CanceladoUsuarioDataGridSource(
+        pedidos: _pedidos,
+        listaProductos: listaProductos,
+        listaPuntosVenta: listaPuntosVenta);
+    _pedidos = widget.auxPedido;
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    List<ProductoModel> productosCargados = await getProductos();
+    List<PuntoVentaModel> puntosCargados = await getPuntosVenta();
+
+    setState(() {
+      listaProductos = productosCargados;
+      listaPuntosVenta = puntosCargados;
+
+      // Ahora inicializa _dataGridSource después de cargar los datos
+      _dataGridSource = CanceladoUsuarioDataGridSource(
+          pedidos: _pedidos,
+          listaProductos: listaProductos,
+          listaPuntosVenta: listaPuntosVenta);
+    });
   }
 
   @override
@@ -203,21 +228,60 @@ class _CanceladoUsuarioState extends State<CanceladoUsuario> {
 }
 
 class CanceladoUsuarioDataGridSource extends DataGridSource {
-  CanceladoUsuarioDataGridSource({required List<PedidoLider> pedidos}) {
+  String productoNombre(int productoAxiliar, List<ProductoModel> productos) {
+    String productName = "";
+
+    for (var producto in productos) {
+      if (producto.id == productoAxiliar) {
+        productName = producto.nombre;
+        break;
+      }
+    }
+
+    return productName;
+  }
+
+  String puntoNombre(int punto, List<PuntoVentaModel> puntosVenta) {
+    String puntoName = "";
+
+    for (var puntoVenta in puntosVenta) {
+      if (puntoVenta.id == punto) {
+        puntoName = puntoVenta.nombre;
+        break;
+      }
+    }
+
+    return puntoName;
+  }
+
+  CanceladoUsuarioDataGridSource({
+    required List<AuxPedidoModel> pedidos,
+    required List<ProductoModel> listaProductos,
+    required List<PuntoVentaModel> listaPuntosVenta,
+  }) {
     _pedidoData = pedidos.map<DataGridRow>((pedido) {
       return DataGridRow(cells: [
-        DataGridCell<String>(columnName: 'Número', value: pedido.numero),
-        DataGridCell<String>(columnName: 'Usuario', value: pedido.usuario),
-        DataGridCell<String>(columnName: 'Producto', value: pedido.producto),
-        DataGridCell<String>(columnName: 'Cantidad', value: pedido.cantidad),
-        DataGridCell<String>(columnName: 'Precio', value: pedido.precio),
         DataGridCell<String>(
-            columnName: 'Fecha Encargo', value: pedido.fechaEncargo),
+            columnName: 'Número', value: pedido.pedido.numeroPedido.toString()),
         DataGridCell<String>(
-            columnName: 'Fecha Entrega', value: pedido.fechaEntrega),
-        DataGridCell<String>(columnName: 'Grupal', value: pedido.grupal),
+            columnName: 'Usuario',
+            value:
+                "${pedido.pedido.usuario.nombres} ${pedido.pedido.usuario.apellidos}"),
         DataGridCell<String>(
-            columnName: 'Punto Venta', value: pedido.puntoVenta),
+            columnName: 'Producto',
+            value: productoNombre(pedido.producto, productos)),
+        DataGridCell<String>(
+            columnName: 'Cantidad', value: pedido.cantidad.toString()),
+        DataGridCell<int>(columnName: 'Precio', value: pedido.precio),
+        DataGridCell<String>(
+            columnName: 'Fecha Encargo', value: pedido.pedido.fechaEncargo),
+        DataGridCell<String>(
+            columnName: 'Fecha Entrega', value: pedido.pedido.fechaEntrega),
+        DataGridCell<String>(
+            columnName: 'Grupal', value: pedido.pedido.grupal ? "Si" : "No"),
+        DataGridCell<String>(
+            columnName: 'Punto Venta',
+            value: puntoNombre(pedido.pedido.puntoVenta, listaPuntosVenta)),
       ]);
     }).toList();
   }
@@ -259,8 +323,10 @@ class CanceladoUsuarioDataGridSource extends DataGridSource {
           child: (row.getCells()[i].value is Widget)
               ? row.getCells()[i].value
               : Text(i == 4
-                  ? "\$${row.getCells()[i].value}"
-                  : row.getCells()[i].value.toString()),
+                  ? "\$${formatter.format(row.getCells()[i].value)}"
+                  : i == 5 || i == 6
+                      ? "${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).day)}-${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).month)}-${DateTime.parse(row.getCells()[i].value.toString()).year.toString()} ${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).hour)}:${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).minute)}"
+                      : row.getCells()[i].value.toString()),
         ),
     ]);
   }

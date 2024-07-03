@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tienda_app/Dashboard/listas/CardsPedidosLider.dart';
+import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/CardsPedidosClase.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
 // Diseño de la card del conteo de las reservas las cuales estaran ubicadas en la parte superior de los dashboard
@@ -13,7 +13,7 @@ class CardPedidoUsuario extends StatelessWidget {
     required this.info,
   });
 
-  final PedidoLider info;
+  final PedidoCardClase info;
 
   @override
   Widget build(BuildContext context) {

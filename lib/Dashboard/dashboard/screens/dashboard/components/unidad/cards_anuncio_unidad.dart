@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/unidad/anuncioCardUnidad.dart';
 import 'package:tienda_app/Models/anuncioModel.dart';
 import 'package:tienda_app/Models/imagenAnuncioModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 
 // Vista donde se llamaran las cards superiores de conteo de reservas y las organiza que se adapten a todos los dispositivos
 
 class CardsAnuncioUnidad extends StatefulWidget {
+  final UsuarioModel usuario;
   const CardsAnuncioUnidad({
     super.key,
+    required this.usuario,
   });
 
   @override
@@ -22,7 +25,7 @@ class _CardsAnuncioUnidadState extends State<CardsAnuncioUnidad> {
   @override
   void initState() {
     super.initState();
-     _datosFuture = _fetchData();
+    _datosFuture = _fetchData();
   }
 
   Future<List<dynamic>> _fetchData() {
@@ -157,8 +160,11 @@ class _CardsAnuncioUnidadState extends State<CardsAnuncioUnidad> {
                 if (allAnuncios.isEmpty) {
                   return const Center(
                     child: Text(
-                      'No hay anuncios para mostrar ',
-                      style: TextStyle(fontSize: 20, color: Colors.white),
+                      'No hay anuncios',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   );
                 } else {
@@ -166,15 +172,29 @@ class _CardsAnuncioUnidadState extends State<CardsAnuncioUnidad> {
                     scrollDirection: Axis.horizontal,
                     itemCount: allAnuncios.length,
                     itemBuilder: (context, index) {
-                      AnuncioModel anuncio = allAnuncios[index];
-                      List<String> imagesAnuncio = allImagesAnuncios
-                          .where((imagen) => imagen.anuncio.id == anuncio.id)
-                          .map((imagen) => imagen.imagen)
-                          .toList();
-                      return AnuncioCardUnidad(
-                        images: imagesAnuncio,
-                        anuncio: anuncio,
-                      );
+                      if (allAnuncios[index].usuario.unidadProduccion ==
+                          widget.usuario.unidadProduccion) {
+                        AnuncioModel anuncio = allAnuncios[index];
+                        List<String> imagesAnuncio = allImagesAnuncios
+                            .where((imagen) => imagen.anuncio.id == anuncio.id)
+                            .map((imagen) => imagen.imagen)
+                            .toList();
+
+                        return AnuncioCardUnidad(
+                          images: imagesAnuncio,
+                          anuncio: anuncio,
+                        );
+                      } else {
+                        return const Center(
+                          child: Text(
+                            'No hay anuncios para mostrar en esta unidad',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
+                      }
                     },
                   );
                 }

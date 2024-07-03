@@ -351,7 +351,7 @@ class _CarritoTablaState extends State<CarritoTabla> {
             height: defaultPadding,
           ),
           Text(
-            "La entrega de su pedido es para: ${twoDigits(_selectedDateTimeEntrega.day)}-${twoDigits(_selectedDateTimeEntrega.month)}-${_selectedDateTimeEntrega.year} ${twoDigits(_selectedDateTimeEntrega.hour)}:${twoDigits(_selectedDateTimeEntrega.minute)}",
+            "La entrega de su pedido es para: ${formatFechaHora(_selectedDateTimeEntrega.toString())}",
             style: Theme.of(context)
                 .textTheme
                 .titleSmall!

@@ -3,27 +3,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:tienda_app/Dashboard/listas/tablasLider.dart';
+import 'package:tienda_app/Models/auxPedidoModel.dart';
+import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
 class CanceladoPunto extends StatefulWidget {
-  const CanceladoPunto({super.key});
+  final List<AuxPedidoModel> auxPedido;
+  const CanceladoPunto({super.key, required this.auxPedido});
 
   @override
   State<CanceladoPunto> createState() => _CanceladoPuntoState();
 }
 
 class _CanceladoPuntoState extends State<CanceladoPunto> {
-
-  List<PedidoLider> _pedidos = [];
+  List<AuxPedidoModel> _pedidos = [];
+  List<ProductoModel> listaProductos = [];
+  List<PuntoVentaModel> listaPuntosVenta = [];
 
   late CanceladoPuntoDataGridSource _dataGridSource;
 
   @override
   void initState() {
     super.initState();
-    _pedidos = pedidoLiderList;
-    _dataGridSource = CanceladoPuntoDataGridSource(pedidos: _pedidos);
+    _dataGridSource = CanceladoPuntoDataGridSource(
+        pedidos: _pedidos,
+        listaProductos: listaProductos,
+        listaPuntosVenta: listaPuntosVenta);
+    _pedidos = widget.auxPedido;
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    List<ProductoModel> productosCargados = await getProductos();
+    List<PuntoVentaModel> puntosCargados = await getPuntosVenta();
+
+    listaProductos = productosCargados;
+    listaPuntosVenta = puntosCargados;
+
+    // Ahora inicializa _dataGridSource después de cargar los datos
+    _dataGridSource = CanceladoPuntoDataGridSource(
+        pedidos: _pedidos,
+        listaProductos: listaProductos,
+        listaPuntosVenta: listaPuntosVenta);
   }
 
   @override
@@ -39,9 +61,14 @@ class _CanceladoPuntoState extends State<CanceladoPunto> {
         children: [
           Text(
             "Pedidos Cancelados",
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(fontFamily: 'Calibri-Bold'),
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium!
+                .copyWith(fontFamily: 'Calibri-Bold'),
           ),
-          const SizedBox(height: defaultPadding,),
+          const SizedBox(
+            height: defaultPadding,
+          ),
           SizedBox(
             height: 300,
             width: double.infinity,
@@ -142,13 +169,13 @@ class _CanceladoPuntoState extends State<CanceladoPunto> {
           const SizedBox(
             height: defaultPadding,
           ),
-            Center(
-              child: Column(
-                children: [
-                  _buildButton('Imprimir Reporte', () {}),
-                ],
-              ),
+          Center(
+            child: Column(
+              children: [
+                _buildButton('Imprimir Reporte', () {}),
+              ],
             ),
+          ),
         ],
       ),
     );
@@ -199,25 +226,62 @@ class _CanceladoPuntoState extends State<CanceladoPunto> {
 }
 
 class CanceladoPuntoDataGridSource extends DataGridSource {
+  String productoNombre(int productoAxiliar, List<ProductoModel> productos) {
+    String productName = "";
 
-  CanceladoPuntoDataGridSource({required List<PedidoLider> pedidos}) {
-  _pedidoData = pedidos.map<DataGridRow>((pedido) {
-        return DataGridRow(cells: [
-          DataGridCell<String>(columnName: 'Número', value: pedido.numero),
-          DataGridCell<String>(
-              columnName: 'Usuario', value: pedido.usuario),
-          DataGridCell<String>(
-              columnName: 'Producto', value: pedido.producto),
-          DataGridCell<String>(columnName: 'Cantidad', value: pedido.cantidad),
-          DataGridCell<String>(
-              columnName: 'Precio', value: pedido.precio),
-          DataGridCell<String>(
-              columnName: 'Fecha Encargo', value: pedido.fechaEncargo),
-          DataGridCell<String>(columnName: 'Fecha Entrega', value: pedido.fechaEntrega),
-          DataGridCell<String>(columnName: 'Grupal', value: pedido.grupal),
-          DataGridCell<String>(columnName: 'Punto Venta', value: pedido.puntoVenta),
-        ]);
-      }).toList();
+    for (var producto in productos) {
+      if (producto.id == productoAxiliar) {
+        productName = producto.nombre;
+        break;
+      }
+    }
+
+    return productName;
+  }
+
+  String puntoNombre(int punto, List<PuntoVentaModel> puntosVenta) {
+    String puntoName = "";
+
+    for (var puntoVenta in puntosVenta) {
+      if (puntoVenta.id == punto) {
+        puntoName = puntoVenta.nombre;
+        break;
+      }
+    }
+
+    return puntoName;
+  }
+
+  CanceladoPuntoDataGridSource({
+    required List<AuxPedidoModel> pedidos,
+    required List<ProductoModel> listaProductos,
+    required List<PuntoVentaModel> listaPuntosVenta,
+  }) {
+    _pedidoData = pedidos.map<DataGridRow>((pedido) {
+      return DataGridRow(cells: [
+        DataGridCell<String>(
+            columnName: 'Número', value: pedido.pedido.numeroPedido.toString()),
+        DataGridCell<String>(
+            columnName: 'Usuario',
+            value:
+                "${pedido.pedido.usuario.nombres} ${pedido.pedido.usuario.apellidos}"),
+        DataGridCell<String>(
+            columnName: 'Producto',
+            value: productoNombre(pedido.producto, productos)),
+        DataGridCell<String>(
+            columnName: 'Cantidad', value: pedido.cantidad.toString()),
+        DataGridCell<int>(columnName: 'Precio', value: pedido.precio),
+        DataGridCell<String>(
+            columnName: 'Fecha Encargo', value: pedido.pedido.fechaEncargo),
+        DataGridCell<String>(
+            columnName: 'Fecha Entrega', value: pedido.pedido.fechaEntrega),
+        DataGridCell<String>(
+            columnName: 'Grupal', value: pedido.pedido.grupal ? "Si" : "No"),
+        DataGridCell<String>(
+            columnName: 'Punto Venta',
+            value: puntoNombre(pedido.pedido.puntoVenta, listaPuntosVenta)),
+      ]);
+    }).toList();
   }
 
   List<DataGridRow> _pedidoData = [];
@@ -256,12 +320,10 @@ class CanceladoPuntoDataGridSource extends DataGridSource {
           padding: const EdgeInsets.all(8.0),
           child: (row.getCells()[i].value is Widget)
               ? row.getCells()[i].value
-              : Text(i == 4?"\$${row.getCells()[i].value}":row.getCells()[i].value.toString()),
+              : Text(i == 4
+                  ? "\$${row.getCells()[i].value}"
+                  : row.getCells()[i].value.toString()),
         ),
     ]);
   }
 }
-
-
-
-

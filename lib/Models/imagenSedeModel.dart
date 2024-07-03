@@ -59,7 +59,7 @@ Future<List<ImagenSedeModel>> getImagenSedes() async {
     }
 
     // Devolver la lista de imagenes de sede
-
+    
     return imagenSedes;
   } else {
     throw Exception(
