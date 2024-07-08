@@ -7,13 +7,12 @@ import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/provider.dart';
 import 'package:tienda_app/responsive.dart';
 
-// Vista donde se llamaran las cards superiores de conteo de reservas y las organiza que se adapten a todos los dispositivos
-
+// Vista que muestra las tarjetas de productos, adaptándose a diferentes dispositivos.
 class CardsProductoLider extends StatelessWidget {
   const CardsProductoLider({
     super.key,
   });
- 
+
   Future<List<dynamic>> futureData() async {
     return Future.wait([getProductos(), getImagenProductos()]);
   }
@@ -25,6 +24,7 @@ class CardsProductoLider extends StatelessWidget {
         final usuarioAutenticado = appState.usuarioAutenticado;
         return Column(
           children: [
+            // Encabezado de las tarjetas de productos
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -35,6 +35,7 @@ class CardsProductoLider extends StatelessWidget {
                       .titleLarge
                       ?.copyWith(fontFamily: 'Calibri-Bold'),
                 ),
+                // Botón "Añadir Producto" visible solo en dispositivos no móviles
                 if (!Responsive.isMobile(context))
                   Container(
                     width: 200,
@@ -48,7 +49,7 @@ class CardsProductoLider extends StatelessWidget {
                       ),
                       boxShadow: const [
                         BoxShadow(
-                          color: botonSombra, // Verde más claro para sombra
+                          color: botonSombra, // Sombra en tono verde claro
                           blurRadius: 5,
                           offset: Offset(0, 3),
                         ),
@@ -78,8 +79,10 @@ class CardsProductoLider extends StatelessWidget {
                   ),
               ],
             ),
+            // Espacio adicional en dispositivos móviles
             if (Responsive.isMobile(context))
               const SizedBox(height: defaultPadding),
+            // Botón "Añadir Producto" visible solo en dispositivos móviles
             if (Responsive.isMobile(context))
               Container(
                 width: 200,
@@ -93,7 +96,7 @@ class CardsProductoLider extends StatelessWidget {
                   ),
                   boxShadow: const [
                     BoxShadow(
-                      color: botonSombra, // Verde más claro para sombra
+                      color: botonSombra, // Sombra en tono verde claro
                       blurRadius: 5,
                       offset: Offset(0, 3),
                     ),
@@ -121,7 +124,9 @@ class CardsProductoLider extends StatelessWidget {
                   ),
                 ),
               ),
+            // Espacio adicional antes del listado de tarjetas de productos
             const SizedBox(height: defaultPadding),
+            // Contenedor que muestra las tarjetas de productos
             SizedBox(
               height: 300,
               child: FutureBuilder(
@@ -129,24 +134,26 @@ class CardsProductoLider extends StatelessWidget {
                 builder: (BuildContext context,
                     AsyncSnapshot<List<dynamic>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
+                    // Indicador de carga mientras se espera la respuesta
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
                   } else if (snapshot.hasError) {
+                    // Mensaje de error si ocurre un problema al cargar datos
                     return Center(
-                      child: Text('error: ${snapshot.error}'),
+                      child: Text('Error al cargar productos: ${snapshot.error}'),
                     );
                   } else {
-                    // creamos las intancias de los datos traidos del futuro en su respectivo indice
+                    // Procesamiento de datos y construcción de las tarjetas de productos
                     List<ProductoModel> productos = snapshot.data![0];
                     List<ImagenProductoModel> allImages = snapshot.data![1];
-                    // creamos otra lista con el fin de tener solo los productos que el usuario con el rol unidad tiene.
+                    // Filtrar los productos por la sede del usuario autenticado
                     final List<ProductoModel> productosLider = productos
                         .where((producto) =>
                             producto.unidadProduccion.sede.id ==
                             usuarioAutenticado!.sede)
                         .toList();
-                    // verificamos si hay productos en la lista.
+                    // Verificar si hay productos para mostrar
                     if (productosLider.isNotEmpty) {
                       return ListView.builder(
                         scrollDirection: Axis.horizontal,
@@ -154,8 +161,7 @@ class CardsProductoLider extends StatelessWidget {
                         itemBuilder: (context, index) {
                           ProductoModel producto = productosLider[index];
                           List<String> images = allImages
-                              .where(
-                                  (imagen) => imagen.producto.id == producto.id)
+                              .where((imagen) => imagen.producto.id == producto.id)
                               .map((imagen) => imagen.imagen)
                               .toList();
                           return ProductoCardLider(
@@ -165,6 +171,7 @@ class CardsProductoLider extends StatelessWidget {
                         },
                       );
                     } else {
+                      // Mensaje si no hay productos en la sede del usuario
                       return const Center(
                         child: Text(
                           'No hay productos para mostrar en esta sede',
@@ -185,3 +192,4 @@ class CardsProductoLider extends StatelessWidget {
     );
   }
 }
+

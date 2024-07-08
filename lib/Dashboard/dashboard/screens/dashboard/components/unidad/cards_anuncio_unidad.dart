@@ -6,8 +6,7 @@ import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 
-// Vista donde se llamaran las cards superiores de conteo de reservas y las organiza que se adapten a todos los dispositivos
-
+// Vista que muestra las tarjetas de anuncios para una unidad de producción.
 class CardsAnuncioUnidad extends StatefulWidget {
   final UsuarioModel usuario;
   const CardsAnuncioUnidad({
@@ -28,6 +27,7 @@ class _CardsAnuncioUnidadState extends State<CardsAnuncioUnidad> {
     _datosFuture = _fetchData();
   }
 
+  // Función asíncrona para obtener datos futuros de anuncios e imágenes de anuncios
   Future<List<dynamic>> _fetchData() {
     return Future.wait([
       getAnuncios(),
@@ -39,6 +39,7 @@ class _CardsAnuncioUnidadState extends State<CardsAnuncioUnidad> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Encabezado de la sección de anuncios
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -49,6 +50,7 @@ class _CardsAnuncioUnidadState extends State<CardsAnuncioUnidad> {
                   .titleLarge
                   ?.copyWith(fontFamily: 'Calibri-Bold'),
             ),
+            // Botón para añadir un nuevo anuncio (solo visible en versiones no móviles)
             if (!Responsive.isMobile(context))
               Container(
                 width: 200,
@@ -62,7 +64,7 @@ class _CardsAnuncioUnidadState extends State<CardsAnuncioUnidad> {
                   ),
                   boxShadow: const [
                     BoxShadow(
-                      color: botonSombra, // Verde más claro para sombra
+                      color: botonSombra, // Sombra verde claro
                       blurRadius: 5,
                       offset: Offset(0, 3),
                     ),
@@ -92,10 +94,12 @@ class _CardsAnuncioUnidadState extends State<CardsAnuncioUnidad> {
               ),
           ],
         ),
+        // Espaciado adicional en dispositivos móviles
         if (Responsive.isMobile(context))
           const SizedBox(
             height: defaultPadding,
           ),
+        // Botón para añadir un nuevo anuncio en dispositivos móviles
         if (Responsive.isMobile(context))
           Center(
             child: Container(
@@ -110,7 +114,7 @@ class _CardsAnuncioUnidadState extends State<CardsAnuncioUnidad> {
                 ),
                 boxShadow: const [
                   BoxShadow(
-                    color: botonSombra, // Verde más claro para sombra
+                    color: botonSombra, // Sombra verde claro
                     blurRadius: 5,
                     offset: Offset(0, 3),
                   ),
@@ -140,6 +144,7 @@ class _CardsAnuncioUnidadState extends State<CardsAnuncioUnidad> {
             ),
           ),
         const SizedBox(height: defaultPadding),
+        // Espacio para mostrar los anuncios
         SizedBox(
           height: 300,
           child: FutureBuilder(
@@ -147,16 +152,21 @@ class _CardsAnuncioUnidadState extends State<CardsAnuncioUnidad> {
             builder:
                 (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
+                // Muestra un indicador de carga mientras se espera la carga de datos
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
               } else if (snapshot.hasError) {
+                // Muestra un mensaje si hay un error al cargar los datos
                 return Center(
-                  child: Text('Ocurrio un error: ${snapshot.error} '),
+                  child: Text('Ocurrió un error: ${snapshot.error}'),
                 );
               } else {
+                // Obtener listas de todos los anuncios y todas las imágenes de anuncios
                 List<AnuncioModel> allAnuncios = snapshot.data![0];
                 List<ImagenAnuncioModel> allImagesAnuncios = snapshot.data![1];
+
+                // Verificar si no hay anuncios disponibles
                 if (allAnuncios.isEmpty) {
                   return const Center(
                     child: Text(
@@ -168,35 +178,46 @@ class _CardsAnuncioUnidadState extends State<CardsAnuncioUnidad> {
                     ),
                   );
                 } else {
-                  return ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: allAnuncios.length,
-                    itemBuilder: (context, index) {
-                      if (allAnuncios[index].usuario.unidadProduccion ==
-                          widget.usuario.unidadProduccion) {
-                        AnuncioModel anuncio = allAnuncios[index];
+                  // Filtrar anuncios por la unidad de producción del usuario
+                  List<AnuncioModel> anunciosUnidad = allAnuncios
+                      .where((anuncio) =>
+                          anuncio.usuario.unidadProduccion ==
+                          widget.usuario.unidadProduccion)
+                      .toList();
+
+                  // Verificar si hay anuncios para mostrar
+                  if (anunciosUnidad.isNotEmpty) {
+                    return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: anunciosUnidad.length,
+                      itemBuilder: (context, index) {
+                        AnuncioModel anuncio = anunciosUnidad[index];
+
+                        // Obtener imágenes asociadas al anuncio actual
                         List<String> imagesAnuncio = allImagesAnuncios
                             .where((imagen) => imagen.anuncio.id == anuncio.id)
                             .map((imagen) => imagen.imagen)
                             .toList();
 
+                        // Mostrar la tarjeta de anuncio individual
                         return AnuncioCardUnidad(
                           images: imagesAnuncio,
                           anuncio: anuncio,
                         );
-                      } else {
-                        return const Center(
-                          child: Text(
-                            'No hay anuncios para mostrar en esta unidad',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                  );
+                      },
+                    );
+                  } else {
+                    // Mostrar mensaje si no hay anuncios para la unidad de producción
+                    return const Center(
+                      child: Text(
+                        'No hay anuncios para mostrar en esta unidad',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  }
                 }
               }
             },

@@ -5,19 +5,19 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/CardsPedidosClase.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
-// Diseño de la card del conteo de las reservas las cuales estaran ubicadas en la parte superior de los dashboard
-
+// Clase que representa una tarjeta de pedidos del usuario en el dashboard.
 class CardPedidoUsuario extends StatelessWidget {
   const CardPedidoUsuario({
     super.key,
     required this.info,
   });
 
+  // Información del pedido para mostrar en la tarjeta.
   final PedidoCardClase info;
 
   @override
   Widget build(BuildContext context) {
-
+    // Retorna un contenedor que muestra la información del pedido.
     return Container(
       padding: const EdgeInsets.all(defaultPadding),
       decoration: const BoxDecoration(
@@ -31,6 +31,7 @@ class CardPedidoUsuario extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // Icono
               Container(
                 padding: const EdgeInsets.all(defaultPadding * 0.75),
                 height: 40,
@@ -45,9 +46,14 @@ class CardPedidoUsuario extends StatelessWidget {
                       info.color ?? Colors.black, BlendMode.srcIn),
                 ),
               ),
-              const Icon(Icons.more_vert, color: primaryColor,),
+              // Icono de más opciones.
+              const Icon(
+                Icons.more_vert,
+                color: primaryColor,
+              ),
             ],
           ),
+          // Título del pedido.
           Flexible(
             child: Text(
               info.title!,
@@ -55,10 +61,12 @@ class CardPedidoUsuario extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
+          // Línea de progreso
           ProgressLine(
             color: info.color,
             percentage: info.percentage,
           ),
+          // Total
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -84,6 +92,7 @@ class CardPedidoUsuario extends StatelessWidget {
   }
 }
 
+// Widget que muestra una línea de progreso con un color y porcentaje dado.
 class ProgressLine extends StatelessWidget {
   const ProgressLine({
     super.key,
@@ -91,13 +100,17 @@ class ProgressLine extends StatelessWidget {
     required this.percentage,
   });
 
+  // Color de la línea de progreso.
   final Color? color;
+  // Porcentaje completado de la línea de progreso.
   final int? percentage;
 
   @override
   Widget build(BuildContext context) {
+    // Retorna una pila de contenedores que representan la línea de progreso.
     return Stack(
       children: [
+        // Fondo de la línea de progreso.
         Container(
           width: double.infinity,
           height: 5,
@@ -106,6 +119,7 @@ class ProgressLine extends StatelessWidget {
             borderRadius: const BorderRadius.all(Radius.circular(10)),
           ),
         ),
+        // Contenedor de progreso actual.
         LayoutBuilder(
           builder: (context, constraints) => Container(
             width: constraints.maxWidth * (percentage! / 100),

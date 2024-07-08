@@ -37,8 +37,34 @@ class DashboardScreenUnidad extends StatefulWidget {
 }
 
 class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
+  /// Representa el índice del elemento seleccionado en la pantalla.
+  ///
+  /// Es un valor opcional que puede ser nulo. Se utiliza para indicar el índice del tab
+  /// seleccionado en la pantalla del dashboard. Por defecto, es nulo.
+  /// Este valor se utiliza para controlar el comportamiento de la pantalla al
+  /// adaptarla a diferentes dispositivos y tamaños de pantalla.
+  ///
+  /// Ejemplo de uso:
+  ///   // Obtener el valor del índice seleccionado
+  ///   int? selectedIndex = _selectedItem;
+  ///
+  ///   // Establecer un nuevo valor para el índice seleccionado
+  ///   _selectedItem = 2;
+  ///
+  /// Nota: Este valor no se debe modificar directamente, ya que puede causar
+  /// comportamientos inesperados en la pantalla. Utiliza los métodos proporcionados
+  /// para cambiar el valor de este índice.
+  ///
+  /// Ver: [DashboardScreenUnidad._scrollToNextTab], [DashboardScreenUnidad._scrollToPreviousTab]
   int? _selectedItem;
 
+  /// Navega hacia la siguiente pestaña en la pantalla del dashboard y actualiza el valor
+  /// del índice seleccionado.
+  ///
+  /// Utiliza el [DefaultTabController.of] para obtener el controlador de la pestaña actual y
+  /// luego llama al método [animateTo] para navegar a la siguiente pestaña.
+  ///
+  /// Luego actualiza el valor de [_selectedItem] con el nuevo índice de la pestaña.
   void _scrollToNextTab(BuildContext context) {
     final tabController = DefaultTabController.of(context);
     if (tabController != null &&
@@ -50,10 +76,22 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
     }
   }
 
+  /// Navega hacia la pestaña anterior en la pantalla del dashboard y actualiza el valor
+  /// del índice seleccionado.
+  ///
+  /// Utiliza el [DefaultTabController.of] para obtener el controlador de la pestaña actual y
+  /// luego llama al método [animateTo] para navegar a la pestaña anterior.
+  ///
+  /// Si el índice actual es mayor que 0, se actualiza el valor de [_selectedItem] con el nuevo
+  /// índice de la pestaña.
   void _scrollToPreviousTab(BuildContext context) {
+    // Obtiene el controlador de la pestaña actual
     final tabController = DefaultTabController.of(context);
+    // Si el controlador existe y el índice actual es mayor que 0
     if (tabController != null && tabController.index > 0) {
+      // Navega hacia la pestaña anterior
       tabController.animateTo(tabController.index - 1);
+      // Actualiza el valor del índice seleccionado
       setState(() {
         _selectedItem = tabController.index;
       });
@@ -62,13 +100,16 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
 
   @override
   Widget build(BuildContext context) {
+    // Obtiene el estado de la aplicación
     return Consumer<AppState>(builder: (context, appState, _) {
+      // Si el estado de la aplicación no es nulo y el usuario autenticado no es nulo
       if (appState == null || appState.usuarioAutenticado == null) {
         return const Center(
           child: CircularProgressIndicator(),
         );
       }
 
+      // Obtiene el usuario autenticado
       final usuarioAutenticado = appState.usuarioAutenticado;
       return SafeArea(
         child: ListView(
@@ -79,11 +120,13 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
           children: [
             Column(
               children: [
+                // Encabezado
                 const Header(),
                 const SizedBox(height: defaultPadding),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Contenido principal
                     Expanded(
                       flex: 5,
                       child: Column(
@@ -95,10 +138,12 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                               children: [
                                 Column(
                                   children: [
+                                    // Sección de cards de producción
                                     CardsProduccionUnidad(
                                       usuario: usuarioAutenticado!,
                                     ),
                                     const SizedBox(height: defaultPadding),
+                                    // Sección de estadísticas si la pantalla es de escritorio
                                     if (!Responsive.isMobile(context))
                                       const Divider(
                                         height: 1,
@@ -141,6 +186,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                     Builder(builder: (context) {
                                                   return Row(
                                                     children: [
+                                                      // Botón de anterior pestaña.
                                                       IconButton(
                                                         icon: const Icon(
                                                           Icons.arrow_back_ios,
@@ -159,6 +205,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                               TabAlignment
                                                                   .center,
                                                           onTap: (index) {
+                                                            // Actualiza el índice seleccionado
                                                             setState(() {
                                                               _selectedItem =
                                                                   index;
@@ -536,6 +583,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                           ],
                                                         ),
                                                       ),
+                                                      // Botón de siguiente pestaña.
                                                       IconButton(
                                                         icon: const Icon(
                                                           Icons
@@ -557,6 +605,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                         height: defaultPadding,
                                       ),
                                     if (!Responsive.isMobile(context))
+                                      // Contenedor que alberga el contenido de la pestaña.
                                       _selectedItem == 0
                                           ? ReporteCostoProduccionAgnoUnidad(
                                               usuario: usuarioAutenticado,
@@ -608,6 +657,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                       color: Colors.grey,
                                     ),
                                     const SizedBox(height: defaultPadding),
+                                    // Cartas de productos
                                     const CardsProductoUnidad(),
                                     const SizedBox(height: defaultPadding),
                                     const Divider(
@@ -615,27 +665,35 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                       color: Colors.grey,
                                     ),
                                     const SizedBox(height: defaultPadding),
+                                    // Cartas de anuncios
                                     CardsAnuncioUnidad(
                                       usuario: usuarioAutenticado,
                                     ),
                                     const SizedBox(height: defaultPadding),
+                                    // Tabla de anuncios
                                     FutureBuilder(
-                                        future: getBoletas(),
+                                        future:
+                                            getBoletas(), // Obtiene las boletas
                                         builder: (context,
                                             AsyncSnapshot<List<BoletaModel>>
                                                 snapshotBoleta) {
+                                          // Muestra un CircularProgressIndicator mientras se obtienen las boletas
                                           if (snapshotBoleta.connectionState ==
                                               ConnectionState.waiting) {
                                             return const CircularProgressIndicator();
+                                            // Muestra un mensaje de error si ocurre un problema al cargar las boletas
                                           } else if (snapshotBoleta.hasError) {
                                             return Text(
                                                 'Error al cargar inscripciones: ${snapshotBoleta.error}');
+                                            // Muestra un mensaje de que no se encontraron boletas
                                           } else if (snapshotBoleta.data ==
                                               null) {
                                             return const Text(
                                                 'No se encontraron inscripciones');
+                                            // Muestra el contenido de las boletas
                                           } else {
-                                            List<BoletaModel> boletaUnidad = [];
+                                            List<BoletaModel> boletaUnidad =
+                                                []; // Lista de boletas
 
                                             boletaUnidad = snapshotBoleta.data!
                                                 .where((boleta) =>
@@ -643,7 +701,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                         .unidadProduccion ==
                                                     usuarioAutenticado
                                                         .unidadProduccion)
-                                                .toList();
+                                                .toList(); // Filtra las boletas por la unidad de usuario
 
                                             return EventosUnidad(
                                               boletas: boletaUnidad,
@@ -651,23 +709,29 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                           }
                                         }),
                                     const SizedBox(height: defaultPadding),
+                                    // Tabla de producciones
                                     FutureBuilder(
-                                        future: getProducciones(),
+                                        future:
+                                            getProducciones(), // Obtiene las producciones
                                         builder: (context,
                                             AsyncSnapshot<List<ProduccionModel>>
                                                 snapshotProduccion) {
+                                          // Muestra un CircularProgressIndicator mientras se obtienen las producciones
                                           if (snapshotProduccion
                                                   .connectionState ==
                                               ConnectionState.waiting) {
                                             return const CircularProgressIndicator();
+                                            // Muestra un mensaje de error si ocurre un problema al cargar las producciones
                                           } else if (snapshotProduccion
                                               .hasError) {
                                             return Text(
                                                 'Error al cargar producciones: ${snapshotProduccion.error}');
+                                            // Muestra un mensaje de que no se encontraron producciones
                                           } else if (snapshotProduccion.data ==
                                               null) {
                                             return const Text(
                                                 'No se encontraron producciones');
+                                            // Muestra el contenido de las producciones
                                           } else {
                                             final produccionUnidad =
                                                 snapshotProduccion.data!
@@ -677,7 +741,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                             .id ==
                                                         usuarioAutenticado
                                                             .unidadProduccion)
-                                                    .toList();
+                                                    .toList(); // Filtra las producciones por la unidad de usuario
 
                                             return ProduccionUnidad(
                                               producciones: produccionUnidad,
@@ -685,23 +749,29 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                           }
                                         }),
                                     const SizedBox(height: defaultPadding),
+                                    // Tabla de producciones recibidas
                                     FutureBuilder(
-                                        future: getProducciones(),
+                                        future:
+                                            getProducciones(), // Obtiene las producciones
                                         builder: (context,
                                             AsyncSnapshot<List<ProduccionModel>>
                                                 snapshotProduccion) {
+                                          // Muestra un CircularProgressIndicator mientras se obtienen las producciones
                                           if (snapshotProduccion
                                                   .connectionState ==
                                               ConnectionState.waiting) {
                                             return const CircularProgressIndicator();
+                                            // Muestra un mensaje de error si ocurre un problema al cargar las producciones
                                           } else if (snapshotProduccion
                                               .hasError) {
                                             return Text(
                                                 'Error al cargar producciones: ${snapshotProduccion.error}');
+                                            // Muestra un mensaje de que no se encontraron producciones
                                           } else if (snapshotProduccion.data ==
                                               null) {
                                             return const Text(
                                                 'No se encontraron producciones');
+                                            // Muestra el contenido de las producciones
                                           } else {
                                             final produccionRecibidaUnidad =
                                                 snapshotProduccion.data!
@@ -711,7 +781,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                             .id ==
                                                         usuarioAutenticado
                                                             .unidadProduccion)
-                                                    .toList();
+                                                    .toList(); // Filtra las producciones por la unidad de usuario
 
                                             return ProduccionRecibidaUnidad(
                                               producciones:
@@ -725,6 +795,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                               ],
                             ),
                           ),
+                          // Si el dispositivo no es de escritorio se muestra la sección de favoritos y visitados
                           if (!Responsive.isDesktop(context))
                             const SizedBox(height: defaultPadding),
                           if (!Responsive.isDesktop(context))
@@ -740,6 +811,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                         ],
                       ),
                     ),
+                    // Si el dispositivo es de escritorio se muestra la sección de favoritos y visitados en la parte derecha
                     if (Responsive.isDesktop(context))
                       const SizedBox(width: defaultPadding),
                     // On Mobile means if the screen is less than 850 we don't want to show it

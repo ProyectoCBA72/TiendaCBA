@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'dart:convert';
 
 import '../source.dart';
@@ -11,13 +13,31 @@ import 'sedeModel.dart';
 import 'unidadProduccionModel.dart';
 import 'usuarioModel.dart';
 
+/// Clase InventarioModel que representa un inventario en la aplicación.
+///
+/// Esta clase define una estructura de datos para representar un inventario.
+/// Un inventario es un registro de la cantidad de productos en una bodega,
+/// la fecha en la que se realizó el inventario y la producción asociada.
 class InventarioModel {
+  /// Identificador único del inventario.
   final int id;
+
+  /// Cantidad de productos en la bodega.
   final int stock;
+
+  /// Fecha en la que se realizó el inventario.
   final String fecha;
+
+  /// Identificador de la producción asociada al inventario.
   final int produccion;
+
+  /// Bodega a la que pertenece el inventario.
   final BodegaModel bodega;
 
+  /// Constructor para inicializar un objeto de la clase InventarioModel.
+  ///
+  /// Los parámetros [id], [stock], [produccion] y [fecha] son obligatorios.
+  /// El parámetro [bodega] es obligatorio.
   InventarioModel({
     required this.id,
     required this.stock,
@@ -27,17 +47,35 @@ class InventarioModel {
   });
 }
 
+/// Lista que almacena los objetos de tipo InventarioModel.
+///
+/// Esta lista se utiliza para almacenar los inventarios obtenidos de la API.
+/// Cada inventario representa la cantidad de productos en una bodega, la fecha
+/// en la que se realizó el inventario y la producción asociada.
+///
+/// Los elementos de esta lista pueden ser agregados utilizando el método [add],
+/// y puedes iterar sobre sus elementos utilizando un bucle [for] o el método [index].
 List<InventarioModel> inventarios = [];
 
-// Futuro para traer los datos de la api
-
+// Método para obtener los datos de los inventarios
 Future<List<InventarioModel>> getInventario() async {
+  // URL utilizada para obtener los inventarios a través de la API.
+  ///
+  // Esta URL se utiliza para realizar una solicitud GET a la API y obtener
+  // los inventarios.
   String url = "";
 
+  // Construir la URL a partir de la URL base de la API y la ruta específica para
+  // obtener los inventarios.
   url = "$sourceApi/api/inventarios/";
 
+  // Realizar una solicitud GET a la URL para obtener los inventarios.
+  ///
+  /// La función http.get devuelve un objeto Future que se resolverá con
+  /// un objeto Response cuando se complete la solicitud.
   final response = await http.get(Uri.parse(url));
 
+  // Verificar el estado de la respuesta
   if (response.statusCode == 200) {
     // Limpiar la lista antes de llenarla con datos actualizados
     inventarios.clear();
@@ -46,6 +84,7 @@ Future<List<InventarioModel>> getInventario() async {
     String responseBodyUtf8 = utf8.decode(response.bodyBytes);
     List<dynamic> decodedData = jsonDecode(responseBodyUtf8);
 
+    // Verificar la lista de datos decodificados
     for (var inventarioData in decodedData) {
       inventarios.add(
         InventarioModel(
@@ -217,9 +256,10 @@ Future<List<InventarioModel>> getInventario() async {
       );
     }
 
-    // Devolver la lista con los valores llenos
+    // Devolver la lista de inventarios
     return inventarios;
   } else {
+    // Si la respuesta no es exitosa, se lanza una excepción
     throw Exception(
         'Fallo la solicitud HTTP con código ${response.statusCode}');
   }

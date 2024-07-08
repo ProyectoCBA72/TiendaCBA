@@ -12,7 +12,7 @@ class MetodoForm extends StatefulWidget {
 }
 
 class _MetodoFormState extends State<MetodoForm> {
-  int? _selectedItem;
+  int? _selectedItem; // Variable para almacenar el método de pago seleccionado
 
   List<MetodoDesplegable> metodo = [
     MetodoDesplegable("Efectivo", 1),
@@ -20,7 +20,7 @@ class _MetodoFormState extends State<MetodoForm> {
     MetodoDesplegable("Nequi", 3),
     MetodoDesplegable("Daviplata", 4),
     MetodoDesplegable("PSE", 5),
-  ];
+  ]; // Lista de métodos de pago disponibles
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +70,7 @@ class _MetodoFormState extends State<MetodoForm> {
                           ),
                         ))
                     .toList(),
-                value: _selectedItem,
+                value: _selectedItem, // Valor seleccionado actualmente
                 onChanged: (dynamic value) {
                   // Actualización del valor seleccionado
                   setState(() {
@@ -129,3 +129,4 @@ class MetodoDesplegable {
 
   MetodoDesplegable(this.nombre, this.valor);
 }
+

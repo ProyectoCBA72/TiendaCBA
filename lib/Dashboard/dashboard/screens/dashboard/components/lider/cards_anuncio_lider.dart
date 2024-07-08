@@ -6,12 +6,12 @@ import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 
-// Vista donde se llamaran las cards superiores de conteo de reservas y las organiza que se adapten a todos los dispositivos
-
+// Vista que muestra las tarjetas de anuncios, adaptándose a diferentes dispositivos.
 class CardsAnuncioLider extends StatelessWidget {
   final UsuarioModel usuario;
   const CardsAnuncioLider({
-    super.key, required this.usuario,
+    super.key,
+    required this.usuario,
   });
 
   Future<List<dynamic>> futureData() async {
@@ -22,6 +22,7 @@ class CardsAnuncioLider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Encabezado de las tarjetas de anuncios
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -32,6 +33,7 @@ class CardsAnuncioLider extends StatelessWidget {
                   .titleLarge
                   ?.copyWith(fontFamily: 'Calibri-Bold'),
             ),
+            // Botón "Añadir Anuncio" visible solo en dispositivos no móviles
             if (!Responsive.isMobile(context))
               Container(
                 width: 200,
@@ -45,7 +47,7 @@ class CardsAnuncioLider extends StatelessWidget {
                   ),
                   boxShadow: const [
                     BoxShadow(
-                      color: botonSombra, // Verde más claro para sombra
+                      color: botonSombra, // Sombra en tono verde claro
                       blurRadius: 5,
                       offset: Offset(0, 3),
                     ),
@@ -75,10 +77,10 @@ class CardsAnuncioLider extends StatelessWidget {
               ),
           ],
         ),
+        // Espacio adicional en dispositivos móviles
         if (Responsive.isMobile(context))
-          const SizedBox(
-            height: defaultPadding,
-          ),
+          const SizedBox(height: defaultPadding),
+        // Botón "Añadir Anuncio" visible solo en dispositivos móviles
         if (Responsive.isMobile(context))
           Center(
             child: Container(
@@ -93,7 +95,7 @@ class CardsAnuncioLider extends StatelessWidget {
                 ),
                 boxShadow: const [
                   BoxShadow(
-                    color: botonSombra, // Verde más claro para sombra
+                    color: botonSombra, // Sombra en tono verde claro
                     blurRadius: 5,
                     offset: Offset(0, 3),
                   ),
@@ -122,7 +124,9 @@ class CardsAnuncioLider extends StatelessWidget {
               ),
             ),
           ),
+        // Espacio adicional antes del listado de tarjetas de anuncios
         const SizedBox(height: defaultPadding),
+        // Contenedor que muestra las tarjetas de anuncios
         SizedBox(
           height: 300,
           child: FutureBuilder(
@@ -130,17 +134,21 @@ class CardsAnuncioLider extends StatelessWidget {
             builder:
                 (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
+                // Indicador de carga mientras se espera la respuesta
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
               } else if (snapshot.hasError) {
+                // Mensaje de error si ocurre un problema al cargar datos
                 return Center(
-                  child: Text('Ocurrio un error: ${snapshot.error} '),
+                  child: Text('Ocurrió un error: ${snapshot.error}'),
                 );
               } else {
+                // Construcción de las tarjetas de anuncios
                 List<AnuncioModel> allAnuncios = snapshot.data![0];
                 List<ImagenAnuncioModel> allImagesAnuncios = snapshot.data![1];
                 if (allAnuncios.isEmpty) {
+                  // Mensaje si no hay anuncios para mostrar
                   return const Center(
                     child: Text(
                       'No hay anuncios',
@@ -151,13 +159,18 @@ class CardsAnuncioLider extends StatelessWidget {
                     ),
                   );
                 } else {
-                  return ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: allAnuncios.length,
-                    itemBuilder: (context, index) {
-                      if (allAnuncios[index].usuario.puntoVenta ==
-                          usuario.puntoVenta) {
-                        AnuncioModel anuncio = allAnuncios[index];
+                  // Filtrar anuncios por sede del usuario autenticado
+                  List<AnuncioModel> anuncioSede = allAnuncios
+                      .where((anuncio) => anuncio.usuario.sede == usuario.sede)
+                      .toList();
+
+                  if (anuncioSede.isNotEmpty) {
+                    // Mostrar listado de tarjetas de anuncios
+                    return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: anuncioSede.length,
+                      itemBuilder: (context, index) {
+                        AnuncioModel anuncio = anuncioSede[index];
                         List<String> imagesAnuncio = allImagesAnuncios
                             .where((imagen) => imagen.anuncio.id == anuncio.id)
                             .map((imagen) => imagen.imagen)
@@ -167,19 +180,20 @@ class CardsAnuncioLider extends StatelessWidget {
                           images: imagesAnuncio,
                           anuncio: anuncio,
                         );
-                      } else {
-                        return const Center(
-                          child: Text(
-                            'No hay anuncios para mostrar en esta unidad',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                  );
+                      },
+                    );
+                  } else {
+                    // Mensaje si no hay anuncios para la sede del usuario
+                    return const Center(
+                      child: Text(
+                        'No hay anuncios para mostrar en esta sede',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  }
                 }
               }
             },
@@ -189,4 +203,3 @@ class CardsAnuncioLider extends StatelessWidget {
     );
   }
 }
-

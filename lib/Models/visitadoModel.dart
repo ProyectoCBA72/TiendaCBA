@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'categoriaModel.dart';
@@ -7,12 +9,26 @@ import 'sedeModel.dart';
 import 'unidadProduccionModel.dart';
 import 'usuarioModel.dart';
 
+/// Clase que representa un visitado en la aplicación.
+///
+/// Esta clase contiene información sobre un visitado, como su identificador único,
+/// la fecha en que se vio y el producto que se vio.
 class VisitadoModel {
+  /// El identificador único del visitado.
   final int id;
+
+  /// La fecha en que se vio el producto.
   final String fechaVista;
+
+  /// El identificador del usuario que vio el producto.
   final int usuario;
+
+  /// El producto que se vio.
   final ProductoModel producto;
 
+  /// Crea una instancia de [VisitadoModel].
+  ///
+  /// Los parámetros [id] y [fechaVista] son obligatorios.
   VisitadoModel({
     required this.id,
     required this.fechaVista,
@@ -21,17 +37,30 @@ class VisitadoModel {
   });
 }
 
+/// Lista que almacena todas las instancias de [VisitadoModel].
+///
+/// Esta lista se utiliza para almacenar todos los visitados
+/// que se han generado en la aplicación.
+/// Los elementos de esta lista son de tipo [VisitadoModel].
+/// Puedes agregar elementos a esta lista utilizando el método [add],
+/// y puedes iterar sobre sus elementos utilizando un bucle [for] o el método [index].
 List<VisitadoModel> visitados = [];
 
-// Futuro para traer los datos de la api
-
+// Método para obtener los datos de los visitados
 Future<List<VisitadoModel>> getVisitados() async {
+  // URL para obtener los datos de los visitados de la API
+  // Esta URL se utiliza para realizar una solicitud GET a la API y obtener los datos de los visitados.
   String url = "";
 
+  // Construir la URL de la API utilizando la variable de configuración [sourceApi]
   url = "$sourceApi/api/visitados/";
 
+  // Realizar una solicitud GET a la URL para obtener los datos de los visitados
+  // El método [http.get] devuelve una promesa que se resuelve en una instancia de la clase [http.Response].
+  // La respuesta de la solicitud se almacena en la variable [response].
   final response = await http.get(Uri.parse(url));
 
+  // Verificar si la respuesta fue exitosa
   if (response.statusCode == 200) {
     // Limpiar la lista antes de llenarla con datos actualizados
     visitados.clear();
@@ -40,6 +69,7 @@ Future<List<VisitadoModel>> getVisitados() async {
     String responseBodyUtf8 = utf8.decode(response.bodyBytes);
     List<dynamic> decodedData = jsonDecode(responseBodyUtf8);
 
+    // Llenar la lista con los datos de los visitados
     for (var visitadoData in decodedData) {
       visitados.add(
         VisitadoModel(
@@ -149,9 +179,10 @@ Future<List<VisitadoModel>> getVisitados() async {
       );
     }
 
-    // Devolver la lista llena
+    // Devolver la lista de visitados
     return visitados;
   } else {
+    // Manejar el error de respuesta HTTP
     throw Exception(
         'Fallo la solicitud HTTP con código ${response.statusCode}');
   }

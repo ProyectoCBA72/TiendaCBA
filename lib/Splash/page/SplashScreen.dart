@@ -7,7 +7,6 @@ import '../data/list.dart';
 
 // Clase SplashScreen, que representa la pantalla de presentación.
 class SplashScreen extends StatefulWidget {
-  // Constructor que recibe un ThemeManager como parámetro.
   const SplashScreen({super.key});
 
   @override
@@ -82,8 +81,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                 if (listaComponents[index].background ==
                                     Colors.white) {
                                   return Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
@@ -124,8 +122,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                   );
                                 } else {
                                   return Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
@@ -655,8 +652,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                 if (listaComponents[index].background ==
                                     Colors.white) {
                                   return Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
@@ -697,8 +693,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                   );
                                 } else {
                                   return Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [

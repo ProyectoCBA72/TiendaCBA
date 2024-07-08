@@ -5,9 +5,16 @@ import 'package:tienda_app/Carrito/source/carritoBodyScreen.dart';
 import '../Home/profileCard.dart';
 import '../constantsDesign.dart';
 
+/// Esta clase representa la pantalla de carrito de la aplicación.
+///
+/// Esta clase extiende [StatefulWidget] y se utiliza para mostrar la pantalla de carrito.
 class CarritoScreen extends StatefulWidget {
+  /// Constructor de la clase [CarritoScreen].
+  ///
+  /// El parámetro [key] es opcional y se utiliza para identificar el widget en la árbol de widgets.
   const CarritoScreen({super.key});
 
+  /// Retorna el estado de la pantalla de carrito.
   @override
   State<CarritoScreen> createState() => _CarritoScreenState();
 }
@@ -19,6 +26,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
+          // Imagen de fondo del carrito
           Image.asset(
             'assets/img/tienda.jpg',
             fit: BoxFit.cover,
@@ -31,7 +39,8 @@ class _CarritoScreenState extends State<CarritoScreen> {
             width: double.infinity,
             height: double.infinity,
           ),
-          
+
+          // Botón de retroceso en la parte superior izquierda
           Positioned(
             top: 40,
             left: 20,
@@ -67,6 +76,8 @@ class _CarritoScreenState extends State<CarritoScreen> {
               ),
             ),
           ),
+
+          // Tarjeta de perfil en la parte superior derecha
           Positioned(
             top: 40,
             right: 20,
@@ -79,6 +90,8 @@ class _CarritoScreenState extends State<CarritoScreen> {
               ],
             ),
           ),
+
+          // Cuerpo del carrito
           const Positioned(
             top: 110,
             left: 0,

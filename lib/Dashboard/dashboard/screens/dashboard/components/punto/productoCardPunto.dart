@@ -9,48 +9,53 @@ import 'package:tienda_app/constantsDesign.dart';
 class ProductoCardPunto extends StatefulWidget {
   final ProductoModel producto;
   final List<String> images;
-  const ProductoCardPunto(
-      {Key? key, required this.producto, required this.images})
-      : super(key: key);
+
+  const ProductoCardPunto({
+    Key? key,
+    required this.producto,
+    required this.images,
+  }) : super(key: key);
 
   @override
   _ProductoCardPuntoState createState() => _ProductoCardPuntoState();
 }
 
 class _ProductoCardPuntoState extends State<ProductoCardPunto> {
-  int _currentImageIndex = 0;
-  Timer? _timer;
-  List<String> _images = [];
+  int _currentImageIndex = 0; // Índice de la imagen actual que se muestra
+  Timer? _timer; // Temporizador para cambiar automáticamente las imágenes
+  List<String> _images = []; // Lista de imágenes del producto
 
   bool _isOnSale = true; // Variable que indica si el producto está en oferta
 
   @override
   void initState() {
     super.initState();
-    _loadImages();
+    _loadImages(); // Carga las imágenes iniciales del widget
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _timer?.cancel(); // Cancela el temporizador al destruir el widget
     super.dispose();
   }
 
   void _startTimer() {
+    // Inicia un temporizador que cambia la imagen cada 3 segundos
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       setState(() {
-        _currentImageIndex = (_currentImageIndex + 1) % _images.length;
+        _currentImageIndex = (_currentImageIndex + 1) % _images.length; // Cambia al siguiente índice de imagen
       });
     });
   }
 
   void _loadImages() {
+    // Carga las imágenes del widget desde widget.images al estado local _images
     _images = widget.images;
   }
 
   @override
   Widget build(BuildContext context) {
-    final producto = widget.producto;
+    final producto = widget.producto; // Obtiene el objeto ProductoModel desde los parámetros widget
     return Padding(
       padding: const EdgeInsets.all(20),
       child: SizedBox(
@@ -58,12 +63,16 @@ class _ProductoCardPuntoState extends State<ProductoCardPunto> {
         height: 200,
         child: InkWell(
           onTap: () {
-            
-            Navigator.push(context,
-                MaterialPageRoute(builder: (builder) =>   DetailsScreen(producto: producto,)));
-            
+            // Navega a la pantalla de detalle del producto al hacer tap
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (builder) => DetailsScreen(producto: producto),
+              ),
+            );
           },
           onHover: (isHovered) {
+            // Inicia o cancela el temporizador según el hover del usuario sobre la tarjeta
             if (isHovered) {
               _startTimer();
             } else {
@@ -72,6 +81,7 @@ class _ProductoCardPuntoState extends State<ProductoCardPunto> {
           },
           child: Stack(
             children: [
+              // Widget que maneja las animaciones y transiciones entre las imágenes
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 500),
                 child: FadeTransition(
@@ -82,7 +92,7 @@ class _ProductoCardPuntoState extends State<ProductoCardPunto> {
                     padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: NetworkImage(_images[_currentImageIndex]),
+                        image: NetworkImage(_images[_currentImageIndex]), // Obtiene la imagen actual desde _images
                         fit: BoxFit.fill,
                       ),
                       color: Colors.black12,
@@ -99,6 +109,7 @@ class _ProductoCardPuntoState extends State<ProductoCardPunto> {
                       padding: const EdgeInsets.only(bottom: 10),
                       child: Stack(
                         children: [
+                          // Botón de edición en la esquina superior izquierda
                           Positioned(
                             top: 5,
                             left: 5,
@@ -108,14 +119,14 @@ class _ProductoCardPuntoState extends State<ProductoCardPunto> {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: IconButton(
-                                icon:
-                                    const Icon(Icons.edit, color: Colors.white),
+                                icon: const Icon(Icons.edit, color: Colors.white),
                                 onPressed: () {
-                                  // Acción al presionar el favorito
+                                  // Acción al presionar el botón de edición (a implementar)
                                 },
                               ),
                             ),
                           ),
+                          // Botón de eliminación en la esquina superior derecha
                           Positioned(
                             top: 5,
                             right: 5,
@@ -125,14 +136,14 @@ class _ProductoCardPuntoState extends State<ProductoCardPunto> {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: IconButton(
-                                icon: const Icon(Icons.delete,
-                                    color: Colors.white),
+                                icon: const Icon(Icons.delete, color: Colors.white),
                                 onPressed: () {
-                                  // Acción al presionar el carrito de compra
+                                  // Acción al presionar el botón de eliminación (a implementar)
                                 },
                               ),
                             ),
                           ),
+                          // Contenedor con información del producto en la parte inferior
                           Positioned(
                             bottom: 6,
                             left: 5,
@@ -148,8 +159,9 @@ class _ProductoCardPuntoState extends State<ProductoCardPunto> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                     Text(
-                                    producto.nombre  ,
+                                    // Nombre del producto
+                                    Text(
+                                      producto.nombre,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20,
@@ -158,20 +170,19 @@ class _ProductoCardPuntoState extends State<ProductoCardPunto> {
                                       ),
                                     ),
                                     const SizedBox(height: 5),
+                                    // Precio del producto (normal o en oferta)
                                     Text(
                                       _isOnSale
                                           ? "\$${formatter.format(producto.precioOferta)}"
                                           : "\$${formatter.format(producto.precio)}",
                                       style: TextStyle(
                                         fontSize: 16,
-                                        color: _isOnSale
-                                            ? Colors.white
-                                            : Colors.red,
-                                        decoration: _isOnSale
-                                            ? null
-                                            : TextDecoration.lineThrough,
+                                        color: _isOnSale ? Colors.white : Colors.red,
+                                        decoration:
+                                            _isOnSale ? null : TextDecoration.lineThrough,
                                       ),
                                     ),
+                                    // Etiqueta de "Oferta" si el producto está en oferta
                                     if (_isOnSale)
                                       const Text(
                                         "Oferta!",
@@ -199,3 +210,4 @@ class _ProductoCardPuntoState extends State<ProductoCardPunto> {
     );
   }
 }
+

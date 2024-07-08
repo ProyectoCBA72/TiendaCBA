@@ -1,19 +1,29 @@
 // ignore_for_file: file_names
 import 'package:flutter/material.dart';
 
+/// Esta clase es un estado para una sección del Home que muestra información sobre SENAC
+///
+/// Esta clase extiende [StatefulWidget] y tiene un único estado:
+/// [_SenaSectionState]
 class SenaSection extends StatefulWidget {
+  /// Constructor de [SenaSection]
+  ///
+  /// Esta función crea una instancia de [SenaSection] con la llave de acceso [key]
   const SenaSection({super.key});
 
+  /// Esta función crea el estado de [SenaSection] con una instancia de [_SenaSectionState]
   @override
   State<SenaSection> createState() => _SenaSectionState();
 }
 
+/// Estado del widget que representa la sección del SENA.
 class _SenaSectionState extends State<SenaSection> {
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // Sección de título "Quienes Somos"
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
@@ -36,6 +46,7 @@ class _SenaSectionState extends State<SenaSection> {
             ),
           ),
         ),
+        // Sección de descripción del SENA
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
@@ -57,6 +68,7 @@ class _SenaSectionState extends State<SenaSection> {
           ),
         ),
         const SizedBox(height: 20),
+        // Imagen del SENA con sombra y bordes redondeados
         SizedBox(
           height: 400,
           child: Stack(

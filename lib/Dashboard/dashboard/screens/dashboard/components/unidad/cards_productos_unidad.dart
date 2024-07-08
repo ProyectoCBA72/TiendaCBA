@@ -7,13 +7,13 @@ import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/provider.dart';
 import 'package:tienda_app/responsive.dart';
 
-// Vista donde se llamaran las cards superiores de conteo de reservas y las organiza que se adapten a todos los dispositivos
-
+/// Vista que muestra las tarjetas de productos individuales para una unidad de producción.
 class CardsProductoUnidad extends StatelessWidget {
   const CardsProductoUnidad({
     super.key,
   });
- 
+
+  /// Función asíncrona que devuelve una lista de datos futuros: productos y sus imágenes.
   Future<List<dynamic>> futureData() async {
     return Future.wait([getProductos(), getImagenProductos()]);
   }
@@ -137,27 +137,33 @@ class CardsProductoUnidad extends StatelessWidget {
                       child: Text('error: ${snapshot.error}'),
                     );
                   } else {
-                    // creamos las intancias de los datos traidos del futuro en su respectivo indice
+                    // Obtener listas de productos e imágenes
                     List<ProductoModel> productos = snapshot.data![0];
                     List<ImagenProductoModel> allImages = snapshot.data![1];
-                    // creamos otra lista con el fin de tener solo los productos que el usuario con el rol unidad tiene.
+                    
+                    // Filtrar productos por la unidad de producción del usuario autenticado
                     final List<ProductoModel> productosUnidad = productos
                         .where((producto) =>
                             producto.unidadProduccion.id ==
                             usuarioAutenticado!.unidadProduccion)
                         .toList();
-                    // verificamos si hay productos en la lista.
+
+                    // Verificar si hay productos para mostrar
                     if (productosUnidad.isNotEmpty) {
                       return ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: productosUnidad.length,
                         itemBuilder: (context, index) {
                           ProductoModel producto = productosUnidad[index];
+                          
+                          // Obtener imágenes asociadas al producto actual
                           List<String> images = allImages
                               .where(
                                   (imagen) => imagen.producto.id == producto.id)
                               .map((imagen) => imagen.imagen)
                               .toList();
+                          
+                          // Mostrar la tarjeta de producto individual
                           return ProductoCardUnidad(
                             images: images,
                             producto: producto,
@@ -165,6 +171,7 @@ class CardsProductoUnidad extends StatelessWidget {
                         },
                       );
                     } else {
+                      // Mostrar mensaje si no hay productos para la unidad de producción
                       return const Center(
                         child: Text(
                           'No hay productos para mostrar en esta unidad',

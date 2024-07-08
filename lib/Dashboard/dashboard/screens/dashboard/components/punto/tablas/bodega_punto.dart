@@ -1,6 +1,7 @@
 // ignore_for_file: use_full_hex_values_for_flutter_colors
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/inventarioModel.dart';
@@ -8,8 +9,22 @@ import 'package:tienda_app/Models/produccionModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 
+/// Un widget de estado que representa la vista de la bodega de un punto de venta.
+///
+/// Esta clase extiende [StatefulWidget] y proporciona un estado asociado
+/// [_BodegaPuntoState]. Tiene una lista de [InventarioModel] que representa
+/// los inventarios de la bodega del punto de venta.
 class BodegaPunto extends StatefulWidget {
+  /// La lista de inventarios de la bodega del punto de venta.
+  ///
+  /// Esta lista contiene objetos de tipo [InventarioModel] que representan
+  /// los inventarios de la bodega del punto de venta.
   final List<InventarioModel> inventarioLista;
+
+  /// Crea un nuevo widget de estado de la bodega de un punto de venta.
+  ///
+  /// Toma como parámetro obligatorio la lista de inventarios de la bodega
+  /// del punto de venta.
   const BodegaPunto({super.key, required this.inventarioLista});
 
   @override
@@ -17,28 +32,64 @@ class BodegaPunto extends StatefulWidget {
 }
 
 class _BodegaPuntoState extends State<BodegaPunto> {
+  /// La lista de inventarios de la bodega del punto de venta.
+  ///
+  /// Esta lista contiene objetos de tipo [InventarioModel] que representan
+  /// los inventarios de la bodega del punto de venta.
   List<InventarioModel> _bodegas = [];
+
+  /// La lista de producciones de la bodega del punto de venta.
+  ///
+  /// Esta lista contiene objetos de tipo [ProduccionModel] que representan
+  /// las producciones de la bodega del punto de venta.
   List<ProduccionModel> listaProducciones = [];
 
+  /// El origen de datos del datagrid de la bodega del punto de venta.
+  ///
+  /// Este objeto contiene la fuente de datos para el datagrid de la bodega
+  /// del punto de venta, incluyendo los inventarios y las producciones.
   late BodegaPuntoDataGridSource _dataGridSource;
 
   @override
+
+  /// Inicializa el estado del widget.
+  ///
+  /// Este método es llamado cuando se crea el widget y se establece su estado.
+  /// Aquí, inicializamos el objeto [_dataGridSource] con la lista de inventarios
+  /// de la bodega del punto de venta y cargamos los datos de las producciones.
+  @override
   void initState() {
     super.initState();
+    // Inicializa el objeto [_dataGridSource] con la lista de inventarios
+    // de la bodega del punto de venta y las producciones
     _dataGridSource = BodegaPuntoDataGridSource(
         bodegas: _bodegas, listaProducciones: listaProducciones);
     _bodegas = widget.inventarioLista;
+    // Carga los datos de las producciones de la bodega del punto de venta
     _loadData();
   }
 
+  /// Carga los datos de las producciones de la bodega del punto de venta.
+  ///
+  /// Esto se hace llamando a la función [getProducciones] de la API
+  /// y asignando los resultados a la variable [_producciones].
+  /// Luego, se actualiza [_dataGridSource] en el siguiente frame de la interfaz de usuario.
   Future<void> _loadData() async {
+    // Obtener las producciones de la bodega del punto de venta
+    // de la API
     List<ProduccionModel> produccionesCargadas = await getProducciones();
 
+    // Asignar las producciones a la variable listaProducciones
     listaProducciones = produccionesCargadas;
 
-    // Ahora inicializa _dataGridSource después de cargar los datos
-    _dataGridSource = BodegaPuntoDataGridSource(
-        bodegas: _bodegas, listaProducciones: listaProducciones);
+    // Actualizar _dataGridSource en el siguiente frame de la interfaz de usuario
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        // Inicializar _dataGridSource con los datos de las producciones y los inventarios
+        _dataGridSource = BodegaPuntoDataGridSource(
+            bodegas: _bodegas, listaProducciones: listaProducciones);
+      });
+    });
   }
 
   @override
@@ -52,6 +103,7 @@ class _BodegaPuntoState extends State<BodegaPunto> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Titulo tabla
           Text(
             "Inventario",
             style: Theme.of(context)
@@ -62,6 +114,7 @@ class _BodegaPuntoState extends State<BodegaPunto> {
           const SizedBox(
             height: defaultPadding,
           ),
+          // Cuerpo de la tabla
           SizedBox(
             height: 300,
             width: double.infinity,
@@ -75,11 +128,12 @@ class _BodegaPuntoState extends State<BodegaPunto> {
                 shrinkWrapColumns: true,
                 shrinkWrapRows: true,
                 rowsPerPage: 10,
-                source: _dataGridSource,
+                source: _dataGridSource, // Asignar _dataGridSource
                 selectionMode: SelectionMode.multiple,
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Cargar columnas
                 columns: <GridColumn>[
                   GridColumn(
                     columnName: 'Producto',
@@ -152,6 +206,7 @@ class _BodegaPuntoState extends State<BodegaPunto> {
           const SizedBox(
             height: defaultPadding,
           ),
+          // Botón para imprimir o añadir un nuevo reporte
           if (!Responsive.isMobile(context))
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -180,40 +235,49 @@ class _BodegaPuntoState extends State<BodegaPunto> {
     );
   }
 
+  /// Construye un botón con los estilos de diseño especificados.
+  ///
+  /// El parámetro [text] es el texto que se mostrará en el botón.
+  /// El parámetro [onPressed] es la función que se ejecutará cuando se presione el botón.
+  ///
+  /// Devuelve un widget [Container] que contiene un widget [Material] con un estilo específico.
   Widget _buildButton(String text, VoidCallback onPressed) {
     return Container(
-      width: 200,
+      width: 200, // Ancho del contenedor
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius:
+            BorderRadius.circular(10), // Borde redondeado con un radio de 10
         gradient: const LinearGradient(
           colors: [
-            botonClaro,
-            botonOscuro,
+            botonClaro, // Color de fondo claro
+            botonOscuro, // Color de fondo oscuro
           ],
-        ),
+        ), // Gradiente de color
         boxShadow: const [
           BoxShadow(
-            color: botonSombra,
-            blurRadius: 5,
-            offset: Offset(0, 3),
+            color: botonSombra, // Color de sombra
+            blurRadius: 5, // Radio de la sombra
+            offset: Offset(0, 3), // Desplazamiento en x e y de la sombra
           ),
-        ],
+        ], // Sombra
       ),
       child: Material(
-        color: Colors.transparent,
+        color: Colors.transparent, // Color de fondo transparente
         child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(10),
+          onTap: onPressed, // Controlador de eventos al presionar el botón
+          borderRadius:
+              BorderRadius.circular(10), // Borde redondeado con un radio de 10
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(
+                vertical: 10), // Padding vertical de 10
             child: Center(
               child: Text(
-                text,
+                text, // Texto del botón
                 style: const TextStyle(
-                  color: background1,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Calibri-Bold',
+                  color: background1, // Color del texto
+                  fontSize: 13, // Tamaño de fuente
+                  fontWeight: FontWeight.bold, // Fuente en negrita
+                  fontFamily: 'Calibri-Bold', // Fuente Calibri en negrita
                 ),
               ),
             ),
@@ -224,49 +288,130 @@ class _BodegaPuntoState extends State<BodegaPunto> {
   }
 }
 
+/// Clase que define los datos de la fuente de datos de la tabla
 class BodegaPuntoDataGridSource extends DataGridSource {
+  /// Obtiene el número de producción de un inventario dado su identificador.
+  ///
+  /// El método recibe el identificador de la producción y una lista de producciones.
+  /// Recorre la lista de producciones buscando la producción que corresponda al
+  /// identificador especificado. Si encuentra una producción que coincide con el
+  /// identificador, obtiene el número de la producción y lo devuelve como una
+  /// cadena. Si no encuentra ninguna producción que coincida, devuelve una cadena
+  /// vacía.
+  ///
+  /// Parámetros:
+  /// - produccionId: El identificador de la producción a buscar.
+  /// - producciones: La lista de producciones en la que buscar la producción.
+  ///
+  /// Retorna:
+  /// - Una cadena con el número de la producción, si se encuentra una producción que
+  ///   coincide con el identificador.
+  /// - Una cadena vacía si no se encuentra ninguna producción que coincida con el
+  ///   identificador.
   String numeroProduccionInventario(
       int produccionId, List<ProduccionModel> producciones) {
+    // Inicializa la variable produccionNumero como una cadena vacía
     String produccionNumero = "";
 
+    // Recorre la lista de producciones buscando la producción que corresponda al
+    // identificador especificado
     for (var produccion in producciones) {
+      // Si el identificador de la producción coincide con el produccionId proporcionado
       if (produccion.id == produccionId) {
+        // Asigna el número de la producción a la variable produccionNumero
         produccionNumero = produccion.numero.toString();
+        // Detiene el bucle for y devuelve el número de la producción
         break;
       }
     }
 
+    // Devuelve el número de la producción o una cadena vacía si no se encuentra la
+    // producción asociada al identificador
     return produccionNumero;
   }
 
+  /// Obtiene el nombre de la unidad de producción asociada a una producción dada su
+  /// identificador.
+  ///
+  /// El método recibe el identificador de la producción y una lista de producciones.
+  /// Recorre la lista de producciones buscando la producción que corresponda al
+  /// identificador especificado. Si encuentra una producción que coincide con el
+  /// identificador, obtiene el nombre de la unidad de producción asociada a la
+  /// producción y lo devuelve como una cadena. Si no encuentra ninguna
+  /// producción que coincida, devuelve una cadena vacía.
+  ///
+  /// Parámetros:
+  /// - produccionId: El identificador de la producción a buscar.
+  /// - producciones: La lista de producciones en la que buscar la producción.
+  ///
+  /// Retorna:
+  /// - Una cadena con el nombre de la unidad de producción, si se encuentra una
+  ///   producción que coincide con el identificador.
+  /// - Una cadena vacía si no se encuentra ninguna producción que coincida con el
+  ///   identificador.
   String unidadProduccionInventario(
       int produccionId, List<ProduccionModel> producciones) {
+    // Inicializa la variable produccionUnidad como una cadena vacía
     String produccionUnidad = "";
 
+    // Recorre la lista de producciones buscando la producción que corresponda al
+    // identificador especificado
     for (var produccion in producciones) {
+      // Si el identificador de la producción coincide con el produccionId proporcionado
       if (produccion.id == produccionId) {
+        // Obtiene el nombre de la unidad de producción asociada a la producción y lo
+        // asigna a la variable produccionUnidad
         produccionUnidad = produccion.unidadProduccion.nombre;
+        // Detiene el bucle for y devuelve el nombre de la unidad de producción
         break;
       }
     }
 
+    // Devuelve el nombre de la unidad de producción o una cadena vacía si no se encuentra la
+    // producción asociada al identificador
     return produccionUnidad;
   }
 
+  /// Obtiene la cantidad de producción asociada a un identificador de producción.
+  ///
+  /// El método recibe el identificador de la producción y una lista de producciones.
+  /// Recorre la lista de producciones buscando la producción que corresponda al
+  /// identificador especificado. Si encuentra una producción que coincide con el
+  /// identificador, obtiene la cantidad de producción y lo devuelve como una cadena.
+  /// Si no encuentra ninguna producción que coincida, devuelve una cadena vacía.
+  ///
+  /// Parámetros:
+  /// - produccionId: El identificador de la producción a buscar.
+  /// - producciones: La lista de producciones en la que buscar la producción.
+  ///
+  /// Retorna:
+  /// - Una cadena con la cantidad de producción, si se encuentra una
+  ///   producción que coincide con el identificador.
+  /// - Una cadena vacía si no se encuentra ninguna producción que coincida con el
+  ///   identificador.
   String cantidadProduccionInventario(
       int produccionId, List<ProduccionModel> producciones) {
+    // Inicializa la variable produccionCantidad como una cadena vacía
     String produccionCantidad = "";
 
+    // Recorre la lista de producciones buscando la producción que corresponda al
+    // identificador especificado
     for (var produccion in producciones) {
+      // Si el identificador de la producción coincide con el produccionId proporcionado
       if (produccion.id == produccionId) {
+        // Obtiene la cantidad de producción y lo asigna a la variable produccionCantidad
         produccionCantidad = produccion.cantidad.toString();
+        // Detiene el bucle for y devuelve la cantidad de producción
         break;
       }
     }
 
+    // Devuelve la cantidad de producción o una cadena vacía si no se encuentra la
+    // producción asociada al identificador
     return produccionCantidad;
   }
 
+  // Crea una fuente de datos para la grilla de bodegas
   BodegaPuntoDataGridSource(
       {required List<InventarioModel> bodegas,
       required List<ProduccionModel> listaProducciones}) {
@@ -297,11 +442,14 @@ class BodegaPuntoDataGridSource extends DataGridSource {
     }).toList();
   }
 
+  // Lista de filas de la grilla
   List<DataGridRow> _bodegaData = [];
 
+  // Asigna la lista de filas a la grilla
   @override
   List<DataGridRow> get rows => _bodegaData;
 
+  // retorna el estilo de la grilla
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(cells: [
@@ -334,8 +482,11 @@ class BodegaPuntoDataGridSource extends DataGridSource {
           child: (row.getCells()[i].value is Widget)
               ? row.getCells()[i].value
               : Text(i == 6
-                  ? "${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).day)}-${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).month)}-${DateTime.parse(row.getCells()[i].value.toString()).year.toString()} ${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).hour)}:${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).minute)}"
-                  : row.getCells()[i].value.toString()),
+                  ? formatFechaHora(row
+                      .getCells()[i]
+                      .value
+                      .toString()) // Formato de fecha y hora
+                  : row.getCells()[i].value.toString()), // Otros valores
         ),
     ]);
   }

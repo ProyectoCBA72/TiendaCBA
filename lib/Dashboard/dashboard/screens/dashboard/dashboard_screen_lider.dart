@@ -58,23 +58,68 @@ class DashboardScreenLider extends StatefulWidget {
 }
 
 class _DashboardScreenLiderState extends State<DashboardScreenLider> {
-  int? _selectedItem;
+  /// Representa el índice del elemento seleccionado en la pantalla del dashboard.
+  ///
+  /// Este valor se utiliza para determinar la pestaña actualmente seleccionada en el Dashboard.
+  /// Si no se ha seleccionado ningún elemento, este valor será nulo.
+  /// El valor inicial se inicializa en nulo.
+  ///
+  /// El tipo de dato de este atributo es `int?` (opcional), lo que significa que puede ser `null`.
+  /// Se utiliza para almacenar un entero que puede ser nulo.
+  ///
+  /// Este atributo se utiliza para mantener el estado de la pantalla del Dashboard y se actualiza
+  /// cada vez que el usuario cambia de pestaña.
+  ///
+  /// Este atributo se declara como privado y no se puede modificar desde fuera de la clase.
+  /// Sólo se puede acceder a este atributo mediante los métodos de la clase.
+  ///
+  /// El nombre de este atributo se utiliza para hacer referencia a él en otros métodos de la clase.
+  int? _selectedItem; // Indice del elemento seleccionado en el dashboard
 
+  /// Navega hacia la siguiente pestaña en la pantalla del dashboard y actualiza el valor
+  /// del índice seleccionado.
+  ///
+  /// Utiliza el [DefaultTabController.of] para obtener el controlador de la pestaña actual y
+  /// luego llama al método [animateTo] para navegar a la siguiente pestaña.
+  ///
+  /// Luego actualiza el valor de [_selectedItem] con el nuevo índice de la pestaña.
+  ///
+  /// El parámetro [context] es el contexto de la construcción de la pantalla.
+  /// Es obligatorio para poder obtener el controlador de la pestaña actual.
   void _scrollToNextTab(BuildContext context) {
+    // Obtiene el controlador de la pestaña actual
     final tabController = DefaultTabController.of(context);
+    // Si el controlador existe y el índice actual es menor que el último índice de la pestaña
     if (tabController != null &&
         tabController.index < tabController.length - 1) {
+      // Navega hacia la siguiente pestaña
       tabController.animateTo(tabController.index + 1);
+      // Actualiza el valor del índice seleccionado
       setState(() {
         _selectedItem = tabController.index;
       });
     }
   }
 
+  /// Navega hacia la pestaña anterior en la pantalla del dashboard y actualiza el valor
+  /// del índice seleccionado.
+  ///
+  /// Utiliza el [DefaultTabController.of] para obtener el controlador de la pestaña actual y
+  /// luego llama al método [animateTo] para navegar a la pestaña anterior.
+  ///
+  /// Si el índice actual es mayor que 0, se actualiza el valor de [_selectedItem] con el nuevo
+  /// índice de la pestaña.
+  ///
+  /// El parámetro [context] es el contexto de la construcción de la pantalla.
+  /// Es obligatorio para poder obtener el controlador de la pestaña actual.
   void _scrollToPreviousTab(BuildContext context) {
+    // Obtiene el controlador de la pestaña actual
     final tabController = DefaultTabController.of(context);
+    // Si el controlador existe y el índice actual es mayor que 0
     if (tabController != null && tabController.index > 0) {
+      // Navega hacia la pestaña anterior
       tabController.animateTo(tabController.index - 1);
+      // Actualiza el valor del índice seleccionado
       setState(() {
         _selectedItem = tabController.index;
       });
@@ -83,13 +128,16 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
 
   @override
   Widget build(BuildContext context) {
+    // Carga el estado del aplicativo
     return Consumer<AppState>(builder: (context, appState, _) {
+      // Carga el usuario autenticado
       if (appState == null || appState.usuarioAutenticado == null) {
         return const Center(
           child: CircularProgressIndicator(),
         );
       }
 
+      // Obtiene el usuario autenticado
       final usuarioAutenticado = appState.usuarioAutenticado;
       return SafeArea(
         child: ListView(
@@ -100,11 +148,13 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
           children: [
             Column(
               children: [
+                // Encabezado
                 const Header(),
                 const SizedBox(height: defaultPadding),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Contenido principal
                     Expanded(
                       flex: 5,
                       child: Column(
@@ -116,14 +166,17 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                               children: [
                                 Column(
                                   children: [
+                                    // Cartas de pedidos de la sede
                                     CardsPedidoLider(
                                       usuario: usuarioAutenticado!,
                                     ),
                                     const SizedBox(height: defaultPadding),
+                                    // Cartas de producciones de la sede
                                     CardsProduccionLider(
                                       usuario: usuarioAutenticado,
                                     ),
                                     const SizedBox(height: defaultPadding),
+                                    // Estadísticas
                                     if (!Responsive.isMobile(context))
                                       const Divider(
                                         height: 1,
@@ -166,6 +219,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                     Builder(builder: (context) {
                                                   return Row(
                                                     children: [
+                                                      // Botón de anterior pestaña.
                                                       IconButton(
                                                         icon: const Icon(
                                                           Icons.arrow_back_ios,
@@ -184,6 +238,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                               TabAlignment
                                                                   .center,
                                                           onTap: (index) {
+                                                            // Actualiza el índice seleccionado
                                                             setState(() {
                                                               _selectedItem =
                                                                   index;
@@ -745,6 +800,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                           ],
                                                         ),
                                                       ),
+                                                      // Botón de siguiente pestaña.
                                                       IconButton(
                                                         icon: const Icon(
                                                           Icons
@@ -764,6 +820,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                     if (!Responsive.isMobile(context))
                                       const SizedBox(height: defaultPadding),
                                     if (!Responsive.isMobile(context))
+                                      // Contenedor que alberga el contenido de la pestaña.
                                       _selectedItem == 0
                                           ? ReporteCostoProduccionAgnoLider(
                                               usuario: usuarioAutenticado,
@@ -831,6 +888,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                       color: Colors.grey,
                                     ),
                                     const SizedBox(height: defaultPadding),
+                                    // Cartas de categorías
                                     const CardsCategoriaLider(),
                                     const SizedBox(height: defaultPadding),
                                     const Divider(
@@ -838,6 +896,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                       color: Colors.grey,
                                     ),
                                     const SizedBox(height: defaultPadding),
+                                    // Cartas de productos
                                     const CardsProductoLider(),
                                     const SizedBox(height: defaultPadding),
                                     const Divider(
@@ -845,32 +904,42 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                       color: Colors.grey,
                                     ),
                                     const SizedBox(height: defaultPadding),
-                                    CardsAnuncioLider(usuario: usuarioAutenticado,),
+                                    // Cartas de anuncios
+                                    CardsAnuncioLider(
+                                      usuario: usuarioAutenticado,
+                                    ),
                                     const SizedBox(height: defaultPadding),
+                                    // Tabla de anuncios
                                     FutureBuilder(
-                                        future: getBoletas(),
+                                        future:
+                                            getBoletas(), // Cargar inscripciones
                                         builder: (context,
                                             AsyncSnapshot<List<BoletaModel>>
                                                 snapshotBoleta) {
+                                          // Cargar inscripciones
                                           if (snapshotBoleta.connectionState ==
                                               ConnectionState.waiting) {
                                             return const CircularProgressIndicator();
+                                            // Validar si hay un error
                                           } else if (snapshotBoleta.hasError) {
                                             return Text(
                                                 'Error al cargar inscripciones: ${snapshotBoleta.error}');
+                                            // Validar si no hay inscripciones
                                           } else if (snapshotBoleta.data ==
                                               null) {
                                             return const Text(
                                                 'No se encontraron inscripciones');
+                                            // Mostrar las inscripciones
                                           } else {
-                                            List<BoletaModel> boletaSede = [];
+                                            List<BoletaModel> boletaSede =
+                                                []; // Lista para las boletas de la sede
 
                                             boletaSede = snapshotBoleta.data!
                                                 .where((boleta) =>
                                                     boleta
                                                         .anuncio.usuario.sede ==
                                                     usuarioAutenticado.sede)
-                                                .toList();
+                                                .toList(); // Filtra las boletas por la sede
 
                                             return EventosLider(
                                               boletas: boletaSede,
@@ -878,46 +947,59 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                           }
                                         }),
                                     const SizedBox(height: defaultPadding),
+                                    // Tabla de pedidos entregados
                                     FutureBuilder(
-                                        future: getPuntosVenta(),
+                                        future:
+                                            getPuntosVenta(), // Cargar puntos
                                         builder: (context,
                                             AsyncSnapshot<List<PuntoVentaModel>>
                                                 snapshotPunto) {
+                                          // Cargar puntos
                                           if (snapshotPunto.connectionState ==
                                               ConnectionState.waiting) {
                                             return const CircularProgressIndicator();
+                                            // Validar si hay un error
                                           } else if (snapshotPunto.hasError) {
                                             return Text(
                                                 'Error al cargar puntos: ${snapshotPunto.error}');
+                                            // Validar si no hay puntos
                                           } else if (snapshotPunto.data ==
                                               null) {
                                             return const Text(
                                                 'No se encontraron puntos');
+                                            // Mostrar los puntos
                                           } else {
                                             return FutureBuilder(
-                                                future: getAuxPedidos(),
+                                                future:
+                                                    getAuxPedidos(), // Cargar pedidos
                                                 builder: (context,
                                                     AsyncSnapshot<
                                                             List<
                                                                 AuxPedidoModel>>
                                                         snapshotAuxiliar) {
+                                                  // Cargar pedidos
                                                   if (snapshotAuxiliar
                                                           .connectionState ==
                                                       ConnectionState.waiting) {
                                                     return const CircularProgressIndicator();
+                                                    // Validar si hay un error
                                                   } else if (snapshotAuxiliar
                                                       .hasError) {
                                                     return Text(
                                                         'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                                    // Validar si no hay pedidos
                                                   } else if (snapshotAuxiliar
                                                           .data ==
                                                       null) {
                                                     return const Text(
                                                         'No se encontraron pedidos');
+                                                    // Mostrar los pedidos
                                                   } else {
                                                     List<AuxPedidoModel>
-                                                        pedidosEntregados = [];
+                                                        pedidosEntregados =
+                                                        []; // Lista para los pedidos
 
+                                                    // Obtener los pedidos entregados de los puntos de venta correspondientes a la sede
                                                     for (var p = 0;
                                                         p <
                                                             snapshotPunto
@@ -953,46 +1035,59 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                           }
                                         }),
                                     const SizedBox(height: defaultPadding),
+                                    // Tabla de pedidos cancelados
                                     FutureBuilder(
-                                        future: getPuntosVenta(),
+                                        future:
+                                            getPuntosVenta(), // Cargar puntos
                                         builder: (context,
                                             AsyncSnapshot<List<PuntoVentaModel>>
                                                 snapshotPunto) {
+                                          // Cargar puntos
                                           if (snapshotPunto.connectionState ==
                                               ConnectionState.waiting) {
                                             return const CircularProgressIndicator();
+                                            // Validar si hay un error
                                           } else if (snapshotPunto.hasError) {
                                             return Text(
                                                 'Error al cargar puntos: ${snapshotPunto.error}');
+                                            // Validar si no hay puntos
                                           } else if (snapshotPunto.data ==
                                               null) {
                                             return const Text(
                                                 'No se encontraron puntos');
+                                            // Mostrar los puntos
                                           } else {
                                             return FutureBuilder(
-                                                future: getAuxPedidos(),
+                                                future:
+                                                    getAuxPedidos(), // Cargar pedidos
                                                 builder: (context,
                                                     AsyncSnapshot<
                                                             List<
                                                                 AuxPedidoModel>>
                                                         snapshotAuxiliar) {
+                                                  // Cargar pedidos
                                                   if (snapshotAuxiliar
                                                           .connectionState ==
                                                       ConnectionState.waiting) {
                                                     return const CircularProgressIndicator();
+                                                    // Validar si hay un error
                                                   } else if (snapshotAuxiliar
                                                       .hasError) {
                                                     return Text(
                                                         'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                                    // Validar si no hay pedidos
                                                   } else if (snapshotAuxiliar
                                                           .data ==
                                                       null) {
                                                     return const Text(
                                                         'No se encontraron pedidos');
+                                                    // Mostrar los pedidos
                                                   } else {
                                                     List<AuxPedidoModel>
-                                                        pedidosCancelados = [];
+                                                        pedidosCancelados =
+                                                        []; // Lista para los pedidos
 
+                                                    // Obtener los pedidos cancelados de los puntos de venta correspondientes a la sede
                                                     for (var p = 0;
                                                         p <
                                                             snapshotPunto
@@ -1025,70 +1120,88 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                           }
                                         }),
                                     const SizedBox(height: defaultPadding),
+                                    // Metodo de pago
                                     const CardsMetodoLider(),
                                     const SizedBox(height: defaultPadding),
+                                    // Tabla de facturas
                                     FutureBuilder(
-                                        future: getPuntosVenta(),
+                                        future:
+                                            getPuntosVenta(), // Obtener los puntos
                                         builder: (context,
                                             AsyncSnapshot<List<PuntoVentaModel>>
                                                 snapshotPunto) {
+                                          // Cargar puntos
                                           if (snapshotPunto.connectionState ==
                                               ConnectionState.waiting) {
                                             return const CircularProgressIndicator();
+                                            // Validar si hay un error
                                           } else if (snapshotPunto.hasError) {
                                             return Text(
                                                 'Error al cargar puntos: ${snapshotPunto.error}');
+                                            // Validar si no hay puntos
                                           } else if (snapshotPunto.data ==
                                               null) {
                                             return const Text(
                                                 'No se encontraron puntos');
+                                            // Mostrar los puntos
                                           } else {
                                             return FutureBuilder(
-                                                future: getFacturas(),
+                                                future:
+                                                    getFacturas(), // Obtener facturas
                                                 builder: (context,
                                                     AsyncSnapshot<
                                                             List<FacturaModel>>
                                                         snapshotFactura) {
+                                                  // Cargar facturas
                                                   if (snapshotFactura
                                                           .connectionState ==
                                                       ConnectionState.waiting) {
                                                     return const CircularProgressIndicator();
+                                                    // Validar si hay un error
                                                   } else if (snapshotFactura
                                                       .hasError) {
                                                     return Text(
                                                         'Error al cargar ventas: ${snapshotFactura.error}');
+                                                    // Validar si no hay facturas
                                                   } else if (snapshotFactura
                                                           .data ==
                                                       null) {
                                                     return const Text(
                                                         'No se encontraron ventas');
+                                                    // Mostrar las facturas
                                                   } else {
                                                     return FutureBuilder(
-                                                        future: getAuxPedidos(),
+                                                        future:
+                                                            getAuxPedidos(), // Obtener pedidos
                                                         builder: (context,
                                                             AsyncSnapshot<
                                                                     List<
                                                                         AuxPedidoModel>>
                                                                 snapshotAuxiliar) {
+                                                          // Cargar pedidos
                                                           if (snapshotAuxiliar
                                                                   .connectionState ==
                                                               ConnectionState
                                                                   .waiting) {
                                                             return const CircularProgressIndicator();
+                                                            // Validar si hay un error
                                                           } else if (snapshotAuxiliar
                                                               .hasError) {
                                                             return Text(
                                                                 'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                                            // Validar si no hay pedidos
                                                           } else if (snapshotAuxiliar
                                                                   .data ==
                                                               null) {
                                                             return const Text(
                                                                 'No se encontraron pedidos');
+                                                            // Mostrar los pedidos
                                                           } else {
                                                             List<AuxPedidoModel>
                                                                 pedidosFacturas =
-                                                                [];
+                                                                []; // Lista para los pedidos
 
+                                                            // Obtener las facturas de los puntos de venta correspondientes a la sede
                                                             for (var p = 0;
                                                                 p <
                                                                     snapshotPunto
@@ -1125,72 +1238,89 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                           }
                                         }),
                                     const SizedBox(height: defaultPadding),
+                                    // Tabla de devoluciones
                                     FutureBuilder(
-                                        future: getDevoluciones(),
+                                        future:
+                                            getDevoluciones(), // Obtiene las devoluciones
                                         builder: (context,
                                             AsyncSnapshot<
                                                     List<DevolucionesModel>>
                                                 snapshotDevolucion) {
+                                          // Muestra un CircularProgressIndicator mientras se obtienen las devoluciones
                                           if (snapshotDevolucion
                                                   .connectionState ==
                                               ConnectionState.waiting) {
                                             return const CircularProgressIndicator();
+                                            // Muestra un mensaje de error si ocurre un problema al cargar las devoluciones
                                           } else if (snapshotDevolucion
                                               .hasError) {
                                             return Text(
                                                 'Error al cargar devoluciones: ${snapshotDevolucion.error}');
+                                            // Muestra un mensaje de que no se encontraron devoluciones
                                           } else if (snapshotDevolucion.data ==
                                               null) {
                                             return const Text(
                                                 'No se encontraron devoluciones');
+                                            // Muestra el contenido de las devoluciones
                                           } else {
                                             return FutureBuilder(
-                                                future: getPuntosVenta(),
+                                                future:
+                                                    getPuntosVenta(), // Obtiene los puntos de venta
                                                 builder: (context,
                                                     AsyncSnapshot<
                                                             List<
                                                                 PuntoVentaModel>>
                                                         snapshotPunto) {
+                                                  // Muestra un CircularProgressIndicator mientras se obtienen los puntos de venta
                                                   if (snapshotPunto
                                                           .connectionState ==
                                                       ConnectionState.waiting) {
                                                     return const CircularProgressIndicator();
+                                                    // Muestra un mensaje de error si ocurre un problema al cargar los puntos de venta
                                                   } else if (snapshotPunto
                                                       .hasError) {
                                                     return Text(
                                                         'Error al cargar puntos: ${snapshotPunto.error}');
+                                                    // Muestra un mensaje de que no se encontraron puntos de venta
                                                   } else if (snapshotPunto
                                                           .data ==
                                                       null) {
                                                     return const Text(
                                                         'No se encontraron puntos');
+                                                    // Muestra el contenido de los puntos de venta
                                                   } else {
                                                     return FutureBuilder(
-                                                        future: getAuxPedidos(),
+                                                        future:
+                                                            getAuxPedidos(), // Obtiene los pedidos
                                                         builder: (context,
                                                             AsyncSnapshot<
                                                                     List<
                                                                         AuxPedidoModel>>
                                                                 snapshotAuxiliar) {
+                                                          // Muestra un CircularProgressIndicator mientras se obtienen los pedidos
                                                           if (snapshotAuxiliar
                                                                   .connectionState ==
                                                               ConnectionState
                                                                   .waiting) {
                                                             return const CircularProgressIndicator();
+                                                            // Muestra un mensaje de error si ocurre un problema al cargar los pedidos
                                                           } else if (snapshotAuxiliar
                                                               .hasError) {
                                                             return Text(
                                                                 'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                                            // Muestra un mensaje de que no se encontraron pedidos
                                                           } else if (snapshotAuxiliar
                                                                   .data ==
                                                               null) {
                                                             return const Text(
                                                                 'No se encontraron pedidos');
+                                                            // Muestra el contenido de los pedidos
                                                           } else {
                                                             List<AuxPedidoModel>
                                                                 pedidosDevueltos =
-                                                                [];
+                                                                []; // Lista para los pedidos
 
+                                                            // Obtener las devoluciones de los puntos de venta correspondientes a la sede
                                                             for (var p = 0;
                                                                 p <
                                                                     snapshotPunto
@@ -1227,25 +1357,32 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                           }
                                         }),
                                     const SizedBox(height: defaultPadding),
+                                    // Cartas de las unidades de producción
                                     const CardsUnidadLider(),
                                     const SizedBox(height: defaultPadding),
+                                    // Tabla de producciones
                                     FutureBuilder(
-                                        future: getProducciones(),
+                                        future:
+                                            getProducciones(), // Obtiene las producciones
                                         builder: (context,
                                             AsyncSnapshot<List<ProduccionModel>>
                                                 snapshotProduccion) {
+                                          // Muestra un CircularProgressIndicator mientras se obtienen las producciones
                                           if (snapshotProduccion
                                                   .connectionState ==
                                               ConnectionState.waiting) {
                                             return const CircularProgressIndicator();
+                                            // Muestra un mensaje de error si ocurre un problema al cargar las producciones
                                           } else if (snapshotProduccion
                                               .hasError) {
                                             return Text(
                                                 'Error al cargar producciones: ${snapshotProduccion.error}');
+                                            // Muestra un mensaje de que no se encontraron producciones
                                           } else if (snapshotProduccion.data ==
                                               null) {
                                             return const Text(
                                                 'No se encontraron producciones');
+                                            // Muestra el contenido de las producciones
                                           } else {
                                             final produccionSede =
                                                 snapshotProduccion.data!
@@ -1255,7 +1392,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                             .sede
                                                             .id ==
                                                         usuarioAutenticado.sede)
-                                                    .toList();
+                                                    .toList(); // Filtra las producciones por la sede de usuario
 
                                             return ProduccionLider(
                                               producciones: produccionSede,
@@ -1263,25 +1400,32 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                           }
                                         }),
                                     const SizedBox(height: defaultPadding),
+                                    // Cartas de los puntos de venta
                                     const CardsPuntoLider(),
                                     const SizedBox(height: defaultPadding),
+                                    // Tabla de inventarios
                                     FutureBuilder(
-                                        future: getInventario(),
+                                        future:
+                                            getInventario(), // Obtiene los inventarios
                                         builder: (context,
                                             AsyncSnapshot<List<InventarioModel>>
                                                 snapshotInventario) {
+                                          // Muestra un CircularProgressIndicator mientras se obtienen los inventarios
                                           if (snapshotInventario
                                                   .connectionState ==
                                               ConnectionState.waiting) {
                                             return const CircularProgressIndicator();
+                                            // Muestra un mensaje de error si ocurre un problema al cargar los inventarios
                                           } else if (snapshotInventario
                                               .hasError) {
                                             return Text(
                                                 'Error al cargar inventarios: ${snapshotInventario.error}');
+                                            // Muestra un mensaje de que no se encontraron inventarios
                                           } else if (snapshotInventario.data ==
                                               null) {
                                             return const Text(
                                                 'No se encontraron inventarios');
+                                            // Muestra el contenido de los inventarios
                                           } else {
                                             final inventarioSede =
                                                 snapshotInventario.data!
@@ -1289,7 +1433,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                         inventario.bodega
                                                             .puntoVenta.sede ==
                                                         usuarioAutenticado.sede)
-                                                    .toList();
+                                                    .toList(); // Filtra los inventarios por la sede de usuario
 
                                             return BodegaLider(
                                               inventarioLista: inventarioSede,
@@ -1297,21 +1441,27 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                           }
                                         }),
                                     const SizedBox(height: defaultPadding),
+                                    // Tabla de usuarios
                                     FutureBuilder(
-                                      future: getUsuarios(),
+                                      future:
+                                          getUsuarios(), // Obtiene los usuarios
                                       builder: (context,
                                           AsyncSnapshot<List<UsuarioModel>>
                                               snapshotUsuario) {
+                                        // Muestra un CircularProgressIndicator mientras se obtienen los usuarios
                                         if (snapshotUsuario.connectionState ==
                                             ConnectionState.waiting) {
                                           return const CircularProgressIndicator();
+                                          // Muestra un mensaje de error si ocurre un problema al cargar los usuarios
                                         } else if (snapshotUsuario.hasError) {
                                           return Text(
                                               'Error al cargar usuarios: ${snapshotUsuario.error}');
+                                          // Muestra un mensaje de que no se encontraron usuarios
                                         } else if (snapshotUsuario.data ==
                                             null) {
                                           return const Text(
                                               'No se encontraron usuarios');
+                                          // Muestra el contenido de los usuarios
                                         } else {
                                           return UsuarioLider(
                                             usuarioLista: snapshotUsuario.data!,
@@ -1320,6 +1470,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                       },
                                     ),
                                     const SizedBox(height: defaultPadding),
+                                    // Cartas de las sedes
                                     const CardsSedeLider(),
                                     const SizedBox(height: defaultPadding),
                                   ],
@@ -1327,6 +1478,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                               ],
                             ),
                           ),
+                          // Si el dispositivo no es de escritorio se muestra la sección de favoritos y visitados
                           if (!Responsive.isDesktop(context))
                             const SizedBox(height: defaultPadding),
                           if (!Responsive.isDesktop(context))
@@ -1342,6 +1494,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                         ],
                       ),
                     ),
+                    // Si el dispositivo es de escritorio se muestra la sección de favoritos y visitados en la parte derecha
                     if (Responsive.isDesktop(context))
                       const SizedBox(width: defaultPadding),
                     // On Mobile means if the screen is less than 850 we don't want to show it

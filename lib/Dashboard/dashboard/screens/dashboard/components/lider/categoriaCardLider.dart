@@ -3,8 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:tienda_app/Models/categoriaModel.dart';
 
+/// Widget para mostrar una tarjeta de categoría específica.
 class CategoriaCardLider extends StatefulWidget {
   final CategoriaModel categoria;
+
+  /// Constructor de CategoriaCardLider.
   const CategoriaCardLider({Key? key, required this.categoria})
       : super(key: key);
 
@@ -12,6 +15,7 @@ class CategoriaCardLider extends StatefulWidget {
   _CategoriaCardLiderState createState() => _CategoriaCardLiderState();
 }
 
+/// Estado asociado al widget CategoriaCardLider.
 class _CategoriaCardLiderState extends State<CategoriaCardLider> {
   @override
   void initState() {
@@ -28,13 +32,13 @@ class _CategoriaCardLiderState extends State<CategoriaCardLider> {
         height: 200,
         child: Stack(
           children: [
+            // Contenedor principal que envuelve la imagen de la categoría
             Container(
               margin: const EdgeInsets.all(10),
               padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
-                image:  DecorationImage(
-                  image: NetworkImage(
-                      categoria.imagen),
+                image: DecorationImage(
+                  image: NetworkImage(categoria.imagen),
                   fit: BoxFit.fill,
                 ),
                 color: Colors.black12,
@@ -49,6 +53,7 @@ class _CategoriaCardLiderState extends State<CategoriaCardLider> {
               ),
               child: Stack(
                 children: [
+                  // Botón de edición en la esquina superior izquierda
                   Positioned(
                     top: 5,
                     left: 5,
@@ -65,6 +70,7 @@ class _CategoriaCardLiderState extends State<CategoriaCardLider> {
                       ),
                     ),
                   ),
+                  // Botón de eliminación en la esquina superior derecha
                   Positioned(
                     top: 5,
                     right: 5,
@@ -81,6 +87,7 @@ class _CategoriaCardLiderState extends State<CategoriaCardLider> {
                       ),
                     ),
                   ),
+                  // Texto de nombre de la categoría en la parte inferior central
                   Positioned(
                     bottom: 20,
                     left: 20,
@@ -98,7 +105,7 @@ class _CategoriaCardLiderState extends State<CategoriaCardLider> {
                           )
                         ],
                       ),
-                      child:  Center(
+                      child: Center(
                         child: Text(
                           categoria.nombre,
                           style: const TextStyle(

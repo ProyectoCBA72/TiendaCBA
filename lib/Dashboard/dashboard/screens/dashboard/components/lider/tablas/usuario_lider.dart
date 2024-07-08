@@ -2,31 +2,82 @@
 
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lider/csvScreen.dart';
 import 'package:tienda_app/EditarUsuario/editarUsuario.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 
+/// Esta clase representa un widget de estado que muestra una tabla de usuarios.
+///
+/// Esta clase extiende [StatefulWidget] y tiene un único método obligatorio:
+/// [createState] que crea un estado [_UsuarioLiderState] para manejar los datos de la pantalla.
+///
+/// Los atributos de esta clase son:
+///
+/// - [usuarioLista] es una lista de objetos [UsuarioModel] que representan los usuarios a mostrar.
 class UsuarioLider extends StatefulWidget {
+  /// Lista de usuarios a mostrar en la tabla.
+  ///
+  /// Esta lista debe contener objetos [UsuarioModel] que representan los
+  /// usuarios a mostrar en la tabla.
   final List<UsuarioModel> usuarioLista;
 
+  /// Constructor de la clase [UsuarioLider].
+  ///
+  /// El parámetro [usuarioLista] es requerido y debe contener una lista de
+  /// objetos [UsuarioModel] que representan los usuarios a mostrar en la tabla.
   const UsuarioLider({super.key, required this.usuarioLista});
 
+  /// Crea el estado de la clase [UsuarioLider].
+  ///
+  /// Este método es obligatorio y debe crear un estado de la clase
+  /// [_UsuarioLiderState] para manejar los datos de la pantalla.
   @override
   State<UsuarioLider> createState() => _UsuarioLiderState();
 }
 
 class _UsuarioLiderState extends State<UsuarioLider> {
+  /// Lista de objetos [UsuarioModel] que representan los usuarios a mostrar en la tabla.
+  ///
+  /// Esta lista se utiliza para almacenar los usuarios a mostrar en la tabla.
   List<UsuarioModel> _usuarios = [];
 
+  /// Instancia de [UsuarioDataGridSource] que representa la fuente de datos para la tabla.
+  ///
+  /// Esta instancia se utiliza para manejar los datos de la tabla y proporcionar
+  /// los datos necesarios para mostrar la tabla en la pantalla.
   late UsuarioDataGridSource _dataGridSource;
 
+  /// Lista de objetos [UsuarioModel] que representan los usuarios a mostrar en la tabla.
+  ///
+  /// Esta lista es privada y solo se puede acceder a través de la propiedad [usuarios].
+  /// La lista se inicializa vacía y se rellena en el método [initState].
+
+  @override
+
+  /// Inicializa el estado de la clase [_UsuarioLiderState].
+  ///
+  /// Este método se llama cuando se crea una instancia de [_UsuarioLiderState] y se
+  /// utiliza para inicializar los datos necesarios para mostrar la tabla de usuarios.
+  /// En este caso, se inicializa la lista [_usuarios] con los usuarios proporcionados
+  /// por el widget y se crea una instancia de [_UsuarioDataGridSource] para manejar
+  /// los datos de la tabla.
   @override
   void initState() {
+    // Llama al super constructor para inicializar el estado del widget.
     super.initState();
+
+    // Inicializa la lista de usuarios con los usuarios proporcionados por el widget.
     _usuarios = widget.usuarioLista;
-    _dataGridSource =
-        UsuarioDataGridSource(usuarios: _usuarios, context: context);
+
+    // Crea una instancia de [_UsuarioDataGridSource] para manejar los datos de la tabla.
+    // El parámetro [usuarios] se utiliza para pasar la lista de usuarios a mostrar en la tabla.
+    // El parámetro [context] se utiliza para obtener el contexto actual de la aplicación.
+    _dataGridSource = UsuarioDataGridSource(
+      usuarios: _usuarios,
+      context: context,
+    );
   }
 
   @override
@@ -40,6 +91,7 @@ class _UsuarioLiderState extends State<UsuarioLider> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Titulo Tabla
           Text(
             "Usuarios",
             style: Theme.of(context)
@@ -50,6 +102,7 @@ class _UsuarioLiderState extends State<UsuarioLider> {
           const SizedBox(
             height: defaultPadding,
           ),
+          // Tabla
           SizedBox(
             height: 300,
             width: double.infinity,
@@ -63,11 +116,12 @@ class _UsuarioLiderState extends State<UsuarioLider> {
                 shrinkWrapColumns: true,
                 shrinkWrapRows: true,
                 rowsPerPage: 10,
-                source: _dataGridSource,
+                source: _dataGridSource, // Fuente de datos de la tabla.
                 selectionMode: SelectionMode.multiple,
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Columnas de la tabla
                 columns: <GridColumn>[
                   GridColumn(
                     columnName: 'Usuario',
@@ -166,6 +220,7 @@ class _UsuarioLiderState extends State<UsuarioLider> {
           const SizedBox(
             height: defaultPadding,
           ),
+          // Botones de acción los cuales imprimen el reporte y añaden el usuario
           if (!Responsive.isMobile(context))
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -174,7 +229,12 @@ class _UsuarioLiderState extends State<UsuarioLider> {
                 const SizedBox(
                   width: defaultPadding,
                 ),
-                _buildButton('Añadir Usuarios', () {}),
+                _buildButton('Añadir Usuarios', () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const UploadUsersCSV()));
+                }),
               ],
             ),
           if (Responsive.isMobile(context))
@@ -185,7 +245,12 @@ class _UsuarioLiderState extends State<UsuarioLider> {
                   const SizedBox(
                     height: defaultPadding,
                   ),
-                  _buildButton('Añadir Usuarios', () {}),
+                  _buildButton('Añadir Usuarios', () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const UploadUsersCSV()));
+                  }),
                 ],
               ),
             ),
@@ -194,40 +259,49 @@ class _UsuarioLiderState extends State<UsuarioLider> {
     );
   }
 
+  /// Crea un botón con los estilos de diseño especificados.
+  ///
+  /// Parámetros:
+  ///   - [text]: El texto que se mostrará en el botón.
+  ///   - [onPressed]: La acción que se ejecutará cuando se presione el botón.
+  ///
+  /// Devuelve un widget [Container] que contiene un widget [Material] con un estilo específico.
   Widget _buildButton(String text, VoidCallback onPressed) {
     return Container(
       width: 200,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10), // Borde redondeado
         gradient: const LinearGradient(
           colors: [
-            botonClaro,
-            botonOscuro,
+            botonClaro, // Color de fondo claro
+            botonOscuro, // Color de fondo oscuro
           ],
-        ),
+        ), // Gradiente de color
         boxShadow: const [
           BoxShadow(
-            color: botonSombra,
-            blurRadius: 5,
-            offset: Offset(0, 3),
+            color: botonSombra, // Color de sombra
+            blurRadius: 5, // Radio de la sombra
+            offset: Offset(0, 3), // Desplazamiento en x e y de la sombra
           ),
-        ],
+        ], // Sombra
       ),
       child: Material(
-        color: Colors.transparent,
+        color: Colors.transparent, // Color de fondo transparente
         child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(10),
+          onTap: onPressed, // Controlador de eventos al presionar el botón
+          borderRadius:
+              BorderRadius.circular(10), // Borde redondeado con un radio de 10
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(
+                vertical: 10), // Padding vertical de 10
             child: Center(
               child: Text(
-                text,
+                text, // Texto del botón
                 style: const TextStyle(
-                  color: background1,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Calibri-Bold',
+                  color: background1, // Color del texto
+                  fontSize: 13, // Tamaño de fuente
+                  fontWeight: FontWeight.bold, // Fuente en negrita
+                  fontFamily: 'Calibri-Bold', // Fuente Calibri en negrita
                 ),
               ),
             ),
@@ -238,7 +312,9 @@ class _UsuarioLiderState extends State<UsuarioLider> {
   }
 }
 
+/// Crea un widget [DataGridSource] para la tabla de usuarios.
 class UsuarioDataGridSource extends DataGridSource {
+  // Crea un objeto de tipo DataGridRow para cada usuario
   UsuarioDataGridSource(
       {required List<UsuarioModel> usuarios, required BuildContext context}) {
     _usuarioData = usuarios.map<DataGridRow>((usuario) {
@@ -269,7 +345,9 @@ class UsuarioDataGridSource extends DataGridSource {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const FormActualizarUsuario()));
+                        builder: (context) => FormActualizarUsuario(
+                              usuario: usuario,
+                            )));
               },
               style: const ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll(primaryColor)),
@@ -279,11 +357,14 @@ class UsuarioDataGridSource extends DataGridSource {
     }).toList();
   }
 
+  // Lista de datos de la grilla
   List<DataGridRow> _usuarioData = [];
 
+  // Metodo para obtener los datos de la grilla
   @override
   List<DataGridRow> get rows => _usuarioData;
 
+  // Retorna un objeto de tipo DataGridRow para cada usuario
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(cells: [
@@ -321,8 +402,11 @@ class UsuarioDataGridSource extends DataGridSource {
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.all(8.0),
           child: (row.getCells()[i].value is Widget)
-              ? row.getCells()[i].value
-              : Text(row.getCells()[i].value.toString()),
+              ? row.getCells()[i].value // Texto normal
+              : Text(row
+                  .getCells()[i]
+                  .value
+                  .toString()), // Texto modificado para valores enteros
         ),
     ]);
   }

@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'usuarioModel.dart';
@@ -6,24 +8,66 @@ import 'unidadProduccionModel.dart';
 import 'categoriaModel.dart';
 import "../source.dart";
 
+/// Clase que representa un producto.
+///
+/// Esta clase define una estructura de datos para representar un producto.
+/// Un producto contiene información como su identificador único, nombre, descripción, estado,
+/// cantidad máxima de reserva, unidad de medida, si es destacado o exclusivo, precio, precio para
+/// aprendices, precio para instructores, precio para funcionarios y precio de oferta. Además,
+/// contiene la categoría a la que pertenece, la unidad de producción a la que pertenece, el usuario al que
+/// pertenece y si es exclusivo para un usuario.
 class ProductoModel {
+  /// Identificador único del producto.
   final int id;
+
+  /// Nombre del producto.
   final String nombre;
+
+  /// Descripción del producto.
   final String descripcion;
+
+  /// Estado del producto (activo o inactivo).
   final bool estado;
+
+  /// Cantidad máxima de reserva del producto.
   final int maxReserva;
+
+  /// Unidad de medida del producto.
   final String unidadMedida;
+
+  /// Si el producto es destacado.
   final bool destacado;
+
+  /// Precio del producto.
   final int precio;
+
+  /// Precio para aprendices del producto.
   final int precioAprendiz;
+
+  /// Precio para instructores del producto.
   final int precioInstructor;
+
+  /// Precio para funcionarios del producto.
   final int precioFuncionario;
+
+  /// Precio de oferta del producto.
   final int precioOferta;
+
+  /// Categoría a la que pertenece el producto.
   final CategoriaModel categoria;
+
+  /// Unidad de producción a la que pertenece el producto.
   final UnidadProduccionModel unidadProduccion;
+
+  /// Usuario al que pertenece el producto.
   final UsuarioModel usuario;
+
+  /// Si el producto es exclusivo para un usuario.
   final bool exclusivo;
 
+  /// Crea un nuevo objeto [ProductoModel].
+  ///
+  /// Todos los parámetros son requeridos.
   ProductoModel({
     required this.id,
     required this.nombre,
@@ -44,17 +88,45 @@ class ProductoModel {
   });
 }
 
+/// Lista que almacena los objetos de tipo [ProductoModel].
+///
+/// Esta lista se utiliza para almacenar los productos obtenidos de la API.
+/// Cada producto representa un objeto con información sobre un producto,
+/// como su nombre, descripción, estado, unidad de medida, precio, etc.
+///
+/// Los elementos de esta lista pueden ser agregados utilizando el método [add],
+/// y puedes iterar sobre sus elementos utilizando un bucle [for] o el método [index].
+///
+/// Ejemplo de uso:
+///   // Agregar un producto a la lista
+///   productos.add(ProductoModel(
+///     id: 1,
+///     nombre: "Producto de prueba",
+///     // ... otros atributos del producto
+///   ));
 List<ProductoModel> productos = [];
 
-// Futuro para traer los datos de la api
-
+// Metodo para obtener los datos de los productos
 Future<List<ProductoModel>> getProductos() async {
+  /// URL de la API que devuelve la lista de productos.
+  /// Está formada por la URL base de la API y la ruta relativa a la endpoint.
+  /// Ejemplo: "http://localhost:8000/api/productos/"
   String url = "";
 
+  // Construcción de la URL de la API
   url = "$sourceApi/api/productos/";
 
+  /// Realiza una solicitud GET a la URL de la API y devuelve la respuesta.
+  ///
+  /// La respuesta se espera en formato JSON.
+  /// Si la respuesta es exitosa, se decodifica la información en una lista de
+  /// objetos de tipo [ProductoModel], que se almacena en la variable [productos].
+  ///
+  /// Si falla la solicitud o la respuesta es distinta de 200 (OK), se imprime un
+  /// mensaje de error.
   final response = await http.get(Uri.parse(url));
 
+  // Verificación del estado de la respuesta
   if (response.statusCode == 200) {
     // Limpiar la lista antes de llenarla con datos actualizados
     productos.clear();
@@ -63,6 +135,7 @@ Future<List<ProductoModel>> getProductos() async {
     String responseBodyUtf8 = utf8.decode(response.bodyBytes);
     List<dynamic> decodedData = jsonDecode(responseBodyUtf8);
 
+    // Llenar la lista con los datos actualizados
     for (var productoData in decodedData) {
       productos.add(
         ProductoModel(
@@ -144,6 +217,7 @@ Future<List<ProductoModel>> getProductos() async {
     // Devolver la lista de productos
     return productos;
   } else {
+    // Lanzar una excepción si la respuesta no fue exitosa
     throw Exception(
         'Fallo la solicitud HTTP con código ${response.statusCode}');
   }

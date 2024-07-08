@@ -4,9 +4,19 @@ import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 import 'package:flutter/material.dart';
 
+/// Esta clase representa una sección de la pantalla de inicio que muestra el logo de la tienda.
+///
+/// Esta clase extiende [StatefulWidget] y tiene un único método obligatorio:
+/// [createState] que crea un estado [_LogoSectionState] para manejar los datos de la pantalla.
 class LogoSection extends StatefulWidget {
+  /// Crea un nuevo objeto [LogoSection].
+  ///
+  /// No tiene parámetros obligatorios.
   const LogoSection({super.key});
 
+  /// Crea un nuevo estado [_LogoSectionState] para manejar los datos de la pantalla.
+  ///
+  /// No tiene parámetros obligatorios.
   @override
   State<LogoSection> createState() => _LogoSectionState();
 }
@@ -14,6 +24,7 @@ class LogoSection extends StatefulWidget {
 class _LogoSectionState extends State<LogoSection> {
   @override
   Widget build(BuildContext context) {
+    // Verifica si la pantalla es escritorio o tableta.
     return Responsive.isDesktop(context) || Responsive.isTablet(context)
         ? Column(
             children: [
@@ -245,6 +256,7 @@ class _LogoSectionState extends State<LogoSection> {
               ),
             ],
           )
+        // Pantalla en caso de que el dispositivo sea móvil.
         : Column(
             children: [
               Column(

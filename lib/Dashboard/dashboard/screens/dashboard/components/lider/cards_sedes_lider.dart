@@ -5,14 +5,14 @@ import 'package:tienda_app/Models/sedeModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 
-// Vista donde se llamaran las cards superiores de conteo de reservas y las organiza que se adapten a todos los dispositivos
-
+// Vista que muestra las tarjetas de sedes, adaptándose a diferentes dispositivos.
 class CardsSedeLider extends StatelessWidget {
   const CardsSedeLider({
     super.key,
   });
 
-  Future<List<dynamic>> fechData() {
+  // Método para obtener datos de sedes y sus imágenes
+  Future<List<dynamic>> fetchData() {
     return Future.wait([getSedes(), getImagenSedes()]);
   }
 
@@ -20,6 +20,7 @@ class CardsSedeLider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Encabezado de las tarjetas de sedes
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -30,6 +31,7 @@ class CardsSedeLider extends StatelessWidget {
                   .titleLarge
                   ?.copyWith(fontFamily: 'Calibri-Bold'),
             ),
+            // Botón "Añadir Sede" visible solo en dispositivos no móviles
             if (!Responsive.isMobile(context))
               Container(
                 width: 200,
@@ -43,7 +45,7 @@ class CardsSedeLider extends StatelessWidget {
                   ),
                   boxShadow: const [
                     BoxShadow(
-                      color: botonSombra, // Verde más claro para sombra
+                      color: botonSombra, // Sombra en tono verde claro
                       blurRadius: 5,
                       offset: Offset(0, 3),
                     ),
@@ -73,8 +75,10 @@ class CardsSedeLider extends StatelessWidget {
               ),
           ],
         ),
+        // Espacio adicional en dispositivos móviles
         if (Responsive.isMobile(context))
           const SizedBox(height: defaultPadding),
+        // Botón "Añadir Sede" visible solo en dispositivos móviles
         if (Responsive.isMobile(context))
           Container(
             width: 200,
@@ -88,7 +92,7 @@ class CardsSedeLider extends StatelessWidget {
               ),
               boxShadow: const [
                 BoxShadow(
-                  color: botonSombra, // Verde más claro para sombra
+                  color: botonSombra, // Sombra en tono verde claro
                   blurRadius: 5,
                   offset: Offset(0, 3),
                 ),
@@ -116,22 +120,28 @@ class CardsSedeLider extends StatelessWidget {
               ),
             ),
           ),
+        // Espacio adicional antes del listado de tarjetas de sedes
         const SizedBox(height: defaultPadding),
+        // Contenedor que muestra las tarjetas de sedes
         SizedBox(
           height: 300,
           child: FutureBuilder(
-            future: fechData(),
+            future: fetchData(),
             builder:
                 (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
+                // Indicador de carga mientras se espera la respuesta
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
               } else if (snapshot.hasError) {
+                // Mensaje de error si ocurre un problema al cargar datos
                 return Text('Error al cargar sedes: ${snapshot.error}');
               } else if (snapshot.data == null) {
+                // Mensaje si no se encontraron datos de sedes
                 return const Text('No se encontraron sedes');
               } else {
+                // Procesamiento de datos y construcción de las tarjetas de sedes
                 List<SedeModel> sedes = snapshot.data![0];
                 List<ImagenSedeModel> allImagesSedes = snapshot.data![1];
 
@@ -140,6 +150,7 @@ class CardsSedeLider extends StatelessWidget {
                   itemCount: sedes.length,
                   itemBuilder: (context, index) {
                     SedeModel sede = sedes[index];
+                    // Filtrado de imágenes por sede y construcción de tarjeta de sede
                     List<String> images = allImagesSedes
                         .where((imagen) => imagen.sede.id == sede.id)
                         .map((imagen) => imagen.imagen)
@@ -158,3 +169,4 @@ class CardsSedeLider extends StatelessWidget {
     );
   }
 }
+

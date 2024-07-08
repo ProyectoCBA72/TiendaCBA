@@ -1,7 +1,6 @@
 // ignore_for_file: unnecessary_null_comparison
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/usuario/cards_pedido_usuario.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/usuario/tablas/cancelado_usuario.dart';
@@ -29,13 +28,16 @@ class DashboardScreenUsuario extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Obtiene el estado de la aplicación
     return Consumer<AppState>(builder: (context, appState, _) {
+      // Obtiene el usuario autenticado
       if (appState == null || appState.usuarioAutenticado == null) {
         return const Center(
           child: CircularProgressIndicator(),
         );
       }
 
+      // Obtiene el usuario autenticado
       final usuarioAutenticado = appState.usuarioAutenticado;
       return SafeArea(
         child: ListView(
@@ -46,11 +48,14 @@ class DashboardScreenUsuario extends StatelessWidget {
           children: [
             Column(
               children: [
+                // Encabezado
                 const Header(),
                 const SizedBox(height: defaultPadding),
+                // Cuerpo
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Divicion izquierda
                     Expanded(
                       flex: 5,
                       child: Column(
@@ -62,34 +67,41 @@ class DashboardScreenUsuario extends StatelessWidget {
                               children: [
                                 Column(
                                   children: [
+                                    // Card de pedidos del usuario
                                     CardsPedidoUsuario(
                                       usuario: usuarioAutenticado!,
                                     ),
                                     const SizedBox(height: defaultPadding),
+                                    // Tabla de los eventos del usuario
                                     FutureBuilder(
-                                        future: getBoletas(),
+                                        future:
+                                            getBoletas(), // Obtiene las boletas
                                         builder: (context,
                                             AsyncSnapshot<List<BoletaModel>>
                                                 snapshotBoleta) {
+                                          // Muestra el indicador de carga mientras los datos se cargan
                                           if (snapshotBoleta.connectionState ==
                                               ConnectionState.waiting) {
                                             return const CircularProgressIndicator();
+                                            // Muestra el mensaje de error si ocurre un problema al cargar los datos
                                           } else if (snapshotBoleta.hasError) {
                                             return Text(
                                                 'Error al cargar inscripciones: ${snapshotBoleta.error}');
+                                            // Muestra un texto 'No se encontraron boletas' si no hay datos
                                           } else if (snapshotBoleta.data ==
                                               null) {
                                             return const Text(
                                                 'No se encontraron inscripciones');
+                                            // Muestra las boletas del usuario
                                           } else {
                                             List<BoletaModel> boletaUsuario =
-                                                [];
+                                                []; // Lista para almacenar las boletas del usuario
 
                                             boletaUsuario = snapshotBoleta.data!
                                                 .where((boleta) =>
                                                     boleta.usuario ==
                                                     usuarioAutenticado.id)
-                                                .toList();
+                                                .toList(); // Filtra las boletas del usuario
 
                                             return EventosUsuario(
                                               boletas: boletaUsuario,
@@ -97,26 +109,33 @@ class DashboardScreenUsuario extends StatelessWidget {
                                           }
                                         }),
                                     const SizedBox(height: defaultPadding),
+                                    // Tabla de los pedidos pendientes
                                     FutureBuilder(
-                                        future: getAuxPedidos(),
+                                        future:
+                                            getAuxPedidos(), // Obtiene los pedidos
                                         builder: (context,
                                             AsyncSnapshot<List<AuxPedidoModel>>
                                                 snapshotAuxiliar) {
+                                          // Muestra el indicador de carga mientras los datos se cargan
                                           if (snapshotAuxiliar
                                                   .connectionState ==
                                               ConnectionState.waiting) {
                                             return const CircularProgressIndicator();
+                                            // Muestra el mensaje de error si ocurre un problema al cargar los datos
                                           } else if (snapshotAuxiliar
                                               .hasError) {
                                             return Text(
                                                 'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                            // Muestra un texto 'No se encontraron pedidos' si no hay datos
                                           } else if (snapshotAuxiliar.data ==
                                               null) {
                                             return const Text(
                                                 'No se encontraron pedidos');
+                                            // Muestra los pedidos pendientes
                                           } else {
                                             List<AuxPedidoModel>
-                                                pedidosPendientes = [];
+                                                pedidosPendientes =
+                                                []; // Lista para almacenar los pedidos pendientes
 
                                             pedidosPendientes = snapshotAuxiliar
                                                 .data!
@@ -128,33 +147,40 @@ class DashboardScreenUsuario extends StatelessWidget {
                                                     auxiliar.pedido.usuario
                                                             .id ==
                                                         usuarioAutenticado.id)
-                                                .toList();
+                                                .toList(); // Filtra los pedidos pendientes del usuario
                                             return PendienteUsuario(
                                               auxPedido: pedidosPendientes,
                                             );
                                           }
                                         }),
                                     const SizedBox(height: defaultPadding),
+                                    // Tabla de los pedidos entregados
                                     FutureBuilder(
-                                        future: getAuxPedidos(),
+                                        future:
+                                            getAuxPedidos(), // Obtiene los pedidos
                                         builder: (context,
                                             AsyncSnapshot<List<AuxPedidoModel>>
                                                 snapshotAuxiliar) {
+                                          // Muestra el indicador de carga mientras los datos se cargan
                                           if (snapshotAuxiliar
                                                   .connectionState ==
                                               ConnectionState.waiting) {
                                             return const CircularProgressIndicator();
+                                            // Muestra el mensaje de error si ocurre un problema al cargar los datos
                                           } else if (snapshotAuxiliar
                                               .hasError) {
                                             return Text(
                                                 'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                            // Muestra un texto 'No se encontraron pedidos' si no hay datos
                                           } else if (snapshotAuxiliar.data ==
                                               null) {
                                             return const Text(
                                                 'No se encontraron pedidos');
+                                            // Muestra los pedidos entregados
                                           } else {
                                             List<AuxPedidoModel>
-                                                pedidosEntregados = [];
+                                                pedidosEntregados =
+                                                []; // Lista para almacenar los pedidos entregados
 
                                             pedidosEntregados = snapshotAuxiliar
                                                 .data!
@@ -165,33 +191,40 @@ class DashboardScreenUsuario extends StatelessWidget {
                                                     auxiliar.pedido.usuario
                                                             .id ==
                                                         usuarioAutenticado.id)
-                                                .toList();
+                                                .toList(); // Filtra los pedidos entregados del usuario
                                             return EntregadoUsuario(
                                               auxPedido: pedidosEntregados,
                                             );
                                           }
                                         }),
                                     const SizedBox(height: defaultPadding),
+                                    // Tabla de los pedidos cancelados
                                     FutureBuilder(
-                                        future: getAuxPedidos(),
+                                        future:
+                                            getAuxPedidos(), // Obtiene los pedidos
                                         builder: (context,
                                             AsyncSnapshot<List<AuxPedidoModel>>
                                                 snapshotAuxiliar) {
+                                          // Muestra el indicador de carga mientras los datos se cargan
                                           if (snapshotAuxiliar
                                                   .connectionState ==
                                               ConnectionState.waiting) {
                                             return const CircularProgressIndicator();
+                                            // Muestra el mensaje de error si ocurre un problema al cargar los datos
                                           } else if (snapshotAuxiliar
                                               .hasError) {
                                             return Text(
                                                 'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                            // Muestra un texto 'No se encontraron pedidos' si no hay datos
                                           } else if (snapshotAuxiliar.data ==
                                               null) {
                                             return const Text(
                                                 'No se encontraron pedidos');
+                                            // Muestra los pedidos cancelados
                                           } else {
                                             List<AuxPedidoModel>
-                                                pedidosCancelados = [];
+                                                pedidosCancelados =
+                                                []; // Lista para almacenar los pedidos cancelados
 
                                             pedidosCancelados = snapshotAuxiliar
                                                 .data!
@@ -201,7 +234,7 @@ class DashboardScreenUsuario extends StatelessWidget {
                                                     auxiliar.pedido.usuario
                                                             .id ==
                                                         usuarioAutenticado.id)
-                                                .toList();
+                                                .toList(); // Filtra los pedidos cancelados del usuario
                                             return CanceladoUsuario(
                                               auxPedido: pedidosCancelados,
                                             );
@@ -209,45 +242,57 @@ class DashboardScreenUsuario extends StatelessWidget {
                                         }),
                                     const SizedBox(height: defaultPadding),
                                     FutureBuilder(
-                                        future: getFacturas(),
+                                        future:
+                                            getFacturas(), // Obtiene las facturas
                                         builder: (context,
                                             AsyncSnapshot<List<FacturaModel>>
                                                 snapshotFactura) {
+                                          // Muestra el indicador de carga mientras los datos se cargan
                                           if (snapshotFactura.connectionState ==
                                               ConnectionState.waiting) {
                                             return const CircularProgressIndicator();
+                                            // Muestra el mensaje de error si ocurre un problema al cargar los datos
                                           } else if (snapshotFactura.hasError) {
                                             return Text(
                                                 'Error al cargar ventas: ${snapshotFactura.error}');
+                                            // Muestra un texto 'No se encontraron ventas' si no hay datos
                                           } else if (snapshotFactura.data ==
                                               null) {
                                             return const Text(
                                                 'No se encontraron ventas');
+                                            // Muestra las ventas
                                           } else {
                                             return FutureBuilder(
-                                                future: getAuxPedidos(),
+                                                future:
+                                                    getAuxPedidos(), // Obtiene los pedidos
                                                 builder: (context,
                                                     AsyncSnapshot<
                                                             List<
                                                                 AuxPedidoModel>>
                                                         snapshotAuxiliar) {
+                                                  // Muestra el indicador de carga mientras los datos se cargan
                                                   if (snapshotAuxiliar
                                                           .connectionState ==
                                                       ConnectionState.waiting) {
                                                     return const CircularProgressIndicator();
+                                                    // Muestra el mensaje de error si ocurre un problema al cargar los datos
                                                   } else if (snapshotAuxiliar
                                                       .hasError) {
                                                     return Text(
                                                         'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                                    // Muestra un texto 'No se encontraron pedidos' si no hay datos
                                                   } else if (snapshotAuxiliar
                                                           .data ==
                                                       null) {
                                                     return const Text(
                                                         'No se encontraron pedidos');
+                                                    // Muestra las ventas
                                                   } else {
                                                     List<AuxPedidoModel>
-                                                        pedidosFacturas = [];
+                                                        pedidosFacturas =
+                                                        []; // Lista para almacenar las facturas
 
+                                                    // Obtiene los pedidos correspondientes a las facturas del usuario
                                                     for (var f = 0;
                                                         f <
                                                             snapshotFactura
@@ -282,39 +327,48 @@ class DashboardScreenUsuario extends StatelessWidget {
                                         }),
                                     const SizedBox(height: defaultPadding),
                                     FutureBuilder(
-                                        future: getDevoluciones(),
+                                        future:
+                                            getDevoluciones(), // Obtiene las devoluciones
                                         builder: (context,
                                             AsyncSnapshot<
                                                     List<DevolucionesModel>>
                                                 snapshotDevolucion) {
+                                          // Muestra el indicador de carga mientras los datos se cargan
                                           if (snapshotDevolucion
                                                   .connectionState ==
                                               ConnectionState.waiting) {
                                             return const CircularProgressIndicator();
+                                            // Muestra el mensaje de error si ocurre un problema al cargar los datos
                                           } else if (snapshotDevolucion
                                               .hasError) {
                                             return Text(
                                                 'Error al cargar devoluciones: ${snapshotDevolucion.error}');
+                                            // Muestra un texto 'No se encontraron devoluciones' si no hay datos
                                           } else if (snapshotDevolucion.data ==
                                               null) {
                                             return const Text(
                                                 'No se encontraron devoluciones');
+                                            // Muestra las devoluciones
                                           } else {
                                             return FutureBuilder(
-                                                future: getAuxPedidos(),
+                                                future:
+                                                    getAuxPedidos(), // Obtiene los pedidos
                                                 builder: (context,
                                                     AsyncSnapshot<
                                                             List<
                                                                 AuxPedidoModel>>
                                                         snapshotAuxiliar) {
+                                                  // Muestra el indicador de carga mientras los datos se cargan
                                                   if (snapshotAuxiliar
                                                           .connectionState ==
                                                       ConnectionState.waiting) {
                                                     return const CircularProgressIndicator();
+                                                    // Muestra el mensaje de error si ocurre un problema al cargar los datos
                                                   } else if (snapshotAuxiliar
                                                       .hasError) {
                                                     return Text(
                                                         'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                                    // Muestra un texto 'No se encontraron pedidos' si no hay datos
                                                   } else if (snapshotAuxiliar
                                                           .data ==
                                                       null) {
@@ -322,8 +376,10 @@ class DashboardScreenUsuario extends StatelessWidget {
                                                         'No se encontraron pedidos');
                                                   } else {
                                                     List<AuxPedidoModel>
-                                                        pedidosDevueltos = [];
+                                                        pedidosDevueltos =
+                                                        []; // Lista para almacenar las devoluciones
 
+                                                    // Obtiene los pedidos correspondientes a las devoluciones del usuario
                                                     for (var d = 0;
                                                         d <
                                                             snapshotDevolucion
@@ -364,6 +420,7 @@ class DashboardScreenUsuario extends StatelessWidget {
                               ],
                             ),
                           ),
+                          // Si la pantalla no es de escritorio, muestra la sección de visitados y favoritos
                           if (!Responsive.isDesktop(context))
                             const SizedBox(height: defaultPadding),
                           if (!Responsive.isDesktop(context))
@@ -379,6 +436,7 @@ class DashboardScreenUsuario extends StatelessWidget {
                         ],
                       ),
                     ),
+                    // Si la pantalla es de escritorio, muestra la sección de visitados y favoritos en la parte derecha de la pantalla
                     if (Responsive.isDesktop(context))
                       const SizedBox(width: defaultPadding),
                     // On Mobile means if the screen is less than 850 we don't want to show it

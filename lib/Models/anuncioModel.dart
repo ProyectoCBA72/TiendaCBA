@@ -6,19 +6,48 @@ import '../source.dart';
 import 'usuarioModel.dart';
 import 'package:http/http.dart' as http;
 
+/// Clase que representa un anuncio en la aplicación.
+///
+/// Esta clase contiene los atributos necesarios para representar un anuncio.
 class AnuncioModel {
+  /// Identificador único del anuncio.
   final int id;
+
+  /// Título del anuncio.
   final String titulo;
+
+  /// Fecha del anuncio.
   final String fecha;
+
+  /// Descripción del anuncio.
   final String descripcion;
+
+  /// Indica si el anuncio es un evento.
   final bool evento;
+
+  /// Fecha del evento.
   final String fechaEvento;
+
+  /// Fecha de inicio de la inscripción al evento.
   final String eventoIncripcionInicio;
+
+  /// Fecha de fin de la inscripción al evento.
   final String eventoIncripcionFin;
+
+  /// Número máximo de cupos para el evento.
   final int maxCupos;
+
+  /// Anexo del anuncio.
   final String anexo;
+
+  /// Usuario que creó el anuncio.
   final UsuarioModel usuario;
 
+  /// Crea una nueva instancia de [AnuncioModel].
+  ///
+  /// Los parámetros [id], [titulo], [fecha], [descripcion], [usuario],
+  /// [fechaEvento], [evento], [eventoIncripcionInicio], [eventoIncripcionFin]
+  /// y [maxCupos] son obligatorios.
   AnuncioModel({
     required this.id,
     required this.titulo,
@@ -34,17 +63,55 @@ class AnuncioModel {
   });
 }
 
+/// Lista de anuncios.
+///
+/// Esta lista almacena instancias de la clase [AnuncioModel], que representan
+/// los anuncios publicados en la aplicación.
+///
+/// Las instancias de esta lista pueden ser agregadas utilizando el método
+/// [add], y se pueden iterar utilizando un bucle [for] o utilizando el método
+/// [index].
+///
+/// Ejemplo de uso:
+///   // Agregar un anuncio a la lista
+///   anuncios.add(AnuncioModel(
+///     id: 1,
+///     titulo: "Anuncio de prueba",
+///     fecha: "2023-01-01",
+///     descripcion: "Descripción del anuncio",
+///     usuario: UsuarioModel(id: 1, nombre: "Juan Pérez"),
+///     fechaEvento: "2023-01-15",
+///     evento: true,
+///     eventoIncripcionInicio: "2023-01-01",
+///     eventoIncripcionFin: "2023-01-14",
+///     maxCupos: 100,
+///     anexo: "url del anexo",
+///   ));
 List<AnuncioModel> anuncios = [];
 
-// Futuro para traer los datos de la api
-
+/// Obtener los anuncios de la base de datos.
 Future<List<AnuncioModel>> getAnuncios() async {
+  /// URL de la API de anuncios.
+  ///
+  /// Esta variable almacena la URL base de la API de anuncios.
   String url = "";
 
+  // Construir la URL de la API de anuncios.
   url = "$sourceApi/api/anuncios/";
 
+  /// Realizar la solicitud HTTP GET para obtener los anuncios de la base de datos.
+  ///
+  /// Esta función realiza una solicitud HTTP GET a la URL construida anteriormente
+  /// para obtener la lista de anuncios de la base de datos. Si la respuesta es exitosa,
+  /// se decodifica la respuesta JSON y se almacena en la lista [anuncios].
+  ///
+  /// Si la respuesta no es exitosa, se lanza una excepción con el código de estado
+  /// de la respuesta.
+  ///
+  /// Devuelve una [Future] que se completa con la lista de anuncios.
   final response = await http.get(Uri.parse(url));
 
+  // Verifica si la respuesta es exitosa
   if (response.statusCode == 200) {
     // Limpiar la lista antes de llenarla con datos actualizados
     anuncios.clear();
@@ -53,6 +120,7 @@ Future<List<AnuncioModel>> getAnuncios() async {
     String responseBodyUtf8 = utf8.decode(response.bodyBytes);
     List<dynamic> decodedData = jsonDecode(responseBodyUtf8);
 
+    // Llenar la lista de anuncios con los datos decodificados
     for (var anuncioData in decodedData) {
       anuncios.add(
         AnuncioModel(
@@ -93,15 +161,10 @@ Future<List<AnuncioModel>> getAnuncios() async {
         ),
       );
     }
-    // print('Número de anuncios cargados: ${anuncios.length}');
-    // print(
-    //     'Primer anuncio: ${anuncios.isNotEmpty ? anuncios[0] : "Lista vacía"}');
-    // print(
-    //     'Primer anuncio - Título: ${anuncios.isNotEmpty ? anuncios[0].usuario.id : "Lista vacía"}');
-
-    // Devolver la lista de imagenes
+    // Devuelve la lista de anuncios
     return anuncios;
   } else {
+    // Lanza una excepción si la respuesta no es exitosa
     throw Exception(
         'Fallo la solicitud HTTP con código ${response.statusCode}');
   }

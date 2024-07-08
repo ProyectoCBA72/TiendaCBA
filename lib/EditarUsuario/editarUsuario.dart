@@ -6,46 +6,126 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:tienda_app/EditarUsuario/desplegablesEditar.dart';
+import 'package:tienda_app/Models/puntoVentaModel.dart';
+import 'package:tienda_app/Models/sedeModel.dart';
+import 'package:tienda_app/Models/unidadProduccionModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:image/image.dart' as im;
 
+/// Un widget de estado que muestra un formulario para actualizar la información
+/// de un usuario.
+///
+/// El widget [FormActualizarUsuario] toma un parámetro obligatorio [usuario],
+/// que es un objeto [UsuarioModel] que representa el usuario a actualizar.
+///
+/// El widget devuelve un [StatefulWidget] con un estado asociado
+/// [_FormActualizarUsuarioState].
 class FormActualizarUsuario extends StatefulWidget {
-  const FormActualizarUsuario({super.key});
+  /// El objeto [UsuarioModel] que representa el usuario a actualizar.
+  final UsuarioModel usuario;
+
+  /// Construye un widget [FormActualizarUsuario].
+  ///
+  /// El parámetro [usuario] es obligatorio y debe ser un objeto
+  /// [UsuarioModel].
+  const FormActualizarUsuario({
+    super.key,
+    required this.usuario,
+  });
 
   @override
   State<FormActualizarUsuario> createState() => _FormActualizarUsuarioState();
 }
 
 class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
+  /// Cadena que almacena el número de documento del usuario.
   String? documento;
 
+  /// Cadena que almacena el primer rol del usuario.
   String? rol1;
 
+  /// Cadena que almacena el segundo rol del usuario.
   String? rol2;
 
+  /// Cadena que almacena la unidad de producción del usuario.
   String? unidad;
 
+  /// Cadena que almacena el punto de venta del usuario.
   String? punto;
 
+  /// Cadena que almacena la sede del usuario.
   String? sede;
 
-  bool isChecked1 = false; // Variable para almacenar el estado del checkbox
+  /// Variable booleana que guarda el estado del primer checkbox.
+  bool isChecked1 = false;
 
-  bool isChecked2 = false; // Variable para almacenar el estado del checkbox
+  /// Variable booleana que guarda el estado del segundo checkbox.
+  bool isChecked2 = false;
 
-  // Mascara para el número de telefono
+  /// Controlador de texto para el nombre del usuario.
+  final TextEditingController _nombresController = TextEditingController();
+
+  /// Controlador de texto para los apellidos del usuario.
+  final TextEditingController _apellidosController = TextEditingController();
+
+  /// Controlador de texto para el correo electrónico del usuario.
+  final TextEditingController _emailController = TextEditingController();
+
+  /// Controlador de texto para el número de teléfono del usuario.
+  final TextEditingController _telefonoController = TextEditingController();
+
+  /// Controlador de texto para el número de documento del usuario.
+  final TextEditingController _documentoController = TextEditingController();
+
+  /// Controlador de texto para la dirección del usuario.
+  final TextEditingController _direccionController = TextEditingController();
+
+  /// Controlador de texto para la ciudad del usuario.
+  final TextEditingController _ciudadController = TextEditingController();
+
+  /// Controlador de texto para el número de teléfono celular del usuario.
+  final TextEditingController _telefonoCelularController =
+      TextEditingController();
+
+  /// Controlador de texto para la ficha del usuario.
+  final TextEditingController _fichaController = TextEditingController();
+
+  /// Controlador de texto para el cargo del usuario.
+  final TextEditingController _cargoController = TextEditingController();
+
+  /// Controlador de texto para la imagen del usuario.
+  final TextEditingController _imagenController = TextEditingController();
+
+  // Máscara para el número de teléfono.
   var inputtelefono = MaskTextInputFormatter(
       mask: "### ### ####", filter: {"#": RegExp(r'[0-9]')});
 
+  /// Cadena que almacena el nombre del archivo seleccionado.
   String selectFile = '';
+
+  /// Byte array que almacena la imagen seleccionada.
   Uint8List? selectedImagenInBytes;
 
   // Método para seleccionar una imagen
+  /// Selecciona un archivo de imagen y lo carga en un Uint8List.
+  ///
+  /// Si la imagen seleccionada no tiene tamaño 400x400, se redimensiona
+  /// a ese tamaño y se reduce la calidad de la imagen a 50.
+  ///
+  /// El parámetro [imagenFrom] indica si se seleccionó la imagen desde el
+  /// botón de "Foto desde dispositivo" o desde la galería del dispositivo.
+  ///
+  /// Si [imagenFrom] es verdadero, se abre la galería del dispositivo para
+  /// que el usuario seleccione la imagen. Si es falso, se abre el selector
+  /// de archivos para que el usuario seleccione la imagen desde el dispositivo.
   _selectFile(bool imagenFrom) async {
+    // Abrir el selector de archivos o la galería del dispositivo
     FilePickerResult? fileResult = await FilePicker.platform.pickFiles();
 
     if (fileResult != null) {
       setState(() {
+        // Obtener el nombre del archivo y los bytes de la imagen seleccionada
         selectFile = fileResult.files.first.name;
         selectedImagenInBytes = fileResult.files.first.bytes;
       });
@@ -76,6 +156,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        // Botón para regresar a la pantalla anterior
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
@@ -87,6 +168,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
           ),
         ),
         actions: [
+          // Botón para guardar los cambios
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: GestureDetector(
@@ -131,6 +213,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Titulo
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 30, horizontal: 5),
@@ -154,7 +237,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                           ),
                         ),
                       ),
-                      // Campo del titulo
+                      // Campo de texto para el nombre
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -164,6 +247,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 2.0, right: 2.0),
                           child: TextFormField(
+                            controller: _nombresController,
                             keyboardType: TextInputType.number,
                             obscureText: false,
                             style: const TextStyle(color: Colors.black),
@@ -186,6 +270,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                         ),
                       ),
                       const SizedBox(height: 20),
+                      // Campo de texto para los apellidos
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -195,6 +280,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 2.0, right: 2.0),
                           child: TextFormField(
+                            controller: _apellidosController,
                             keyboardType: TextInputType.number,
                             obscureText: false,
                             style: const TextStyle(color: Colors.black),
@@ -217,6 +303,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                         ),
                       ),
                       const SizedBox(height: 20),
+                      // Campo de texto para la identificación
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5),
                         child: Text(
@@ -240,6 +327,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                         ),
                       ),
                       const SizedBox(height: 15),
+                      // DropdownButton para el tipo de documento
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -344,6 +432,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                               padding:
                                   const EdgeInsets.only(left: 2.0, right: 2.0),
                               child: TextFormField(
+                                controller: _documentoController,
                                 keyboardType: TextInputType.number,
                                 obscureText: false,
                                 style: const TextStyle(color: Colors.black),
@@ -369,6 +458,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                         ],
                       ),
                       const SizedBox(height: 20),
+                      // Campo de texto para el correo
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -378,6 +468,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 2.0, right: 2.0),
                           child: TextFormField(
+                            controller: _emailController,
                             keyboardType: TextInputType.number,
                             obscureText: false,
                             style: const TextStyle(color: Colors.black),
@@ -400,6 +491,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                         ),
                       ),
                       const SizedBox(height: 20),
+                      // Información de contacto
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5),
                         child: Text(
@@ -423,6 +515,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                         ),
                       ),
                       const SizedBox(height: 15),
+                      // Campo de texto para la dirección y ciudad
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -438,6 +531,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                 padding: const EdgeInsets.only(
                                     left: 2.0, right: 2.0),
                                 child: TextFormField(
+                                  controller: _direccionController,
                                   keyboardType: TextInputType.number,
                                   obscureText: false,
                                   style: const TextStyle(color: Colors.black),
@@ -475,6 +569,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                 padding: const EdgeInsets.only(
                                     left: 2.0, right: 2.0),
                                 child: TextFormField(
+                                  controller: _ciudadController,
                                   keyboardType: TextInputType.number,
                                   obscureText: false,
                                   style: const TextStyle(color: Colors.black),
@@ -503,6 +598,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                       const SizedBox(
                         height: 20,
                       ),
+                      // Campo de texto para el telefono y telefono celular
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -518,6 +614,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                 padding: const EdgeInsets.only(
                                     left: 2.0, right: 2.0),
                                 child: TextFormField(
+                                  controller: _telefonoController,
                                   inputFormatters: [inputtelefono],
                                   keyboardType: TextInputType.number,
                                   obscureText: false,
@@ -556,6 +653,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                 padding: const EdgeInsets.only(
                                     left: 2.0, right: 2.0),
                                 child: TextFormField(
+                                  controller: _telefonoCelularController,
                                   inputFormatters: [inputtelefono],
                                   keyboardType: TextInputType.number,
                                   obscureText: false,
@@ -585,6 +683,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                       const SizedBox(
                         height: 20,
                       ),
+                      // Imagen de perfil
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5),
                         child: Text(
@@ -630,6 +729,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                       const SizedBox(
                         height: 15,
                       ),
+                      // Botón de editar imagen
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -702,390 +802,18 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                       const SizedBox(
                         height: 20,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
-                        child: Text(
-                          "Información Aprendiz",
-                          style: TextStyle(
-                            fontSize: 19,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Calibri-Bold',
-                            shadows: [
-                              Shadow(
-                                color: Colors.black.withOpacity(
-                                    0.5), // Color y opacidad de la sombra
-                                offset: const Offset(2,
-                                    2), // Desplazamiento de la sombra (horizontal, vertical)
-                                blurRadius:
-                                    3, // Radio de desenfoque de la sombra
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
+                      // Información aprendiz
+                      // ver si es aprendiz
+                      if (widget.usuario.rol2 == "APRENDIZ")
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          child: Text(
+                            "Información Aprendiz",
+                            style: TextStyle(
+                              fontSize: 19,
                               color: Colors.white,
-                              border: Border.all(color: Colors.white),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 2.0, right: 2.0),
-                              child: TextFormField(
-                                keyboardType: TextInputType.number,
-                                obscureText: false,
-                                style: const TextStyle(color: Colors.black),
-                                decoration: InputDecoration(
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide:
-                                          const BorderSide(color: Colors.white),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide:
-                                          const BorderSide(color: Colors.white),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    fillColor: Colors.grey[200],
-                                    filled: true,
-                                    labelStyle:
-                                        const TextStyle(color: Colors.grey),
-                                    labelText: "N° Ficha"),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: defaultPadding,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "¿Usted es vocero?",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium!
-                                    .copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  shadows: [
-                                    Shadow(
-                                      color: Colors.black.withOpacity(
-                                          0.5), // Color y opacidad de la sombra
-                                      offset: const Offset(2,
-                                          2), // Desplazamiento de la sombra (horizontal, vertical)
-                                      blurRadius:
-                                          3, // Radio de desenfoque de la sombra
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Checkbox(
-                                side: const BorderSide(
-                                    color: Colors.white, width: 2.0),
-                                value: isChecked1, // Estado actual del checkbox
-                                onChanged: (bool? newValue) {
-                                  // Función que se ejecuta cuando el usuario cambia el estado del checkbox
-                                  setState(() {
-                                    // Actualiza el estado del widget
-                                    isChecked1 = newValue ??
-                                        false; // Cambia el estado del checkbox al nuevo valor
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
-                        child: Text(
-                          "Información Funcionario",
-                          style: TextStyle(
-                            fontSize: 19,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Calibri-Bold',
-                            shadows: [
-                              Shadow(
-                                color: Colors.black.withOpacity(
-                                    0.5), // Color y opacidad de la sombra
-                                offset: const Offset(2,
-                                    2), // Desplazamiento de la sombra (horizontal, vertical)
-                                blurRadius:
-                                    3, // Radio de desenfoque de la sombra
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: Colors.white),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 2.0, right: 2.0),
-                          child: TextFormField(
-                            keyboardType: TextInputType.number,
-                            obscureText: false,
-                            style: const TextStyle(color: Colors.black),
-                            decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      const BorderSide(color: Colors.white),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      const BorderSide(color: Colors.white),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                fillColor: Colors.grey[200],
-                                filled: true,
-                                labelStyle: const TextStyle(color: Colors.grey),
-                                labelText: "Cargo"),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
-                        child: Text(
-                          "Información Aplicativo",
-                          style: TextStyle(
-                            fontSize: 19,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Calibri-Bold',
-                            shadows: [
-                              Shadow(
-                                color: Colors.black.withOpacity(
-                                    0.5), // Color y opacidad de la sombra
-                                offset: const Offset(2,
-                                    2), // Desplazamiento de la sombra (horizontal, vertical)
-                                blurRadius:
-                                    3, // Radio de desenfoque de la sombra
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 25.0),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton2<String>(
-                                // Configuración del DropdownButton
-                                isExpanded: true,
-                                hint: const Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        'Seleccione rol secundario',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                items: rolN1
-                                    .map((item) => DropdownMenuItem<String>(
-                                          value: item.valor,
-                                          child: Text(
-                                            item.titulo,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ))
-                                    .toList(),
-                                value: rol1,
-                                onChanged: (String? value) {
-                                  // Actualización del valor seleccionado
-                                  setState(() {
-                                    rol1 = value;
-                                  });
-                                },
-                                buttonStyleData: ButtonStyleData(
-                                  height: 50,
-                                  padding: const EdgeInsets.only(
-                                      left: 14, right: 14),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(
-                                      color: Colors.black26,
-                                    ),
-                                    color: Colors.white,
-                                  ),
-                                  elevation: 2,
-                                ),
-                                iconStyleData: const IconStyleData(
-                                  icon: Icon(
-                                    Icons.arrow_forward_ios_outlined,
-                                  ),
-                                  iconSize: 14,
-                                  iconEnabledColor: Colors.black,
-                                  iconDisabledColor: Colors.grey,
-                                ),
-                                dropdownStyleData: DropdownStyleData(
-                                  maxHeight: 200,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(14),
-                                    color: Colors.white,
-                                  ),
-                                  offset: const Offset(-20, 0),
-                                  scrollbarTheme: ScrollbarThemeData(
-                                    radius: const Radius.circular(40),
-                                    thickness:
-                                        WidgetStateProperty.all<double>(6),
-                                    thumbVisibility:
-                                        WidgetStateProperty.all<bool>(true),
-                                  ),
-                                ),
-                                menuItemStyleData: const MenuItemStyleData(
-                                  height: 40,
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 25.0),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: defaultPadding,
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 25.0),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton2<String>(
-                                // Configuración del DropdownButton
-                                isExpanded: true,
-                                hint: const Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        'Seleccione rol terciario',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                items: rolN2
-                                    .map((item) => DropdownMenuItem<String>(
-                                          value: item.valor,
-                                          child: Text(
-                                            item.titulo,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ))
-                                    .toList(),
-                                value: rol2,
-                                onChanged: (String? value) {
-                                  // Actualización del valor seleccionado
-                                  setState(() {
-                                    rol2 = value;
-                                  });
-                                },
-                                buttonStyleData: ButtonStyleData(
-                                  height: 50,
-                                  padding: const EdgeInsets.only(
-                                      left: 14, right: 14),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(
-                                      color: Colors.black26,
-                                    ),
-                                    color: Colors.white,
-                                  ),
-                                  elevation: 2,
-                                ),
-                                iconStyleData: const IconStyleData(
-                                  icon: Icon(
-                                    Icons.arrow_forward_ios_outlined,
-                                  ),
-                                  iconSize: 14,
-                                  iconEnabledColor: Colors.black,
-                                  iconDisabledColor: Colors.grey,
-                                ),
-                                dropdownStyleData: DropdownStyleData(
-                                  maxHeight: 200,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(14),
-                                    color: Colors.white,
-                                  ),
-                                  offset: const Offset(-20, 0),
-                                  scrollbarTheme: ScrollbarThemeData(
-                                    radius: const Radius.circular(40),
-                                    thickness:
-                                        WidgetStateProperty.all<double>(6),
-                                    thumbVisibility:
-                                        WidgetStateProperty.all<bool>(true),
-                                  ),
-                                ),
-                                menuItemStyleData: const MenuItemStyleData(
-                                  height: 40,
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 25.0),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "¿El usuario se encuentra activo?",
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              fontFamily: 'Calibri-Bold',
                               shadows: [
                                 Shadow(
                                   color: Colors.black.withOpacity(
@@ -1098,297 +826,851 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                               ],
                             ),
                           ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Checkbox(
-                            side: const BorderSide(
-                                color: Colors.white, width: 2.0),
-                            value: isChecked2, // Estado actual del checkbox
-                            onChanged: (bool? newValue) {
-                              // Función que se ejecuta cuando el usuario cambia el estado del checkbox
-                              setState(() {
-                                // Actualiza el estado del widget
-                                isChecked2 = newValue ??
-                                    false; // Cambia el estado del checkbox al nuevo valor
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 25.0),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton2<String>(
-                                // Configuración del DropdownButton
-                                isExpanded: true,
-                                hint: const Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        'Seleccione unidad de producción',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
+                        ),
+                      // ver si es aprendiz
+                      if (widget.usuario.rol2 == "APRENDIZ")
+                        const SizedBox(height: 15),
+                      // ver si es aprendiz
+                      // captura el n° de ficha y si es vocero
+                      if (widget.usuario.rol2 == "APRENDIZ")
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(color: Colors.white),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 2.0, right: 2.0),
+                                child: TextFormField(
+                                  controller: _fichaController,
+                                  keyboardType: TextInputType.number,
+                                  obscureText: false,
+                                  style: const TextStyle(color: Colors.black),
+                                  decoration: InputDecoration(
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                            color: Colors.white),
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                items: unidadL
-                                    .map((item) => DropdownMenuItem<String>(
-                                          value: item.valor,
-                                          child: Text(
-                                            item.titulo,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ))
-                                    .toList(),
-                                value: unidad,
-                                onChanged: (String? value) {
-                                  // Actualización del valor seleccionado
-                                  setState(() {
-                                    unidad = value;
-                                  });
-                                },
-                                buttonStyleData: ButtonStyleData(
-                                  height: 50,
-                                  padding: const EdgeInsets.only(
-                                      left: 14, right: 14),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(
-                                      color: Colors.black26,
-                                    ),
-                                    color: Colors.white,
-                                  ),
-                                  elevation: 2,
-                                ),
-                                iconStyleData: const IconStyleData(
-                                  icon: Icon(
-                                    Icons.arrow_forward_ios_outlined,
-                                  ),
-                                  iconSize: 14,
-                                  iconEnabledColor: Colors.black,
-                                  iconDisabledColor: Colors.grey,
-                                ),
-                                dropdownStyleData: DropdownStyleData(
-                                  maxHeight: 200,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(14),
-                                    color: Colors.white,
-                                  ),
-                                  offset: const Offset(-20, 0),
-                                  scrollbarTheme: ScrollbarThemeData(
-                                    radius: const Radius.circular(40),
-                                    thickness:
-                                        WidgetStateProperty.all<double>(6),
-                                    thumbVisibility:
-                                        WidgetStateProperty.all<bool>(true),
-                                  ),
-                                ),
-                                menuItemStyleData: const MenuItemStyleData(
-                                  height: 40,
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 25.0),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                            color: Colors.white),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      fillColor: Colors.grey[200],
+                                      filled: true,
+                                      labelStyle:
+                                          const TextStyle(color: Colors.grey),
+                                      labelText: "N° Ficha"),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: defaultPadding,
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 25.0),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton2<String>(
-                                // Configuración del DropdownButton
-                                isExpanded: true,
-                                hint: const Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        'Seleccione punto de venta',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                items: puntoL
-                                    .map((item) => DropdownMenuItem<String>(
-                                          value: item.valor,
-                                          child: Text(
-                                            item.titulo,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ))
-                                    .toList(),
-                                value: punto,
-                                onChanged: (String? value) {
-                                  // Actualización del valor seleccionado
-                                  setState(() {
-                                    punto = value;
-                                  });
-                                },
-                                buttonStyleData: ButtonStyleData(
-                                  height: 50,
-                                  padding: const EdgeInsets.only(
-                                      left: 14, right: 14),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(
-                                      color: Colors.black26,
-                                    ),
-                                    color: Colors.white,
-                                  ),
-                                  elevation: 2,
-                                ),
-                                iconStyleData: const IconStyleData(
-                                  icon: Icon(
-                                    Icons.arrow_forward_ios_outlined,
-                                  ),
-                                  iconSize: 14,
-                                  iconEnabledColor: Colors.black,
-                                  iconDisabledColor: Colors.grey,
-                                ),
-                                dropdownStyleData: DropdownStyleData(
-                                  maxHeight: 200,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(14),
-                                    color: Colors.white,
-                                  ),
-                                  offset: const Offset(-20, 0),
-                                  scrollbarTheme: ScrollbarThemeData(
-                                    radius: const Radius.circular(40),
-                                    thickness:
-                                        WidgetStateProperty.all<double>(6),
-                                    thumbVisibility:
-                                        WidgetStateProperty.all<bool>(true),
-                                  ),
-                                ),
-                                menuItemStyleData: const MenuItemStyleData(
-                                  height: 40,
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 25.0),
-                                ),
-                              ),
+                            const SizedBox(
+                              height: defaultPadding,
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton2<String>(
-                            // Configuración del DropdownButton
-                            isExpanded: true,
-                            hint: const Row(
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Expanded(
-                                  child: Text(
-                                    'Seleccione Sede',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
+                                Text(
+                                  "¿Usted es vocero?",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium!
+                                      .copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black.withOpacity(
+                                            0.5), // Color y opacidad de la sombra
+                                        offset: const Offset(2,
+                                            2), // Desplazamiento de la sombra (horizontal, vertical)
+                                        blurRadius:
+                                            3, // Radio de desenfoque de la sombra
+                                      ),
+                                    ],
                                   ),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Checkbox(
+                                  side: const BorderSide(
+                                      color: Colors.white, width: 2.0),
+                                  value:
+                                      isChecked1, // Estado actual del checkbox
+                                  onChanged: (bool? newValue) {
+                                    // Función que se ejecuta cuando el usuario cambia el estado del checkbox
+                                    setState(() {
+                                      // Actualiza el estado del widget
+                                      isChecked1 = newValue ??
+                                          false; // Cambia el estado del checkbox al nuevo valor
+                                    });
+                                  },
                                 ),
                               ],
                             ),
-                            items: sedeL
-                                .map((item) => DropdownMenuItem<String>(
-                                      value: item.valor,
-                                      child: Text(
-                                        item.titulo,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ))
-                                .toList(),
-                            value: sede,
-                            onChanged: (String? value) {
-                              // Actualización del valor seleccionado
-                              setState(() {
-                                sede = value;
-                              });
-                            },
-                            buttonStyleData: ButtonStyleData(
-                              height: 50,
-                              padding:
-                                  const EdgeInsets.only(left: 14, right: 14),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                  color: Colors.black26,
+                          ],
+                        ),
+                      // ver si es aprendiz
+                      if (widget.usuario.rol2 == "APRENDIZ")
+                        const SizedBox(
+                          height: 20,
+                        ),
+                      // ver si es funcionario
+                      if (widget.usuario.rol2 == "FUNCIONARIO")
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          child: Text(
+                            "Información Funcionario",
+                            style: TextStyle(
+                              fontSize: 19,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Calibri-Bold',
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withOpacity(
+                                      0.5), // Color y opacidad de la sombra
+                                  offset: const Offset(2,
+                                      2), // Desplazamiento de la sombra (horizontal, vertical)
+                                  blurRadius:
+                                      3, // Radio de desenfoque de la sombra
                                 ),
-                                color: Colors.white,
-                              ),
-                              elevation: 2,
-                            ),
-                            iconStyleData: const IconStyleData(
-                              icon: Icon(
-                                Icons.arrow_forward_ios_outlined,
-                              ),
-                              iconSize: 14,
-                              iconEnabledColor: Colors.black,
-                              iconDisabledColor: Colors.grey,
-                            ),
-                            dropdownStyleData: DropdownStyleData(
-                              maxHeight: 200,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(14),
-                                color: Colors.white,
-                              ),
-                              offset: const Offset(-20, 0),
-                              scrollbarTheme: ScrollbarThemeData(
-                                radius: const Radius.circular(40),
-                                thickness: WidgetStateProperty.all<double>(6),
-                                thumbVisibility:
-                                    WidgetStateProperty.all<bool>(true),
-                              ),
-                            ),
-                            menuItemStyleData: const MenuItemStyleData(
-                              height: 40,
-                              padding: EdgeInsets.symmetric(horizontal: 25.0),
+                              ],
                             ),
                           ),
                         ),
-                      ),
+                      // ver si es funcionario
+                      if (widget.usuario.rol2 == "FUNCIONARIO")
+                        const SizedBox(height: 15),
+                      // ver si es funcionario
+                      // campo de texto cargo
+                      if (widget.usuario.rol2 == "FUNCIONARIO")
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: Colors.white),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(left: 2.0, right: 2.0),
+                            child: TextFormField(
+                              controller: _cargoController,
+                              keyboardType: TextInputType.number,
+                              obscureText: false,
+                              style: const TextStyle(color: Colors.black),
+                              decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        const BorderSide(color: Colors.white),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                        const BorderSide(color: Colors.white),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  fillColor: Colors.grey[200],
+                                  filled: true,
+                                  labelStyle:
+                                      const TextStyle(color: Colors.grey),
+                                  labelText: "Cargo"),
+                            ),
+                          ),
+                        ),
+                      // ver si es funcionario
+                      if (widget.usuario.rol2 == "FUNCIONARIO")
+                        const SizedBox(
+                          height: 20,
+                        ),
+                      // ver si es lider
+                      if (widget.usuario.rol3 == "LIDER")
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          child: Text(
+                            "Información Aplicativo",
+                            style: TextStyle(
+                              fontSize: 19,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Calibri-Bold',
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withOpacity(
+                                      0.5), // Color y opacidad de la sombra
+                                  offset: const Offset(2,
+                                      2), // Desplazamiento de la sombra (horizontal, vertical)
+                                  blurRadius:
+                                      3, // Radio de desenfoque de la sombra
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      // ver si es lider
+                      if (widget.usuario.rol3 == "LIDER")
+                        const SizedBox(height: 15),
+                      // ver si es lider
+                      // Desplegables para elegir los roles
+                      if (widget.usuario.rol3 == "LIDER")
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 25.0),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton2<String>(
+                                  // Configuración del DropdownButton
+                                  isExpanded: true,
+                                  hint: const Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          'Seleccione rol secundario',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  items: rolN1
+                                      .map((item) => DropdownMenuItem<String>(
+                                            value: item.valor,
+                                            child: Text(
+                                              item.titulo,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ))
+                                      .toList(),
+                                  value: rol1,
+                                  onChanged: (String? value) {
+                                    // Actualización del valor seleccionado
+                                    setState(() {
+                                      rol1 = value;
+                                    });
+                                  },
+                                  buttonStyleData: ButtonStyleData(
+                                    height: 50,
+                                    padding: const EdgeInsets.only(
+                                        left: 14, right: 14),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(
+                                        color: Colors.black26,
+                                      ),
+                                      color: Colors.white,
+                                    ),
+                                    elevation: 2,
+                                  ),
+                                  iconStyleData: const IconStyleData(
+                                    icon: Icon(
+                                      Icons.arrow_forward_ios_outlined,
+                                    ),
+                                    iconSize: 14,
+                                    iconEnabledColor: Colors.black,
+                                    iconDisabledColor: Colors.grey,
+                                  ),
+                                  dropdownStyleData: DropdownStyleData(
+                                    maxHeight: 200,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(14),
+                                      color: Colors.white,
+                                    ),
+                                    offset: const Offset(-20, 0),
+                                    scrollbarTheme: ScrollbarThemeData(
+                                      radius: const Radius.circular(40),
+                                      thickness:
+                                          WidgetStateProperty.all<double>(6),
+                                      thumbVisibility:
+                                          WidgetStateProperty.all<bool>(true),
+                                    ),
+                                  ),
+                                  menuItemStyleData: const MenuItemStyleData(
+                                    height: 40,
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 25.0),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: defaultPadding,
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 25.0),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton2<String>(
+                                  // Configuración del DropdownButton
+                                  isExpanded: true,
+                                  hint: const Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          'Seleccione rol terciario',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  items: rolN2
+                                      .map((item) => DropdownMenuItem<String>(
+                                            value: item.valor,
+                                            child: Text(
+                                              item.titulo,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ))
+                                      .toList(),
+                                  value: rol2,
+                                  onChanged: (String? value) {
+                                    // Actualización del valor seleccionado
+                                    setState(() {
+                                      rol2 = value;
+                                    });
+                                  },
+                                  buttonStyleData: ButtonStyleData(
+                                    height: 50,
+                                    padding: const EdgeInsets.only(
+                                        left: 14, right: 14),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(
+                                        color: Colors.black26,
+                                      ),
+                                      color: Colors.white,
+                                    ),
+                                    elevation: 2,
+                                  ),
+                                  iconStyleData: const IconStyleData(
+                                    icon: Icon(
+                                      Icons.arrow_forward_ios_outlined,
+                                    ),
+                                    iconSize: 14,
+                                    iconEnabledColor: Colors.black,
+                                    iconDisabledColor: Colors.grey,
+                                  ),
+                                  dropdownStyleData: DropdownStyleData(
+                                    maxHeight: 200,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(14),
+                                      color: Colors.white,
+                                    ),
+                                    offset: const Offset(-20, 0),
+                                    scrollbarTheme: ScrollbarThemeData(
+                                      radius: const Radius.circular(40),
+                                      thickness:
+                                          WidgetStateProperty.all<double>(6),
+                                      thumbVisibility:
+                                          WidgetStateProperty.all<bool>(true),
+                                    ),
+                                  ),
+                                  menuItemStyleData: const MenuItemStyleData(
+                                    height: 40,
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 25.0),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      // ver si es lider
+                      if (widget.usuario.rol3 == "LIDER")
+                        const SizedBox(
+                          height: 20,
+                        ),
+                      // ver si es lider
+                      // Checkbox para habilitar o deshabilitar el usuario
+                      if (widget.usuario.rol3 == "LIDER")
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "¿El usuario se encuentra activo?",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black.withOpacity(
+                                        0.5), // Color y opacidad de la sombra
+                                    offset: const Offset(2,
+                                        2), // Desplazamiento de la sombra (horizontal, vertical)
+                                    blurRadius:
+                                        3, // Radio de desenfoque de la sombra
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Checkbox(
+                              side: const BorderSide(
+                                  color: Colors.white, width: 2.0),
+                              value: isChecked2, // Estado actual del checkbox
+                              onChanged: (bool? newValue) {
+                                // Función que se ejecuta cuando el usuario cambia el estado del checkbox
+                                setState(() {
+                                  // Actualiza el estado del widget
+                                  isChecked2 = newValue ??
+                                      false; // Cambia el estado del checkbox al nuevo valor
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      // ver si es lider
+                      if (widget.usuario.rol3 == "LIDER")
+                        const SizedBox(
+                          height: 20,
+                        ),
+                      // ver si es lider
+                      // Desplegables para seleccionar la unidad de producción y el punto de venta
+                      if (widget.usuario.rol3 == "LIDER")
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            FutureBuilder(
+                                future:
+                                    getUndadesProduccion(), // Llamada al método para obtener los datos
+                                builder: (context,
+                                    AsyncSnapshot<List<UnidadProduccionModel>>
+                                        snapshot) {
+                                  // Verificar el estado de la llamada
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                    // Verificar si hay un error
+                                  } else if (snapshot.hasError) {
+                                    return Center(
+                                      child: Text(
+                                        'Error al cargar unidades: ${snapshot.error}',
+                                        style: TextStyle(
+                                          fontSize: 50,
+                                          color: Colors.white,
+                                          shadows: [
+                                            Shadow(
+                                              color: Colors.black.withOpacity(
+                                                  0.5), // Color y opacidad de la sombra
+                                              offset: const Offset(2,
+                                                  2), // Desplazamiento de la sombra (horizontal, vertical)
+                                              blurRadius:
+                                                  3, // Radio de desenfoque de la sombra
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                    // Verificar si hay datos
+                                  } else {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 25.0),
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton2<String>(
+                                          // Configuración del DropdownButton
+                                          isExpanded: true,
+                                          hint: const Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  'Seleccione unidad de producción',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          items: snapshot.data!
+                                              .map((item) =>
+                                                  DropdownMenuItem<String>(
+                                                    value: item.id.toString(),
+                                                    child: Text(
+                                                      item.nombre,
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black,
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ))
+                                              .toList(),
+                                          value: unidad,
+                                          onChanged: (String? value) {
+                                            // Actualización del valor seleccionado
+                                            setState(() {
+                                              unidad = value;
+                                            });
+                                          },
+                                          buttonStyleData: ButtonStyleData(
+                                            height: 50,
+                                            padding: const EdgeInsets.only(
+                                                left: 14, right: 14),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                              border: Border.all(
+                                                color: Colors.black26,
+                                              ),
+                                              color: Colors.white,
+                                            ),
+                                            elevation: 2,
+                                          ),
+                                          iconStyleData: const IconStyleData(
+                                            icon: Icon(
+                                              Icons.arrow_forward_ios_outlined,
+                                            ),
+                                            iconSize: 14,
+                                            iconEnabledColor: Colors.black,
+                                            iconDisabledColor: Colors.grey,
+                                          ),
+                                          dropdownStyleData: DropdownStyleData(
+                                            maxHeight: 200,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                              color: Colors.white,
+                                            ),
+                                            offset: const Offset(-20, 0),
+                                            scrollbarTheme: ScrollbarThemeData(
+                                              radius: const Radius.circular(40),
+                                              thickness: WidgetStateProperty
+                                                  .all<double>(6),
+                                              thumbVisibility:
+                                                  WidgetStateProperty.all<bool>(
+                                                      true),
+                                            ),
+                                          ),
+                                          menuItemStyleData:
+                                              const MenuItemStyleData(
+                                            height: 40,
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 25.0),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }),
+                            const SizedBox(
+                              height: defaultPadding,
+                            ),
+                            FutureBuilder(
+                                future:
+                                    getPuntosVenta(), // Llamada al método para obtener los datos
+                                builder: (context,
+                                    AsyncSnapshot<List<PuntoVentaModel>>
+                                        snapshot) {
+                                  // Verificar el estado de la llamada
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                    // Verificar si hay un error
+                                  } else if (snapshot.hasError) {
+                                    return Center(
+                                      child: Text(
+                                        'Error al cargar puntos: ${snapshot.error}',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.white,
+                                          shadows: [
+                                            Shadow(
+                                              color: Colors.black.withOpacity(
+                                                  0.5), // Color y opacidad de la sombra
+                                              offset: const Offset(2,
+                                                  2), // Desplazamiento de la sombra (horizontal, vertical)
+                                              blurRadius:
+                                                  3, // Radio de desenfoque de la sombra
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                    // Verificar si hay datos
+                                  } else {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 25.0),
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton2<String>(
+                                          // Configuración del DropdownButton
+                                          isExpanded: true,
+                                          hint: const Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  'Seleccione punto de venta',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          items: snapshot.data!
+                                              .map((item) =>
+                                                  DropdownMenuItem<String>(
+                                                    value: item.id.toString(),
+                                                    child: Text(
+                                                      item.nombre,
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black,
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ))
+                                              .toList(),
+                                          value: punto,
+                                          onChanged: (String? value) {
+                                            // Actualización del valor seleccionado
+                                            setState(() {
+                                              punto = value;
+                                            });
+                                          },
+                                          buttonStyleData: ButtonStyleData(
+                                            height: 50,
+                                            padding: const EdgeInsets.only(
+                                                left: 14, right: 14),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                              border: Border.all(
+                                                color: Colors.black26,
+                                              ),
+                                              color: Colors.white,
+                                            ),
+                                            elevation: 2,
+                                          ),
+                                          iconStyleData: const IconStyleData(
+                                            icon: Icon(
+                                              Icons.arrow_forward_ios_outlined,
+                                            ),
+                                            iconSize: 14,
+                                            iconEnabledColor: Colors.black,
+                                            iconDisabledColor: Colors.grey,
+                                          ),
+                                          dropdownStyleData: DropdownStyleData(
+                                            maxHeight: 200,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                              color: Colors.white,
+                                            ),
+                                            offset: const Offset(-20, 0),
+                                            scrollbarTheme: ScrollbarThemeData(
+                                              radius: const Radius.circular(40),
+                                              thickness: WidgetStateProperty
+                                                  .all<double>(6),
+                                              thumbVisibility:
+                                                  WidgetStateProperty.all<bool>(
+                                                      true),
+                                            ),
+                                          ),
+                                          menuItemStyleData:
+                                              const MenuItemStyleData(
+                                            height: 40,
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 25.0),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }),
+                          ],
+                        ),
+                      // ver si es lider
+                      if (widget.usuario.rol3 == "LIDER")
+                        const SizedBox(
+                          height: 20,
+                        ),
+                      // ver si es lider
+                      // Desplegable de sedes
+                      if (widget.usuario.rol3 == "LIDER")
+                        FutureBuilder(
+                            future:
+                                getSedes(), // Llamada al método para obtener los datos
+                            builder: (context,
+                                AsyncSnapshot<List<SedeModel>> snapshot) {
+                              // Verificar el estado de la llamada
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                                // Verificar si hay un error
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                  child: Text(
+                                    'Error al cargar sedes: ${snapshot.error}',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.black.withOpacity(
+                                              0.5), // Color y opacidad de la sombra
+                                          offset: const Offset(2,
+                                              2), // Desplazamiento de la sombra (horizontal, vertical)
+                                          blurRadius:
+                                              3, // Radio de desenfoque de la sombra
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                                // Verificar si hay datos
+                              } else {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 25.0),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton2<String>(
+                                      // Configuración del DropdownButton
+                                      isExpanded: true,
+                                      hint: const Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              'Seleccione Sede',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      items: snapshot.data!
+                                          .map((item) =>
+                                              DropdownMenuItem<String>(
+                                                value: item.id.toString(),
+                                                child: Text(
+                                                  item.nombre,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ))
+                                          .toList(),
+                                      value: sede,
+                                      onChanged: (String? value) {
+                                        // Actualización del valor seleccionado
+                                        setState(() {
+                                          sede = value;
+                                        });
+                                      },
+                                      buttonStyleData: ButtonStyleData(
+                                        height: 50,
+                                        padding: const EdgeInsets.only(
+                                            left: 14, right: 14),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(14),
+                                          border: Border.all(
+                                            color: Colors.black26,
+                                          ),
+                                          color: Colors.white,
+                                        ),
+                                        elevation: 2,
+                                      ),
+                                      iconStyleData: const IconStyleData(
+                                        icon: Icon(
+                                          Icons.arrow_forward_ios_outlined,
+                                        ),
+                                        iconSize: 14,
+                                        iconEnabledColor: Colors.black,
+                                        iconDisabledColor: Colors.grey,
+                                      ),
+                                      dropdownStyleData: DropdownStyleData(
+                                        maxHeight: 200,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(14),
+                                          color: Colors.white,
+                                        ),
+                                        offset: const Offset(-20, 0),
+                                        scrollbarTheme: ScrollbarThemeData(
+                                          radius: const Radius.circular(40),
+                                          thickness:
+                                              WidgetStateProperty.all<double>(
+                                                  6),
+                                          thumbVisibility:
+                                              WidgetStateProperty.all<bool>(
+                                                  true),
+                                        ),
+                                      ),
+                                      menuItemStyleData:
+                                          const MenuItemStyleData(
+                                        height: 40,
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 25.0),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }),
                     ],
                   ),
                 ),
@@ -1407,6 +1689,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                       fit: BoxFit.cover)),
               child: Row(
                 children: [
+                  // Columna izquierda
                   Expanded(
                       flex: 2,
                       child: Padding(
@@ -1416,6 +1699,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // Titulo
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 30, horizontal: 5),
@@ -1439,7 +1723,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                   ),
                                 ),
                               ),
-                              // Campo del titulo
+                              // Campo de nombres
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -1450,6 +1734,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                   padding: const EdgeInsets.only(
                                       left: 2.0, right: 2.0),
                                   child: TextFormField(
+                                    controller: _nombresController,
                                     keyboardType: TextInputType.number,
                                     obscureText: false,
                                     style: const TextStyle(color: Colors.black),
@@ -1475,6 +1760,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                 ),
                               ),
                               const SizedBox(height: 20),
+                              // Campo de apellidos
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -1485,6 +1771,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                   padding: const EdgeInsets.only(
                                       left: 2.0, right: 2.0),
                                   child: TextFormField(
+                                    controller: _apellidosController,
                                     keyboardType: TextInputType.number,
                                     obscureText: false,
                                     style: const TextStyle(color: Colors.black),
@@ -1510,6 +1797,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                 ),
                               ),
                               const SizedBox(height: 20),
+                              // Campos de identificación
                               Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 5),
@@ -1647,6 +1935,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                         padding: const EdgeInsets.only(
                                             left: 2.0, right: 2.0),
                                         child: TextFormField(
+                                          controller: _documentoController,
                                           keyboardType: TextInputType.number,
                                           obscureText: false,
                                           style: const TextStyle(
@@ -1676,6 +1965,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                 ],
                               ),
                               const SizedBox(height: 20),
+                              // Campo de correo electronico
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -1686,6 +1976,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                   padding: const EdgeInsets.only(
                                       left: 2.0, right: 2.0),
                                   child: TextFormField(
+                                    controller: _emailController,
                                     keyboardType: TextInputType.number,
                                     obscureText: false,
                                     style: const TextStyle(color: Colors.black),
@@ -1711,6 +2002,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                 ),
                               ),
                               const SizedBox(height: 20),
+                              // Información de contacto
                               Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 5),
@@ -1735,6 +2027,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                 ),
                               ),
                               const SizedBox(height: 15),
+                              // Campos de dirección y ciudad
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
@@ -1751,6 +2044,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                         padding: const EdgeInsets.only(
                                             left: 2.0, right: 2.0),
                                         child: TextFormField(
+                                          controller: _direccionController,
                                           keyboardType: TextInputType.number,
                                           obscureText: false,
                                           style: const TextStyle(
@@ -1791,6 +2085,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                         padding: const EdgeInsets.only(
                                             left: 2.0, right: 2.0),
                                         child: TextFormField(
+                                          controller: _ciudadController,
                                           keyboardType: TextInputType.number,
                                           obscureText: false,
                                           style: const TextStyle(
@@ -1822,6 +2117,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                               const SizedBox(
                                 height: 20,
                               ),
+                              // Campos de teléfono y celular
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
@@ -1838,6 +2134,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                         padding: const EdgeInsets.only(
                                             left: 2.0, right: 2.0),
                                         child: TextFormField(
+                                          controller: _telefonoController,
                                           inputFormatters: [inputtelefono],
                                           keyboardType: TextInputType.number,
                                           obscureText: false,
@@ -1879,6 +2176,8 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                         padding: const EdgeInsets.only(
                                             left: 2.0, right: 2.0),
                                         child: TextFormField(
+                                          controller:
+                                              _telefonoCelularController,
                                           inputFormatters: [inputtelefono],
                                           keyboardType: TextInputType.number,
                                           obscureText: false,
@@ -1911,425 +2210,18 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                               const SizedBox(
                                 height: 20,
                               ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 5),
-                                child: Text(
-                                  "Información Aprendiz",
-                                  style: TextStyle(
-                                    fontSize: 19,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Calibri-Bold',
-                                    shadows: [
-                                      Shadow(
-                                        color: Colors.black.withOpacity(
-                                            0.5), // Color y opacidad de la sombra
-                                        offset: const Offset(2,
-                                            2), // Desplazamiento de la sombra (horizontal, vertical)
-                                        blurRadius:
-                                            3, // Radio de desenfoque de la sombra
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 15),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Flexible(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        border: Border.all(color: Colors.white),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 2.0, right: 2.0),
-                                        child: TextFormField(
-                                          keyboardType: TextInputType.number,
-                                          obscureText: false,
-                                          style: const TextStyle(
-                                              color: Colors.black),
-                                          decoration: InputDecoration(
-                                              enabledBorder: OutlineInputBorder(
-                                                borderSide: const BorderSide(
-                                                    color: Colors.white),
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                              focusedBorder: OutlineInputBorder(
-                                                borderSide: const BorderSide(
-                                                    color: Colors.white),
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                              fillColor: Colors.grey[200],
-                                              filled: true,
-                                              labelStyle: const TextStyle(
-                                                  color: Colors.grey),
-                                              labelText: "N° Ficha"),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: defaultPadding,
-                                  ),
-                                  Flexible(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          "¿Usted es vocero?",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium!
-                                              .copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                            shadows: [
-                                              Shadow(
-                                                color: Colors.black.withOpacity(
-                                                    0.5), // Color y opacidad de la sombra
-                                                offset: const Offset(2,
-                                                    2), // Desplazamiento de la sombra (horizontal, vertical)
-                                                blurRadius:
-                                                    3, // Radio de desenfoque de la sombra
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Checkbox(
-                                          side: const BorderSide(
-                                              color: Colors.white, width: 2.0),
-                                          value:
-                                              isChecked1, // Estado actual del checkbox
-                                          onChanged: (bool? newValue) {
-                                            // Función que se ejecuta cuando el usuario cambia el estado del checkbox
-                                            setState(() {
-                                              // Actualiza el estado del widget
-                                              isChecked1 = newValue ??
-                                                  false; // Cambia el estado del checkbox al nuevo valor
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 5),
-                                child: Text(
-                                  "Información Funcionario",
-                                  style: TextStyle(
-                                    fontSize: 19,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Calibri-Bold',
-                                    shadows: [
-                                      Shadow(
-                                        color: Colors.black.withOpacity(
-                                            0.5), // Color y opacidad de la sombra
-                                        offset: const Offset(2,
-                                            2), // Desplazamiento de la sombra (horizontal, vertical)
-                                        blurRadius:
-                                            3, // Radio de desenfoque de la sombra
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 15),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(color: Colors.white),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 2.0, right: 2.0),
-                                  child: TextFormField(
-                                    keyboardType: TextInputType.number,
-                                    obscureText: false,
-                                    style: const TextStyle(color: Colors.black),
-                                    decoration: InputDecoration(
-                                        enabledBorder: OutlineInputBorder(
-                                          borderSide: const BorderSide(
-                                              color: Colors.white),
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderSide: const BorderSide(
-                                              color: Colors.white),
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                        fillColor: Colors.grey[200],
-                                        filled: true,
-                                        labelStyle:
-                                            const TextStyle(color: Colors.grey),
-                                        labelText: "Cargo"),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 5),
-                                child: Text(
-                                  "Información Aplicativo",
-                                  style: TextStyle(
-                                    fontSize: 19,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Calibri-Bold',
-                                    shadows: [
-                                      Shadow(
-                                        color: Colors.black.withOpacity(
-                                            0.5), // Color y opacidad de la sombra
-                                        offset: const Offset(2,
-                                            2), // Desplazamiento de la sombra (horizontal, vertical)
-                                        blurRadius:
-                                            3, // Radio de desenfoque de la sombra
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 15),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Flexible(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 25.0),
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButton2<String>(
-                                          // Configuración del DropdownButton
-                                          isExpanded: true,
-                                          hint: const Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  'Seleccione rol secundario',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black,
-                                                  ),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          items: rolN1
-                                              .map((item) =>
-                                                  DropdownMenuItem<String>(
-                                                    value: item.valor,
-                                                    child: Text(
-                                                      item.titulo,
-                                                      style: const TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.black,
-                                                      ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ))
-                                              .toList(),
-                                          value: rol1,
-                                          onChanged: (String? value) {
-                                            // Actualización del valor seleccionado
-                                            setState(() {
-                                              rol1 = value;
-                                            });
-                                          },
-                                          buttonStyleData: ButtonStyleData(
-                                            height: 50,
-                                            padding: const EdgeInsets.only(
-                                                left: 14, right: 14),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(14),
-                                              border: Border.all(
-                                                color: Colors.black26,
-                                              ),
-                                              color: Colors.white,
-                                            ),
-                                            elevation: 2,
-                                          ),
-                                          iconStyleData: const IconStyleData(
-                                            icon: Icon(
-                                              Icons.arrow_forward_ios_outlined,
-                                            ),
-                                            iconSize: 14,
-                                            iconEnabledColor: Colors.black,
-                                            iconDisabledColor: Colors.grey,
-                                          ),
-                                          dropdownStyleData: DropdownStyleData(
-                                            maxHeight: 200,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(14),
-                                              color: Colors.white,
-                                            ),
-                                            offset: const Offset(-20, 0),
-                                            scrollbarTheme: ScrollbarThemeData(
-                                              radius: const Radius.circular(40),
-                                              thickness: WidgetStateProperty
-                                                  .all<double>(6),
-                                              thumbVisibility:
-                                                  WidgetStateProperty.all<bool>(
-                                                      true),
-                                            ),
-                                          ),
-                                          menuItemStyleData:
-                                              const MenuItemStyleData(
-                                            height: 40,
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 25.0),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Flexible(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 25.0),
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButton2<String>(
-                                          // Configuración del DropdownButton
-                                          isExpanded: true,
-                                          hint: const Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  'Seleccione rol terciario',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black,
-                                                  ),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          items: rolN2
-                                              .map((item) =>
-                                                  DropdownMenuItem<String>(
-                                                    value: item.valor,
-                                                    child: Text(
-                                                      item.titulo,
-                                                      style: const TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.black,
-                                                      ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ))
-                                              .toList(),
-                                          value: rol2,
-                                          onChanged: (String? value) {
-                                            // Actualización del valor seleccionado
-                                            setState(() {
-                                              rol2 = value;
-                                            });
-                                          },
-                                          buttonStyleData: ButtonStyleData(
-                                            height: 50,
-                                            padding: const EdgeInsets.only(
-                                                left: 14, right: 14),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(14),
-                                              border: Border.all(
-                                                color: Colors.black26,
-                                              ),
-                                              color: Colors.white,
-                                            ),
-                                            elevation: 2,
-                                          ),
-                                          iconStyleData: const IconStyleData(
-                                            icon: Icon(
-                                              Icons.arrow_forward_ios_outlined,
-                                            ),
-                                            iconSize: 14,
-                                            iconEnabledColor: Colors.black,
-                                            iconDisabledColor: Colors.grey,
-                                          ),
-                                          dropdownStyleData: DropdownStyleData(
-                                            maxHeight: 200,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(14),
-                                              color: Colors.white,
-                                            ),
-                                            offset: const Offset(-20, 0),
-                                            scrollbarTheme: ScrollbarThemeData(
-                                              radius: const Radius.circular(40),
-                                              thickness: WidgetStateProperty
-                                                  .all<double>(6),
-                                              thumbVisibility:
-                                                  WidgetStateProperty.all<bool>(
-                                                      true),
-                                            ),
-                                          ),
-                                          menuItemStyleData:
-                                              const MenuItemStyleData(
-                                            height: 40,
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 25.0),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "¿El usuario se encuentra activo?",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium!
-                                        .copyWith(
-                                      fontWeight: FontWeight.bold,
+                              // Ver si es aprendiz
+                              if (widget.usuario.rol2 == "APRENDIZ")
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 5),
+                                  child: Text(
+                                    "Información Aprendiz",
+                                    style: TextStyle(
+                                      fontSize: 19,
                                       color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Calibri-Bold',
                                       shadows: [
                                         Shadow(
                                           color: Colors.black.withOpacity(
@@ -2342,328 +2234,986 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Checkbox(
-                                    side: const BorderSide(
-                                        color: Colors.white, width: 2.0),
-                                    value:
-                                        isChecked2, // Estado actual del checkbox
-                                    onChanged: (bool? newValue) {
-                                      // Función que se ejecuta cuando el usuario cambia el estado del checkbox
-                                      setState(() {
-                                        // Actualiza el estado del widget
-                                        isChecked2 = newValue ??
-                                            false; // Cambia el estado del checkbox al nuevo valor
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Flexible(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 25.0),
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButton2<String>(
-                                          // Configuración del DropdownButton
-                                          isExpanded: true,
-                                          hint: const Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  'Seleccione unidad de producción',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black,
-                                                  ),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
+                                ),
+                              // Ver si es aprendiz
+                              if (widget.usuario.rol2 == "APRENDIZ")
+                                const SizedBox(height: 15),
+                              // Ver si es aprendiz
+                              // Campos de ficha y si es vocero
+                              if (widget.usuario.rol2 == "APRENDIZ")
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          border:
+                                              Border.all(color: Colors.white),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 2.0, right: 2.0),
+                                          child: TextFormField(
+                                            controller: _fichaController,
+                                            keyboardType: TextInputType.number,
+                                            obscureText: false,
+                                            style: const TextStyle(
+                                                color: Colors.black),
+                                            decoration: InputDecoration(
+                                                enabledBorder:
+                                                    OutlineInputBorder(
+                                                  borderSide: const BorderSide(
+                                                      color: Colors.white),
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          items: unidadL
-                                              .map((item) =>
-                                                  DropdownMenuItem<String>(
-                                                    value: item.valor,
-                                                    child: Text(
-                                                      item.titulo,
-                                                      style: const TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.black,
-                                                      ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ))
-                                              .toList(),
-                                          value: unidad,
-                                          onChanged: (String? value) {
-                                            // Actualización del valor seleccionado
-                                            setState(() {
-                                              unidad = value;
-                                            });
-                                          },
-                                          buttonStyleData: ButtonStyleData(
-                                            height: 50,
-                                            padding: const EdgeInsets.only(
-                                                left: 14, right: 14),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(14),
-                                              border: Border.all(
-                                                color: Colors.black26,
-                                              ),
-                                              color: Colors.white,
-                                            ),
-                                            elevation: 2,
-                                          ),
-                                          iconStyleData: const IconStyleData(
-                                            icon: Icon(
-                                              Icons.arrow_forward_ios_outlined,
-                                            ),
-                                            iconSize: 14,
-                                            iconEnabledColor: Colors.black,
-                                            iconDisabledColor: Colors.grey,
-                                          ),
-                                          dropdownStyleData: DropdownStyleData(
-                                            maxHeight: 200,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(14),
-                                              color: Colors.white,
-                                            ),
-                                            offset: const Offset(-20, 0),
-                                            scrollbarTheme: ScrollbarThemeData(
-                                              radius: const Radius.circular(40),
-                                              thickness: WidgetStateProperty
-                                                  .all<double>(6),
-                                              thumbVisibility:
-                                                  WidgetStateProperty.all<bool>(
-                                                      true),
-                                            ),
-                                          ),
-                                          menuItemStyleData:
-                                              const MenuItemStyleData(
-                                            height: 40,
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 25.0),
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                  borderSide: const BorderSide(
+                                                      color: Colors.white),
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
+                                                fillColor: Colors.grey[200],
+                                                filled: true,
+                                                labelStyle: const TextStyle(
+                                                    color: Colors.grey),
+                                                labelText: "N° Ficha"),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  Flexible(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 25.0),
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButton2<String>(
-                                          // Configuración del DropdownButton
-                                          isExpanded: true,
-                                          hint: const Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  'Seleccione punto de venta',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black,
-                                                  ),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          items: puntoL
-                                              .map((item) =>
-                                                  DropdownMenuItem<String>(
-                                                    value: item.valor,
-                                                    child: Text(
-                                                      item.titulo,
-                                                      style: const TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.black,
-                                                      ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ))
-                                              .toList(),
-                                          value: punto,
-                                          onChanged: (String? value) {
-                                            // Actualización del valor seleccionado
-                                            setState(() {
-                                              punto = value;
-                                            });
-                                          },
-                                          buttonStyleData: ButtonStyleData(
-                                            height: 50,
-                                            padding: const EdgeInsets.only(
-                                                left: 14, right: 14),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(14),
-                                              border: Border.all(
-                                                color: Colors.black26,
-                                              ),
-                                              color: Colors.white,
-                                            ),
-                                            elevation: 2,
-                                          ),
-                                          iconStyleData: const IconStyleData(
-                                            icon: Icon(
-                                              Icons.arrow_forward_ios_outlined,
-                                            ),
-                                            iconSize: 14,
-                                            iconEnabledColor: Colors.black,
-                                            iconDisabledColor: Colors.grey,
-                                          ),
-                                          dropdownStyleData: DropdownStyleData(
-                                            maxHeight: 200,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(14),
-                                              color: Colors.white,
-                                            ),
-                                            offset: const Offset(-20, 0),
-                                            scrollbarTheme: ScrollbarThemeData(
-                                              radius: const Radius.circular(40),
-                                              thickness: WidgetStateProperty
-                                                  .all<double>(6),
-                                              thumbVisibility:
-                                                  WidgetStateProperty.all<bool>(
-                                                      true),
-                                            ),
-                                          ),
-                                          menuItemStyleData:
-                                              const MenuItemStyleData(
-                                            height: 40,
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 25.0),
-                                          ),
-                                        ),
-                                      ),
+                                    const SizedBox(
+                                      width: defaultPadding,
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 25.0),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton2<String>(
-                                    // Configuración del DropdownButton
-                                    isExpanded: true,
-                                    hint: const Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            'Seleccione Sede',
-                                            style: TextStyle(
-                                              fontSize: 14,
+                                    Flexible(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "¿Usted es vocero?",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium!
+                                                .copyWith(
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.black,
+                                              color: Colors.white,
+                                              shadows: [
+                                                Shadow(
+                                                  color: Colors.black.withOpacity(
+                                                      0.5), // Color y opacidad de la sombra
+                                                  offset: const Offset(2,
+                                                      2), // Desplazamiento de la sombra (horizontal, vertical)
+                                                  blurRadius:
+                                                      3, // Radio de desenfoque de la sombra
+                                                ),
+                                              ],
                                             ),
-                                            overflow: TextOverflow.ellipsis,
                                           ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Checkbox(
+                                            side: const BorderSide(
+                                                color: Colors.white,
+                                                width: 2.0),
+                                            value:
+                                                isChecked1, // Estado actual del checkbox
+                                            onChanged: (bool? newValue) {
+                                              // Función que se ejecuta cuando el usuario cambia el estado del checkbox
+                                              setState(() {
+                                                // Actualiza el estado del widget
+                                                isChecked1 = newValue ??
+                                                    false; // Cambia el estado del checkbox al nuevo valor
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              // Ver si es aprendiz
+                              if (widget.usuario.rol2 == "APRENDIZ")
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                              // Ver si es funcionario
+                              if (widget.usuario.rol2 == "FUNCIONARIO")
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 5),
+                                  child: Text(
+                                    "Información Funcionario",
+                                    style: TextStyle(
+                                      fontSize: 19,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Calibri-Bold',
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.black.withOpacity(
+                                              0.5), // Color y opacidad de la sombra
+                                          offset: const Offset(2,
+                                              2), // Desplazamiento de la sombra (horizontal, vertical)
+                                          blurRadius:
+                                              3, // Radio de desenfoque de la sombra
                                         ),
                                       ],
                                     ),
-                                    items: sedeL
-                                        .map((item) => DropdownMenuItem<String>(
-                                              value: item.valor,
-                                              child: Text(
-                                                item.titulo,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ))
-                                        .toList(),
-                                    value: sede,
-                                    onChanged: (String? value) {
-                                      // Actualización del valor seleccionado
-                                      setState(() {
-                                        sede = value;
-                                      });
-                                    },
-                                    buttonStyleData: ButtonStyleData(
-                                      height: 50,
-                                      padding: const EdgeInsets.only(
-                                          left: 14, right: 14),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(14),
-                                        border: Border.all(
-                                          color: Colors.black26,
-                                        ),
-                                        color: Colors.white,
-                                      ),
-                                      elevation: 2,
-                                    ),
-                                    iconStyleData: const IconStyleData(
-                                      icon: Icon(
-                                        Icons.arrow_forward_ios_outlined,
-                                      ),
-                                      iconSize: 14,
-                                      iconEnabledColor: Colors.black,
-                                      iconDisabledColor: Colors.grey,
-                                    ),
-                                    dropdownStyleData: DropdownStyleData(
-                                      maxHeight: 200,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(14),
-                                        color: Colors.white,
-                                      ),
-                                      offset: const Offset(-20, 0),
-                                      scrollbarTheme: ScrollbarThemeData(
-                                        radius: const Radius.circular(40),
-                                        thickness:
-                                            WidgetStateProperty.all<double>(6),
-                                        thumbVisibility:
-                                            WidgetStateProperty.all<bool>(true),
-                                      ),
-                                    ),
-                                    menuItemStyleData: const MenuItemStyleData(
-                                      height: 40,
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 25.0),
+                                  ),
+                                ),
+                              // Ver si es funcionario
+                              if (widget.usuario.rol2 == "FUNCIONARIO")
+                                const SizedBox(height: 15),
+                              // Ver si es funcionario
+                              // Campo para el cargo
+                              if (widget.usuario.rol2 == "FUNCIONARIO")
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border.all(color: Colors.white),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 2.0, right: 2.0),
+                                    child: TextFormField(
+                                      controller: _cargoController,
+                                      keyboardType: TextInputType.number,
+                                      obscureText: false,
+                                      style:
+                                          const TextStyle(color: Colors.black),
+                                      decoration: InputDecoration(
+                                          enabledBorder: OutlineInputBorder(
+                                            borderSide: const BorderSide(
+                                                color: Colors.white),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: const BorderSide(
+                                                color: Colors.white),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                          fillColor: Colors.grey[200],
+                                          filled: true,
+                                          labelStyle: const TextStyle(
+                                              color: Colors.grey),
+                                          labelText: "Cargo"),
                                     ),
                                   ),
                                 ),
-                              ),
+                              // Ver si es funcionario
+                              if (widget.usuario.rol2 == "FUNCIONARIO")
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                              // Ver si es lider
+                              if (widget.usuario.rol3 == "LIDER")
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 5),
+                                  child: Text(
+                                    "Información Aplicativo",
+                                    style: TextStyle(
+                                      fontSize: 19,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Calibri-Bold',
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.black.withOpacity(
+                                              0.5), // Color y opacidad de la sombra
+                                          offset: const Offset(2,
+                                              2), // Desplazamiento de la sombra (horizontal, vertical)
+                                          blurRadius:
+                                              3, // Radio de desenfoque de la sombra
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              // Ver si es lider
+                              if (widget.usuario.rol3 == "LIDER")
+                                const SizedBox(height: 15),
+                              // Ver si es lider
+                              // Desplegables para los roles
+                              if (widget.usuario.rol3 == "LIDER")
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 25.0),
+                                        child: DropdownButtonHideUnderline(
+                                          child: DropdownButton2<String>(
+                                            // Configuración del DropdownButton
+                                            isExpanded: true,
+                                            hint: const Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'Seleccione rol secundario',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            items: rolN1
+                                                .map((item) =>
+                                                    DropdownMenuItem<String>(
+                                                      value: item.valor,
+                                                      child: Text(
+                                                        item.titulo,
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.black,
+                                                        ),
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ))
+                                                .toList(),
+                                            value: rol1,
+                                            onChanged: (String? value) {
+                                              // Actualización del valor seleccionado
+                                              setState(() {
+                                                rol1 = value;
+                                              });
+                                            },
+                                            buttonStyleData: ButtonStyleData(
+                                              height: 50,
+                                              padding: const EdgeInsets.only(
+                                                  left: 14, right: 14),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(14),
+                                                border: Border.all(
+                                                  color: Colors.black26,
+                                                ),
+                                                color: Colors.white,
+                                              ),
+                                              elevation: 2,
+                                            ),
+                                            iconStyleData: const IconStyleData(
+                                              icon: Icon(
+                                                Icons
+                                                    .arrow_forward_ios_outlined,
+                                              ),
+                                              iconSize: 14,
+                                              iconEnabledColor: Colors.black,
+                                              iconDisabledColor: Colors.grey,
+                                            ),
+                                            dropdownStyleData:
+                                                DropdownStyleData(
+                                              maxHeight: 200,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(14),
+                                                color: Colors.white,
+                                              ),
+                                              offset: const Offset(-20, 0),
+                                              scrollbarTheme:
+                                                  ScrollbarThemeData(
+                                                radius:
+                                                    const Radius.circular(40),
+                                                thickness: WidgetStateProperty
+                                                    .all<double>(6),
+                                                thumbVisibility:
+                                                    WidgetStateProperty.all<
+                                                        bool>(true),
+                                              ),
+                                            ),
+                                            menuItemStyleData:
+                                                const MenuItemStyleData(
+                                              height: 40,
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 25.0),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Flexible(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 25.0),
+                                        child: DropdownButtonHideUnderline(
+                                          child: DropdownButton2<String>(
+                                            // Configuración del DropdownButton
+                                            isExpanded: true,
+                                            hint: const Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'Seleccione rol terciario',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            items: rolN2
+                                                .map((item) =>
+                                                    DropdownMenuItem<String>(
+                                                      value: item.valor,
+                                                      child: Text(
+                                                        item.titulo,
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.black,
+                                                        ),
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ))
+                                                .toList(),
+                                            value: rol2,
+                                            onChanged: (String? value) {
+                                              // Actualización del valor seleccionado
+                                              setState(() {
+                                                rol2 = value;
+                                              });
+                                            },
+                                            buttonStyleData: ButtonStyleData(
+                                              height: 50,
+                                              padding: const EdgeInsets.only(
+                                                  left: 14, right: 14),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(14),
+                                                border: Border.all(
+                                                  color: Colors.black26,
+                                                ),
+                                                color: Colors.white,
+                                              ),
+                                              elevation: 2,
+                                            ),
+                                            iconStyleData: const IconStyleData(
+                                              icon: Icon(
+                                                Icons
+                                                    .arrow_forward_ios_outlined,
+                                              ),
+                                              iconSize: 14,
+                                              iconEnabledColor: Colors.black,
+                                              iconDisabledColor: Colors.grey,
+                                            ),
+                                            dropdownStyleData:
+                                                DropdownStyleData(
+                                              maxHeight: 200,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(14),
+                                                color: Colors.white,
+                                              ),
+                                              offset: const Offset(-20, 0),
+                                              scrollbarTheme:
+                                                  ScrollbarThemeData(
+                                                radius:
+                                                    const Radius.circular(40),
+                                                thickness: WidgetStateProperty
+                                                    .all<double>(6),
+                                                thumbVisibility:
+                                                    WidgetStateProperty.all<
+                                                        bool>(true),
+                                              ),
+                                            ),
+                                            menuItemStyleData:
+                                                const MenuItemStyleData(
+                                              height: 40,
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 25.0),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              // Ver si es lider
+                              if (widget.usuario.rol3 == "LIDER")
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                              // Ver si es lider
+                              // Campo para activar o desactivar el usuario
+                              if (widget.usuario.rol3 == "LIDER")
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "¿El usuario se encuentra activo?",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium!
+                                          .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        shadows: [
+                                          Shadow(
+                                            color: Colors.black.withOpacity(
+                                                0.5), // Color y opacidad de la sombra
+                                            offset: const Offset(2,
+                                                2), // Desplazamiento de la sombra (horizontal, vertical)
+                                            blurRadius:
+                                                3, // Radio de desenfoque de la sombra
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Checkbox(
+                                      side: const BorderSide(
+                                          color: Colors.white, width: 2.0),
+                                      value:
+                                          isChecked2, // Estado actual del checkbox
+                                      onChanged: (bool? newValue) {
+                                        // Función que se ejecuta cuando el usuario cambia el estado del checkbox
+                                        setState(() {
+                                          // Actualiza el estado del widget
+                                          isChecked2 = newValue ??
+                                              false; // Cambia el estado del checkbox al nuevo valor
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              // Ver si es lider
+                              if (widget.usuario.rol3 == "LIDER")
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                              // Ver si es lider
+                              // Desplegables para el punto de venta y la unidad de producción
+                              if (widget.usuario.rol3 == "LIDER")
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: FutureBuilder(
+                                          future:
+                                              getUndadesProduccion(), // Carga las unidades de producción
+                                          builder: (context,
+                                              AsyncSnapshot<
+                                                      List<
+                                                          UnidadProduccionModel>>
+                                                  snapshot) {
+                                            // Verifica el estado de la carga
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return const Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                              // Verifica si hay un error
+                                            } else if (snapshot.hasError) {
+                                              return Center(
+                                                child: Text(
+                                                  'Error al cargar unidades: ${snapshot.error}',
+                                                  style: TextStyle(
+                                                    fontSize: 50,
+                                                    color: Colors.white,
+                                                    shadows: [
+                                                      Shadow(
+                                                        color: Colors.black
+                                                            .withOpacity(
+                                                                0.5), // Color y opacidad de la sombra
+                                                        offset: const Offset(2,
+                                                            2), // Desplazamiento de la sombra (horizontal, vertical)
+                                                        blurRadius:
+                                                            3, // Radio de desenfoque de la sombra
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                              // Verifica si hay datos
+                                            } else {
+                                              return Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 25.0),
+                                                child:
+                                                    DropdownButtonHideUnderline(
+                                                  child:
+                                                      DropdownButton2<String>(
+                                                    // Configuración del DropdownButton
+                                                    isExpanded: true,
+                                                    hint: const Row(
+                                                      children: [
+                                                        Expanded(
+                                                          child: Text(
+                                                            'Seleccione unidad de producción',
+                                                            style: TextStyle(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color:
+                                                                  Colors.black,
+                                                            ),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    items: snapshot.data!
+                                                        .map((item) =>
+                                                            DropdownMenuItem<
+                                                                String>(
+                                                              value: item.id
+                                                                  .toString(),
+                                                              child: Text(
+                                                                item.nombre,
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                            ))
+                                                        .toList(),
+                                                    value: unidad,
+                                                    onChanged: (String? value) {
+                                                      // Actualización del valor seleccionado
+                                                      setState(() {
+                                                        unidad = value;
+                                                      });
+                                                    },
+                                                    buttonStyleData:
+                                                        ButtonStyleData(
+                                                      height: 50,
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 14,
+                                                              right: 14),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(14),
+                                                        border: Border.all(
+                                                          color: Colors.black26,
+                                                        ),
+                                                        color: Colors.white,
+                                                      ),
+                                                      elevation: 2,
+                                                    ),
+                                                    iconStyleData:
+                                                        const IconStyleData(
+                                                      icon: Icon(
+                                                        Icons
+                                                            .arrow_forward_ios_outlined,
+                                                      ),
+                                                      iconSize: 14,
+                                                      iconEnabledColor:
+                                                          Colors.black,
+                                                      iconDisabledColor:
+                                                          Colors.grey,
+                                                    ),
+                                                    dropdownStyleData:
+                                                        DropdownStyleData(
+                                                      maxHeight: 200,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(14),
+                                                        color: Colors.white,
+                                                      ),
+                                                      offset:
+                                                          const Offset(-20, 0),
+                                                      scrollbarTheme:
+                                                          ScrollbarThemeData(
+                                                        radius: const Radius
+                                                            .circular(40),
+                                                        thickness:
+                                                            WidgetStateProperty
+                                                                .all<double>(6),
+                                                        thumbVisibility:
+                                                            WidgetStateProperty
+                                                                .all<bool>(
+                                                                    true),
+                                                      ),
+                                                    ),
+                                                    menuItemStyleData:
+                                                        const MenuItemStyleData(
+                                                      height: 40,
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 25.0),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          }),
+                                    ),
+                                    Flexible(
+                                      child: FutureBuilder(
+                                          future:
+                                              getPuntosVenta(), // Carga los puntos de venta
+                                          builder: (context,
+                                              AsyncSnapshot<
+                                                      List<PuntoVentaModel>>
+                                                  snapshot) {
+                                            // Verifica el estado de la carga
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return const Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                              // Verifica si hay un error
+                                            } else if (snapshot.hasError) {
+                                              return Center(
+                                                child: Text(
+                                                  'Error al cargar puntos: ${snapshot.error}',
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.white,
+                                                    shadows: [
+                                                      Shadow(
+                                                        color: Colors.black
+                                                            .withOpacity(
+                                                                0.5), // Color y opacidad de la sombra
+                                                        offset: const Offset(2,
+                                                            2), // Desplazamiento de la sombra (horizontal, vertical)
+                                                        blurRadius:
+                                                            3, // Radio de desenfoque de la sombra
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                              // Verifica si hay datos
+                                            } else {
+                                              return Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 25.0),
+                                                child:
+                                                    DropdownButtonHideUnderline(
+                                                  child:
+                                                      DropdownButton2<String>(
+                                                    // Configuración del DropdownButton
+                                                    isExpanded: true,
+                                                    hint: const Row(
+                                                      children: [
+                                                        Expanded(
+                                                          child: Text(
+                                                            'Seleccione punto de venta',
+                                                            style: TextStyle(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color:
+                                                                  Colors.black,
+                                                            ),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    items: snapshot.data!
+                                                        .map((item) =>
+                                                            DropdownMenuItem<
+                                                                String>(
+                                                              value: item.id
+                                                                  .toString(),
+                                                              child: Text(
+                                                                item.nombre,
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                            ))
+                                                        .toList(),
+                                                    value: punto,
+                                                    onChanged: (String? value) {
+                                                      // Actualización del valor seleccionado
+                                                      setState(() {
+                                                        punto = value;
+                                                      });
+                                                    },
+                                                    buttonStyleData:
+                                                        ButtonStyleData(
+                                                      height: 50,
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 14,
+                                                              right: 14),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(14),
+                                                        border: Border.all(
+                                                          color: Colors.black26,
+                                                        ),
+                                                        color: Colors.white,
+                                                      ),
+                                                      elevation: 2,
+                                                    ),
+                                                    iconStyleData:
+                                                        const IconStyleData(
+                                                      icon: Icon(
+                                                        Icons
+                                                            .arrow_forward_ios_outlined,
+                                                      ),
+                                                      iconSize: 14,
+                                                      iconEnabledColor:
+                                                          Colors.black,
+                                                      iconDisabledColor:
+                                                          Colors.grey,
+                                                    ),
+                                                    dropdownStyleData:
+                                                        DropdownStyleData(
+                                                      maxHeight: 200,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(14),
+                                                        color: Colors.white,
+                                                      ),
+                                                      offset:
+                                                          const Offset(-20, 0),
+                                                      scrollbarTheme:
+                                                          ScrollbarThemeData(
+                                                        radius: const Radius
+                                                            .circular(40),
+                                                        thickness:
+                                                            WidgetStateProperty
+                                                                .all<double>(6),
+                                                        thumbVisibility:
+                                                            WidgetStateProperty
+                                                                .all<bool>(
+                                                                    true),
+                                                      ),
+                                                    ),
+                                                    menuItemStyleData:
+                                                        const MenuItemStyleData(
+                                                      height: 40,
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 25.0),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          }),
+                                    ),
+                                  ],
+                                ),
+                              // Ver si es lider
+                              if (widget.usuario.rol3 == "LIDER")
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                              // Ver si es lider
+                              // Desplegable para la sede
+                              if (widget.usuario.rol3 == "LIDER")
+                                FutureBuilder(
+                                    future: getSedes(), // Carga las sedes
+                                    builder: (context,
+                                        AsyncSnapshot<List<SedeModel>>
+                                            snapshot) {
+                                      // Verifica el estado de la carga
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return const Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                        // Verifica si hay un error
+                                      } else if (snapshot.hasError) {
+                                        return Center(
+                                          child: Text(
+                                            'Error al cargar sedes: ${snapshot.error}',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.white,
+                                              shadows: [
+                                                Shadow(
+                                                  color: Colors.black.withOpacity(
+                                                      0.5), // Color y opacidad de la sombra
+                                                  offset: const Offset(2,
+                                                      2), // Desplazamiento de la sombra (horizontal, vertical)
+                                                  blurRadius:
+                                                      3, // Radio de desenfoque de la sombra
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                        // Verifica si hay datos
+                                      } else {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 25.0),
+                                          child: DropdownButtonHideUnderline(
+                                            child: DropdownButton2<String>(
+                                              // Configuración del DropdownButton
+                                              isExpanded: true,
+                                              hint: const Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      'Seleccione Sede',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black,
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              items: snapshot.data!
+                                                  .map((item) =>
+                                                      DropdownMenuItem<String>(
+                                                        value:
+                                                            item.id.toString(),
+                                                        child: Text(
+                                                          item.nombre,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Colors.black,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ))
+                                                  .toList(),
+                                              value: sede,
+                                              onChanged: (String? value) {
+                                                // Actualización del valor seleccionado
+                                                setState(() {
+                                                  sede = value;
+                                                });
+                                              },
+                                              buttonStyleData: ButtonStyleData(
+                                                height: 50,
+                                                padding: const EdgeInsets.only(
+                                                    left: 14, right: 14),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(14),
+                                                  border: Border.all(
+                                                    color: Colors.black26,
+                                                  ),
+                                                  color: Colors.white,
+                                                ),
+                                                elevation: 2,
+                                              ),
+                                              iconStyleData:
+                                                  const IconStyleData(
+                                                icon: Icon(
+                                                  Icons
+                                                      .arrow_forward_ios_outlined,
+                                                ),
+                                                iconSize: 14,
+                                                iconEnabledColor: Colors.black,
+                                                iconDisabledColor: Colors.grey,
+                                              ),
+                                              dropdownStyleData:
+                                                  DropdownStyleData(
+                                                maxHeight: 200,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(14),
+                                                  color: Colors.white,
+                                                ),
+                                                offset: const Offset(-20, 0),
+                                                scrollbarTheme:
+                                                    ScrollbarThemeData(
+                                                  radius:
+                                                      const Radius.circular(40),
+                                                  thickness: WidgetStateProperty
+                                                      .all<double>(6),
+                                                  thumbVisibility:
+                                                      WidgetStateProperty.all<
+                                                          bool>(true),
+                                                ),
+                                              ),
+                                              menuItemStyleData:
+                                                  const MenuItemStyleData(
+                                                height: 40,
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 25.0),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    }),
                             ],
                           ),
                         ),
                       )),
+                  // Separador
                   Container(
                     width: 2,
                     height: MediaQuery.of(context).size.height - 150,
                     color: Colors.white,
                   ),
+                  // Columna derecha
                   Expanded(
                     flex: 2,
                     child: Padding(
@@ -2677,6 +3227,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                             const SizedBox(
                               height: 20,
                             ),
+                            // Imagen de perfil
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 5),
@@ -2699,6 +3250,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                               ),
                             ),
                             const SizedBox(height: 15),
+                            // Imagen
                             Center(
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -2722,6 +3274,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                             const SizedBox(
                               height: 30,
                             ),
+                            // Botón de editar
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -2754,6 +3307,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                         color:
                                             primaryColor), // Incremento de tamaño del icono
                                     onPressed: () {
+                                      // Llamado a la función
                                       _selectFile(true);
                                     },
                                   ),

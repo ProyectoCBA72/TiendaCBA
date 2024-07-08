@@ -15,19 +15,32 @@ import 'menu.dart';
 
 // Clase PdfPageScreen que extiende StatefulWidget para la generación de PDF.
 // ignore: must_be_immutable
+/// Representa una pantalla que genera un PDF con la constancia de un pedido.
+///
+/// Esta clase define una pantalla que genera un PDF con la constancia de un
+/// pedido. La pantalla no tiene estado y utiliza un [StatefulWidget] para
+/// almacenar los datos del pedido y del usuario. Los datos se pasan al estado
+/// a través del constructor. Esta pantalla es utilizada para mostrar la
+/// constancia del pedido al usuario.
+///
+/// Parámetros requeridos para la construcción del widget:
+///
+/// - `usuario`: El objeto de usuario que realizó el pedido.
+/// - `pedido`: El objeto de pedido que se va a generar la constancia.
 class PdfPageConstanciaPedidoScreen extends StatefulWidget {
-  // Parámetros requeridos para la construcción del widget.
-  final UsuarioModel usuario;
-  final AuxPedidoModel pedido;
-
-  // Constructor que recibe los parámetros necesarios.
   const PdfPageConstanciaPedidoScreen({
     super.key,
     required this.usuario,
     required this.pedido,
   });
 
-  // Método que crea el estado para el widget.
+  /// El objeto de usuario que realizó el pedido.
+  final UsuarioModel usuario;
+
+  /// El objeto de pedido que se va a generar la constancia.
+  final AuxPedidoModel pedido;
+
+  /// Método que crea el estado para el widget.
   @override
   State<PdfPageConstanciaPedidoScreen> createState() =>
       _PdfPageConstanciaPedidoScreenState(
@@ -39,27 +52,52 @@ class PdfPageConstanciaPedidoScreen extends StatefulWidget {
 // Estado privado para PdfPageScreen.
 class _PdfPageConstanciaPedidoScreenState
     extends State<PdfPageConstanciaPedidoScreen> {
-  // Variables para almacenar los datos de la reserva.
+  /// Los datos del usuario que realizó el pedido.
   final UsuarioModel usuario;
+
+  /// Los datos del pedido para el cual se generará la constancia.
   final AuxPedidoModel pedido;
-  // Constructor para inicializar las variables con los datos de la reserva.
+
+  /// Constructor para inicializar las variables con los datos de la reserva.
+  ///
+  /// Parámetros requeridos para la construcción del widget:
+  ///
+  /// - `usuario`: El objeto de usuario que realizó el pedido.
+  /// - `pedido`: El objeto de pedido que se va a generar la constancia.
   _PdfPageConstanciaPedidoScreenState({
     required this.usuario,
     required this.pedido,
   });
 
+  /// Variable para almacenar información de impresión.
   PrintingInfo? printingInfo;
 
   // Método para inicializar el estado.
   @override
+
+  /// Inicializa el estado del widget.
+  ///
+  /// Este método llama al método privado [_init] para obtener información de impresión.
+  @override
   void initState() {
+    // Llamamos al método base para inicializar el estado.
     super.initState();
+
+    // Llamamos al método privado [_init] para obtener información de impresión.
     _init();
   }
 
   // Método para obtener información de impresión.
+  /// Método para obtener información de impresión.
+  ///
+  /// Este método utiliza el paquete [printing] para obtener información sobre el dispositivo
+  /// y el entorno en el cual se generará el PDF. Luego, actualiza el estado del widget
+  /// con la información obtenida.
   Future<void> _init() async {
+    // Obtenemos la información de impresión.
     final info = await Printing.info();
+
+    // Actualizamos el estado del widget con la información obtenida.
     setState(() {
       printingInfo = info;
     });
@@ -67,9 +105,22 @@ class _PdfPageConstanciaPedidoScreenState
 
   // Método para construir y mostrar la pantalla PDF.
   @override
+
+  /// Método para construir y mostrar la pantalla PDF.
+  ///
+  /// Este método construye la interfaz de usuario de la pantalla PDF.
+  /// Agrega un [AppBar] con un botón de retroceso y un título.
+  /// Crea un widget [PdfPreview] que muestra el PDF generado y
+  /// permite guardarlo en el dispositivo o compartirlo.
+  ///
+  /// Devuelve un [Scaffold] con la interfaz de usuario de la pantalla PDF.
   Widget build(BuildContext context) {
+    // Se activa el modo de depuración para el widget RichText.
     pw.RichText.debug = true;
+
+    // Se definen las acciones disponibles en la pantalla PDF.
     final actions = <PdfPreviewAction>[
+      // Si no se está ejecutando en un navegador web, se agrega la opción de guardar el PDF.
       if (!kIsWeb)
         const PdfPreviewAction(
           icon: Icon(
@@ -79,10 +130,13 @@ class _PdfPageConstanciaPedidoScreenState
           onPressed: saveAsFile,
         ),
     ];
+
+    // Se construye y devuelve la interfaz de usuario de la pantalla PDF.
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
+            // Se navega hacia atrás cuando se presiona el botón de retroceso.
             Navigator.pop(context);
           },
           icon: const Icon(
@@ -92,17 +146,23 @@ class _PdfPageConstanciaPedidoScreenState
           ),
         ),
         centerTitle: true,
+        // Se establece el título de la pantalla PDF.
         title: const Text(
           "CBA MOSQUERA",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: primaryColor,
       ),
+      // Se crea un widget PdfPreview que muestra el PDF generado y
+      // permite guardarlo en el dispositivo o compartirlo.
       body: PdfPreview(
         maxPageWidth: 700,
         actions: actions,
+        // Método llamado cuando se imprime el PDF.
         onPrinted: showPrintedToast,
+        // Método llamado cuando se comparte el PDF.
         onShared: showSharedToast,
+        // Método llamado para generar el PDF.
         build: generatePdf,
       ),
     );

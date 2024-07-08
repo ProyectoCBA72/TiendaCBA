@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:tienda_app/Models/medioPagoModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
+/// Tarjeta que muestra un método de pago específico.
 class MetodoCardLider extends StatelessWidget {
   final MedioPagoModel medioPago;
+
+  /// Constructor de MetodoCardLider.
   const MetodoCardLider({
     super.key,
     required this.medioPago,
@@ -148,6 +151,7 @@ class MetodoCardLider extends StatelessWidget {
   }
 }
 
+/// Función privada que muestra un modal de seguridad para el método de pago seleccionado.
 void _modalSeguridad(BuildContext context, MedioPagoModel medioPAgo) {
   showDialog(
       context: context,

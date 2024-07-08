@@ -4,8 +4,7 @@ import 'package:tienda_app/Models/categoriaModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 
-// Vista donde se llamaran las cards superiores de conteo de reservas y las organiza que se adapten a todos los dispositivos
-
+// Vista que muestra las tarjetas de categorías, adaptándose a diferentes dispositivos.
 class CardsCategoriaLider extends StatelessWidget {
   const CardsCategoriaLider({
     super.key,
@@ -15,6 +14,7 @@ class CardsCategoriaLider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Encabezado de las tarjetas de categorías
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -25,53 +25,54 @@ class CardsCategoriaLider extends StatelessWidget {
                   .titleLarge
                   ?.copyWith(fontFamily: 'Calibri-Bold'),
             ),
-            if(!Responsive.isMobile(context))
-            Container(
-              width: 200,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                gradient: const LinearGradient(
-                  colors: [
-                    botonClaro, // Verde más claro
-                    botonOscuro, // Verde más oscuro
+            // Botón "Añadir Categoría" visible solo en dispositivos no móviles
+            if (!Responsive.isMobile(context))
+              Container(
+                width: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  gradient: const LinearGradient(
+                    colors: [
+                      botonClaro, // Verde más claro
+                      botonOscuro, // Verde más oscuro
+                    ],
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: botonSombra, // Sombra en tono verde claro
+                      blurRadius: 5,
+                      offset: Offset(0, 3),
+                    ),
                   ],
                 ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: botonSombra, // Verde más claro para sombra
-                    blurRadius: 5,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {},
-                  borderRadius: BorderRadius.circular(10),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Center(
-                      child: Text(
-                        'Añadir Categoría',
-                        style: TextStyle(
-                          color: background1,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Calibri-Bold',
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {},
+                    borderRadius: BorderRadius.circular(10),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: Center(
+                        child: Text(
+                          'Añadir Categoría',
+                          style: TextStyle(
+                            color: background1,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Calibri-Bold',
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
+        // Espacio adicional en dispositivos móviles
         if (Responsive.isMobile(context))
-          const SizedBox(
-            height: defaultPadding,
-          ),
+          const SizedBox(height: defaultPadding),
+        // Botón "Añadir Categoría" visible solo en dispositivos móviles
         if (Responsive.isMobile(context))
           Center(
             child: Container(
@@ -86,7 +87,7 @@ class CardsCategoriaLider extends StatelessWidget {
                 ),
                 boxShadow: const [
                   BoxShadow(
-                    color: botonSombra, // Verde más claro para sombra
+                    color: botonSombra, // Sombra en tono verde claro
                     blurRadius: 5,
                     offset: Offset(0, 3),
                   ),
@@ -115,7 +116,9 @@ class CardsCategoriaLider extends StatelessWidget {
               ),
             ),
           ),
+        // Espacio adicional antes del listado de tarjetas de categorías
         const SizedBox(height: defaultPadding),
+        // Contenedor que muestra las tarjetas de categorías
         SizedBox(
           height: 300,
           child: FutureBuilder(
@@ -123,14 +126,17 @@ class CardsCategoriaLider extends StatelessWidget {
             builder: (BuildContext context,
                 AsyncSnapshot<List<CategoriaModel>> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
+                // Indicador de carga mientras se espera la respuesta
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
               } else if (snapshot.hasError) {
+                // Mensaje de error si ocurre un problema al cargar datos
                 return Center(
-                  child: Text('Ocurrio un erro ${snapshot.error}'),
+                  child: Text('Ocurrió un error: ${snapshot.error}'),
                 );
               } else {
+                // Construcción de las tarjetas de categorías
                 final categorias = snapshot.data!;
                 return ListView.builder(
                   scrollDirection: Axis.horizontal,
