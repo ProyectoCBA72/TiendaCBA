@@ -1,6 +1,7 @@
 // ignore_for_file: use_full_hex_values_for_flutter_colors
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
@@ -8,44 +9,113 @@ import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
+/// Esta clase representa un widget de estado que muestra una tabla de pedidos cancelados de un lider.
+///
+/// Esta clase extiende [StatefulWidget] y tiene un único método obligatorio:
+/// [createState] que crea un estado [_CanceladoLiderState] para manejar los datos de la pantalla.
+///
+/// Los atributos de esta clase son:
+///
+/// - [auxPedido] es una lista de objetos [AuxPedidoModel] que representan los pedidos cancelados del lider.
 class CanceladoLider extends StatefulWidget {
+  /// Lista de objetos [AuxPedidoModel] que representan los pedidos cancelados del lider.
   final List<AuxPedidoModel> auxPedido;
+
+  /// Constructor del widget.
+  ///
+  /// Los parámetros obligatorios son:
+  /// - [key] clave única del widget.
+  /// - [auxPedido] lista de objetos [AuxPedidoModel] que representan los pedidos cancelados del lider.
   const CanceladoLider({super.key, required this.auxPedido});
 
+  /// Crea un estado [_CanceladoLiderState] para manejar los datos de la pantalla.
   @override
   State<CanceladoLider> createState() => _CanceladoLiderState();
 }
 
 class _CanceladoLiderState extends State<CanceladoLider> {
+  /// Lista de objetos [AuxPedidoModel] que representan los pedidos cancelados del lider.
   List<AuxPedidoModel> _pedidos = [];
+
+  /// Lista de objetos [ProductoModel] que representan los productos de los pedidos cancelados del lider.
   List<ProductoModel> listaProductos = [];
+
+  /// Lista de objetos [PuntoVentaModel] que representan los puntos de venta de los pedidos cancelados del lider.
   List<PuntoVentaModel> listaPuntosVenta = [];
 
+  /// Origen de datos de la tabla de pedidos cancelados del lider.
+  ///
+  /// Se inicializa en el método [initState] con los parámetros [_pedidos],
+  /// [listaProductos] y [listaPuntosVenta].
   late CanceladoLiderDataGridSource _dataGridSource;
 
   @override
+
+  /// Método llamado cuando el widget está listo para ser mostrado en la pantalla.
+  ///
+  /// Se inicializa [_dataGridSource] con los parámetros [_pedidos],
+  /// [listaProductos] y [listaPuntosVenta]. Luego, se actualizan los parámetros
+  /// [_pedidos] con los del widget y se llama al método [_loadData] para cargar los
+  /// datos iniciales necesarios para la pantalla.
+  @override
   void initState() {
     super.initState();
+
+    // Inicializa el origen de datos de la tabla con los parámetros iniciales
     _dataGridSource = CanceladoLiderDataGridSource(
         pedidos: _pedidos,
         listaProductos: listaProductos,
         listaPuntosVenta: listaPuntosVenta);
+
+    // Actualiza los pedidos con los del widget
     _pedidos = widget.auxPedido;
+
+    // Carga los datos iniciales necesarios para la pantalla
     _loadData();
   }
 
+  /// Carga los datos de los productos y los puntos de venta.
+  ///
+  /// Esto se hace llamando a las funciones [getProductos] y [getPuntosVenta]
+  /// y asignando los resultados a las variables [listaProductos] y
+  /// [listaPuntosVenta], respectivamente. Luego, se actualiza [_dataGridSource]
+  /// en el siguiente frame de la interfaz de usuario.
   Future<void> _loadData() async {
+    // Carga los productos
     List<ProductoModel> productosCargados = await getProductos();
+
+    // Carga los puntos de venta
     List<PuntoVentaModel> puntosCargados = await getPuntosVenta();
 
+    // Asigna los productos y los puntos de venta a las variables correspondientes
     listaProductos = productosCargados;
     listaPuntosVenta = puntosCargados;
 
-    // Ahora inicializa _dataGridSource después de cargar los datos
-    _dataGridSource = CanceladoLiderDataGridSource(
-        pedidos: _pedidos,
-        listaProductos: listaProductos,
-        listaPuntosVenta: listaPuntosVenta);
+    if (mounted) {
+      // Ahora inicializa _dataGridSource después de cargar los datos
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          // Inicializa _dataGridSource con los datos de los pedidos, productos y puntos de venta
+          _dataGridSource = CanceladoLiderDataGridSource(
+              pedidos: _pedidos,
+              listaProductos: listaProductos,
+              listaPuntosVenta: listaPuntosVenta);
+        });
+      });
+    }
+  }
+
+  /// Se llama automáticamente cuando se elimina el widget.
+  ///
+  /// Se debe llamar a [dispose] para liberar los recursos utilizados por la
+  /// operación.
+  @override
+  void dispose() {
+    // Cancela cualquier operación en curso si es necesario.
+    // Este método se debe llamar automáticamente cuando se elimina el widget.
+    // Se debe llamar a [dispose] para liberar los recursos utilizados por la
+    // operación.
+    super.dispose();
   }
 
   @override
@@ -59,6 +129,7 @@ class _CanceladoLiderState extends State<CanceladoLider> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Titulo de la tabla
           Text(
             "Pedidos Cancelados",
             style: Theme.of(context)
@@ -69,6 +140,7 @@ class _CanceladoLiderState extends State<CanceladoLider> {
           const SizedBox(
             height: defaultPadding,
           ),
+          // Cuerpo de la tabla
           SizedBox(
             height: 300,
             width: double.infinity,
@@ -82,11 +154,12 @@ class _CanceladoLiderState extends State<CanceladoLider> {
                 shrinkWrapColumns: true,
                 shrinkWrapRows: true,
                 rowsPerPage: 10,
-                source: _dataGridSource,
+                source: _dataGridSource, // Origen de datos
                 selectionMode: SelectionMode.multiple,
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Columnas
                 columns: <GridColumn>[
                   GridColumn(
                     columnName: 'Número',
@@ -169,6 +242,7 @@ class _CanceladoLiderState extends State<CanceladoLider> {
           const SizedBox(
             height: defaultPadding,
           ),
+          // Botón de impresión
           Center(
             child: Column(
               children: [
@@ -181,40 +255,48 @@ class _CanceladoLiderState extends State<CanceladoLider> {
     );
   }
 
+  /// Crea un botón con los estilos de diseño especificados.
+  ///
+  /// El parámetro [text] es el texto que se mostrará en el botón.
+  /// El parámetro [onPressed] es la función que se ejecutará cuando se presione el botón.
+  ///
+  /// Devuelve un widget [Container] que contiene un widget [Material] con un estilo específico.
   Widget _buildButton(String text, VoidCallback onPressed) {
     return Container(
-      width: 200,
+      width: 200, // Ancho del botón
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10), // Borde redondeado
         gradient: const LinearGradient(
           colors: [
-            botonClaro,
-            botonOscuro,
+            botonClaro, // Color de fondo claro
+            botonOscuro, // Color de fondo oscuro
           ],
-        ),
+        ), // Gradiente de color
         boxShadow: const [
           BoxShadow(
-            color: botonSombra,
-            blurRadius: 5,
-            offset: Offset(0, 3),
+            color: botonSombra, // Color de sombra
+            blurRadius: 5, // Radio de la sombra
+            offset: Offset(0, 3), // Desplazamiento en x e y de la sombra
           ),
-        ],
-      ),
+        ], // Sombra
+      ), // Decoración del contenedor con un gradiente de color y sombra
       child: Material(
-        color: Colors.transparent,
+        color: Colors.transparent, // Color de fondo transparente
         child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(10),
+          onTap: onPressed, // Controlador de eventos al presionar el botón
+          borderRadius:
+              BorderRadius.circular(10), // Borde redondeado con un radio de 10
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(
+                vertical: 10), // Padding vertical de 10
             child: Center(
               child: Text(
-                text,
+                text, // Texto del botón
                 style: const TextStyle(
-                  color: background1,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Calibri-Bold',
+                  color: background1, // Color del texto
+                  fontSize: 13, // Tamaño de fuente
+                  fontWeight: FontWeight.bold, // Fuente en negrita
+                  fontFamily: 'Calibri-Bold', // Fuente Calibri en negrita
                 ),
               ),
             ),
@@ -226,32 +308,81 @@ class _CanceladoLiderState extends State<CanceladoLider> {
 }
 
 class CanceladoLiderDataGridSource extends DataGridSource {
+  /// Obtiene el nombre de un producto dado su identificador auxiliar.
+  ///
+  /// El método recibe el identificador auxiliar del producto y una lista de
+  /// productos. Recorre la lista de productos buscando el producto que
+  /// corresponda al identificador auxiliar especificado. Si encuentra un
+  /// producto que coincide con el identificador auxiliar, obtiene su nombre y
+  /// lo devuelve como una cadena. Si no encuentra ningún producto que
+  /// coincida, devuelve una cadena vacía.
+  ///
+  /// Parámetros:
+  /// - productoAxiliar: El identificador auxiliar del producto a buscar.
+  /// - productos: La lista de productos en la que buscar el producto.
+  ///
+  /// Retorna:
+  /// - Una cadena con el nombre del producto encontrado, si se encuentra un
+  ///   producto que coincida con el identificador auxiliar.
+  /// - Una cadena vacía si no se encuentra ningún producto que coincida con
+  ///   el identificador auxiliar.
   String productoNombre(int productoAxiliar, List<ProductoModel> productos) {
+    // Inicializa una cadena vacía para almacenar el nombre del producto.
     String productName = "";
 
+    // Recorre la lista de productos buscando el producto correspondiente.
     for (var producto in productos) {
+      // Verifica si el identificador auxiliar del producto coincide con el buscado.
       if (producto.id == productoAxiliar) {
+        // Obtiene el nombre del producto.
         productName = producto.nombre;
+        // Detiene el bucle for y devuelve el nombre del producto.
         break;
       }
     }
 
+    // Devuelve el nombre del producto encontrado o una cadena vacía.
     return productName;
   }
 
+  /// Obtiene el nombre de un punto de venta dado su identificador.
+  ///
+  /// El método recibe el identificador del punto de venta y una lista de
+  /// puntos de venta. Recorre la lista de puntos de venta buscando el punto
+  /// de venta que corresponda al identificador especificado. Si encuentra un
+  /// punto de venta que coincida con el identificador, obtiene su nombre y
+  /// lo devuelve como una cadena. Si no encuentra ningún punto de venta que
+  /// coincida, devuelve una cadena vacía.
+  ///
+  /// Parámetros:
+  /// - punto: El identificador del punto de venta a buscar.
+  /// - puntosVenta: La lista de puntos de venta en la que buscar el punto.
+  ///
+  /// Retorna:
+  /// - Una cadena con el nombre del punto de venta encontrado, si se encuentra un
+  ///   punto de venta que coincida con el identificador.
+  /// - Una cadena vacía si no se encuentra ningún punto de venta que coincida con
+  ///   el identificador.
   String puntoNombre(int punto, List<PuntoVentaModel> puntosVenta) {
+    // Inicializa una cadena vacía para almacenar el nombre del punto de venta.
     String puntoName = "";
 
+    // Recorre la lista de puntos de venta buscando el punto correspondiente.
     for (var puntoVenta in puntosVenta) {
+      // Verifica si el identificador del punto de venta coincide con el buscado.
       if (puntoVenta.id == punto) {
+        // Obtiene el nombre del punto de venta.
         puntoName = puntoVenta.nombre;
+        // Detiene el bucle for y devuelve el nombre del punto de venta.
         break;
       }
     }
 
+    // Devuelve el nombre del punto de venta encontrado o una cadena vacía.
     return puntoName;
   }
 
+  /// Crea una instancia de la clase CanceladoLiderDataGridSource.
   CanceladoLiderDataGridSource({
     required List<AuxPedidoModel> pedidos,
     required List<ProductoModel> listaProductos,
@@ -284,11 +415,14 @@ class CanceladoLiderDataGridSource extends DataGridSource {
     }).toList();
   }
 
+  /// La lista de pedidos.
   List<DataGridRow> _pedidoData = [];
 
+  // Obtener la lista de pedidos.
   @override
   List<DataGridRow> get rows => _pedidoData;
 
+  // Retorna un widget que muestra los valores de las celdas
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(cells: [
@@ -321,10 +455,13 @@ class CanceladoLiderDataGridSource extends DataGridSource {
           child: (row.getCells()[i].value is Widget)
               ? row.getCells()[i].value
               : Text(i == 4
-                  ? "\$${formatter.format(row.getCells()[i].value)}"
+                  ? "\$${formatter.format(row.getCells()[i].value)}" // Formato de moneda
                   : i == 5 || i == 6
-                      ? "${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).day)}-${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).month)}-${DateTime.parse(row.getCells()[i].value.toString()).year.toString()} ${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).hour)}:${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).minute)}"
-                      : row.getCells()[i].value.toString()),
+                      ? formatFechaHora(row
+                          .getCells()[i]
+                          .value
+                          .toString()) // Formato de fecha
+                      : row.getCells()[i].value.toString()), // Valores normales
         ),
     ]);
   }

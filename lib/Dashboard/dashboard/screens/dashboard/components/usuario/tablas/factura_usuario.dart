@@ -1,6 +1,7 @@
 // ignore_for_file: use_full_hex_values_for_flutter_colors
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
@@ -8,46 +9,123 @@ import 'package:tienda_app/Models/facturaModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
+/// Clase [FacturaUsuario] que representa una pantalla de la aplicación para
+/// mostrar las facturas de un usuario.
+///
+/// Esta clase define una pantalla de la aplicación que muestra las facturas de
+/// un usuario. Se utiliza para mostrar una lista de facturas de un usuario
+/// determinado.
+///
+/// Los atributos de esta clase son:
+///
+/// - [auxPedido]: La lista de pedidos del usuario a mostrar.
 class FacturaUsuario extends StatefulWidget {
+  /// La lista de pedidos del usuario a mostrar.
+  ///
+  /// Este atributo es requerido y debe ser una lista de objetos [AuxPedidoModel].
   final List<AuxPedidoModel> auxPedido;
+
+  /// Constructor de [FacturaUsuario].
+  ///
+  /// El constructor toma una lista de pedidos del usuario a mostrar y
+  /// almacena en el atributo [auxPedido].
   const FacturaUsuario({super.key, required this.auxPedido});
 
+  /// Crea el estado para [FacturaUsuario].
+  ///
+  /// Este método crea un estado [_FacturaUsuarioState] para manejar los datos
+  /// de la pantalla.
   @override
   State<FacturaUsuario> createState() => _FacturaUsuarioState();
 }
 
 class _FacturaUsuarioState extends State<FacturaUsuario> {
+  /// La lista de pedidos del usuario a mostrar.
+  ///
+  /// Esta variable almacena la lista de pedidos del usuario a mostrar.
   List<AuxPedidoModel> _facturas = [];
+
+  /// La lista de productos.
+  ///
+  /// Esta variable almacena la lista de productos utilizada para mostrar los
+  /// nombres de los productos en la pantalla de facturas.
   List<ProductoModel> listaProductos = [];
+
+  /// La lista de facturas.
+  ///
+  /// Esta variable almacena la lista de facturas utilizada para mostrar los
+  /// detalles de las facturas en la pantalla de facturas.
   List<FacturaModel> listaFacturas = [];
 
+  /// El origen de datos de la cuadrícula de facturas del usuario.
+  ///
+  /// Este objeto es utilizado para definir la estructura y los datos de la
+  /// cuadrícula de facturas del usuario.
   late FacturaUsuarioDataGridSource _dataGridSource;
 
   @override
+
+  /// Método de inicialización de estado.
+  ///
+  /// Este método se llama cuando se crea el estado [_FacturaUsuarioState].
+  /// Inicializa la fuente de datos de la cuadrícula de facturas del usuario,
+  /// establece la lista de facturas y llama a [_loadData] para cargar los datos
+  /// necesarios.
+  @override
   void initState() {
     super.initState();
+
+    // Inicializa la fuente de datos de la cuadrícula de facturas del usuario
     _dataGridSource = FacturaUsuarioDataGridSource(
         facturas: _facturas,
         listaProductos: listaProductos,
         listaFacturas: listaFacturas);
+
+    // Establece la lista de facturas a la lista de pedidos del usuario
     _facturas = widget.auxPedido;
+
+    // Carga los datos necesarios para mostrar las facturas
     _loadData();
   }
 
+  /// Carga los datos necesarios para mostrar las facturas.
+  ///
+  /// Este método obtiene los productos y las facturas de la API y luego
+  /// actualiza las variables [_listaProductos] y [_listaFacturas] con los
+  /// datos recibidos. Finalmente, actualiza [_dataGridSource] en el siguiente
+  /// frame de la interfaz de usuario.
   Future<void> _loadData() async {
+    // Obtiene los productos de la API
     List<ProductoModel> productosCargados = await getProductos();
+
+    // Obtiene las facturas de la API
     List<FacturaModel> facturasCargadas = await getFacturas();
 
-    setState(() {
-      listaProductos = productosCargados;
-      listaFacturas = facturasCargadas;
+    // Asigna los productos y las facturas a las variables correspondientes
+    listaProductos = productosCargados;
+    listaFacturas = facturasCargadas;
 
+    if (mounted) {
       // Ahora inicializa _dataGridSource después de cargar los datos
-      _dataGridSource = FacturaUsuarioDataGridSource(
-          facturas: _facturas,
-          listaProductos: listaProductos,
-          listaFacturas: listaFacturas);
-    });
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          // Inicializa _dataGridSource con los datos de las facturas, productos y pedidos
+          _dataGridSource = FacturaUsuarioDataGridSource(
+              facturas: _facturas,
+              listaProductos: listaProductos,
+              listaFacturas: listaFacturas);
+        });
+      });
+    }
+  }
+
+  /// Libera los recursos utilizados por el widget.
+  ///
+  /// Este método se llama automáticamente cuando el widget se elimina del
+  /// árbol de widgets. Libera los recursos utilizados por el widget.
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -61,6 +139,7 @@ class _FacturaUsuarioState extends State<FacturaUsuario> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Titulo Tabla
           Text(
             "Compras",
             style: Theme.of(context)
@@ -71,6 +150,7 @@ class _FacturaUsuarioState extends State<FacturaUsuario> {
           const SizedBox(
             height: defaultPadding,
           ),
+          // Cuerpo Tabla
           SizedBox(
             height: 300,
             width: double.infinity,
@@ -84,11 +164,13 @@ class _FacturaUsuarioState extends State<FacturaUsuario> {
                 shrinkWrapColumns: true,
                 shrinkWrapRows: true,
                 rowsPerPage: 10,
-                source: _dataGridSource,
+                source:
+                    _dataGridSource, // Asigna _dataGridSource como fuente de datos
                 selectionMode: SelectionMode.multiple,
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Define las columnas de la tabla
                 columns: <GridColumn>[
                   GridColumn(
                     columnName: 'Número',
@@ -153,6 +235,7 @@ class _FacturaUsuarioState extends State<FacturaUsuario> {
           const SizedBox(
             height: defaultPadding,
           ),
+          // Botón para imprimir el reporte
           Center(
             child: Column(
               children: [
@@ -165,40 +248,54 @@ class _FacturaUsuarioState extends State<FacturaUsuario> {
     );
   }
 
+  /// Crea un botón con los estilos de diseño especificados.
+  ///
+  /// El parámetro [text] es el texto que se mostrará en el botón.
+  /// El parámetro [onPressed] es la función que se ejecutará cuando se presione el botón.
+  ///
+  /// Devuelve un widget [Container] que contiene un widget [Material] con un estilo específico.
   Widget _buildButton(String text, VoidCallback onPressed) {
     return Container(
+      // Ancho del botón
       width: 200,
+
+      // Decoración del contenedor con un gradiente de color y sombra
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius:
+            BorderRadius.circular(10), // Borde redondeado con un radio de 10
         gradient: const LinearGradient(
           colors: [
-            botonClaro,
-            botonOscuro,
+            botonClaro, // Color de fondo claro
+            botonOscuro, // Color de fondo oscuro
           ],
-        ),
+        ), // Gradiente de color
         boxShadow: const [
           BoxShadow(
-            color: botonSombra,
-            blurRadius: 5,
-            offset: Offset(0, 3),
+            color: botonSombra, // Color de sombra
+            blurRadius: 5, // Radio de la sombra
+            offset: Offset(0, 3), // Desplazamiento en x e y de la sombra
           ),
-        ],
+        ], // Sombra
       ),
+
+      // Contenido del contenedor, un widget [Material] con un estilo específico
       child: Material(
-        color: Colors.transparent,
+        color: Colors.transparent, // Color de fondo transparente
         child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(10),
+          onTap: onPressed, // Controlador de eventos al presionar el botón
+          borderRadius:
+              BorderRadius.circular(10), // Borde redondeado con un radio de 10
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(
+                vertical: 10), // Padding vertical de 10
             child: Center(
               child: Text(
-                text,
+                text, // Texto del botón
                 style: const TextStyle(
-                  color: background1,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Calibri-Bold',
+                  color: background1, // Color del texto
+                  fontSize: 13, // Tamaño de fuente
+                  fontWeight: FontWeight.bold, // Fuente en negrita
+                  fontFamily: 'Calibri-Bold', // Fuente Calibri en negrita
                 ),
               ),
             ),
@@ -210,55 +307,153 @@ class _FacturaUsuarioState extends State<FacturaUsuario> {
 }
 
 class FacturaUsuarioDataGridSource extends DataGridSource {
+  /// Obtiene el número de venta de una factura dado su número de pedido.
+  ///
+  /// El método recibe el número de pedido de la factura y una lista de facturas.
+  /// Recorre la lista de facturas buscando la factura que corresponda al
+  /// número de pedido especificado. Si encuentra una factura que coincide con
+  /// el número de pedido, obtiene el número de venta y lo devuelve como una
+  /// cadena. Si no encuentra ninguna factura que coincida, devuelve una cadena
+  /// vacía.
+  ///
+  /// Parámetros:
+  /// - numeroPedido: El número de pedido de la factura a buscar.
+  /// - facturas: La lista de facturas en la que buscar la factura.
+  ///
+  /// Retorna:
+  /// - Una cadena con el número de venta de la factura encontrada, si se encuentra
+  ///   una factura que coincida con el número de pedido.
+  /// - Una cadena vacía si no se encuentra ninguna factura que coincida con el
+  ///   número de pedido.
   String numeroVentaFactura(int numeroPedido, List<FacturaModel> facturas) {
     String numeroVenta = "";
 
+    // Recorre la lista de facturas buscando la factura correspondiente.
     for (var factura in facturas) {
+      // Verifica si el número de pedido de la factura coincide con el buscado.
       if (factura.pedido.numeroPedido == numeroPedido) {
+        // Obtiene el número de venta de la factura.
         numeroVenta = factura.numero.toString();
       }
     }
 
+    // Devuelve el número de venta encontrado o una cadena vacía.
     return numeroVenta;
   }
 
+  /// Obtiene el nombre de un producto dado su identificador auxiliar.
+  ///
+  /// El método recibe el identificador auxiliar del producto y una lista de
+  /// productos. Recorre la lista de productos buscando el producto que
+  /// corresponda al identificador auxiliar especificado. Si encuentra un
+  /// producto que coincide con el identificador auxiliar, obtiene su nombre y
+  /// lo devuelve como una cadena. Si no encuentra ningún producto que
+  /// coincida, devuelve una cadena vacía.
+  ///
+  /// Parámetros:
+  /// - productoAxiliar: El identificador auxiliar del producto a buscar.
+  /// - productos: La lista de productos en la que buscar el producto.
+  ///
+  /// Retorna:
+  /// - Una cadena con el nombre del producto encontrado, si se encuentra un
+  ///   producto que coincida con el identificador auxiliar.
+  /// - Una cadena vacía si no se encuentra ningún producto que coincida con
+  ///   el identificador auxiliar.
   String productoNombre(int productoAxiliar, List<ProductoModel> productos) {
-    String productName = "";
+    String productName =
+        ""; // Inicializa una cadena vacía para almacenar el nombre del producto
 
+    // Recorre la lista de productos buscando el producto correspondiente.
     for (var producto in productos) {
+      // Verifica si el identificador auxiliar del producto coincide con el buscado.
       if (producto.id == productoAxiliar) {
+        // Obtiene el nombre del producto.
         productName = producto.nombre;
+        break; // Salta el bucle para evitar buscar más productos.
+      }
+    }
+
+    // Devuelve el nombre del producto encontrado o una cadena vacía.
+    return productName;
+  }
+
+  /// Obtiene la fecha de venta de una factura dado su número de pedido.
+  ///
+  /// El método recibe el número de pedido de la factura y una lista de
+  /// facturas. Recorre la lista de facturas buscando la factura que
+  /// corresponda al número de pedido especificado. Si encuentra una factura que
+  /// coincide con el número de pedido, obtiene la fecha de venta y la devuelve como
+  /// una cadena. Si no encuentra ninguna factura que coincida, devuelve una
+  /// cadena vacía.
+  ///
+  /// Parámetros:
+  /// - numeroPedido: El número de pedido de la factura a buscar.
+  /// - facturas: La lista de facturas en la que buscar la factura.
+  ///
+  /// Retorna:
+  /// - Una cadena con la fecha de venta de la factura encontrada, si se encuentra
+  ///   una factura que coincida con el número de pedido.
+  /// - Una cadena vacía si no se encuentra ninguna factura que coincida con el
+  ///   número de pedido.
+  String fechaVentaFactura(int numeroPedido, List<FacturaModel> facturas) {
+    // Inicializa una cadena vacía para almacenar la fecha de venta.
+    String fechaVenta = "";
+
+    // Recorre la lista de facturas buscando la factura correspondiente.
+    for (var factura in facturas) {
+      // Verifica si el número de pedido de la factura coincide con el buscado.
+      if (factura.pedido.numeroPedido == numeroPedido) {
+        // Obtiene la fecha de venta de la factura.
+        fechaVenta = factura.fecha;
+        // Salta el bucle para evitar buscar más facturas.
         break;
       }
     }
 
-    return productName;
-  }
-
-  String fechaVentaFactura(int numeroPedido, List<FacturaModel> facturas) {
-    String fechaVenta = "";
-
-    for (var factura in facturas) {
-      if (factura.pedido.numeroPedido == numeroPedido) {
-        fechaVenta = factura.fecha;
-      }
-    }
-
+    // Devuelve la fecha de venta de la factura encontrada o una cadena vacía.
     return fechaVenta;
   }
 
+  /// Obtiene el medio de pago de una factura dado su número de pedido.
+  ///
+  /// El método recibe el número de pedido de la factura y una lista de
+  /// facturas. Recorre la lista de facturas buscando la factura que
+  /// corresponda al número de pedido especificado. Si encuentra una factura que
+  /// coincide con el número de pedido, obtiene el medio de pago y la devuelve como
+  /// una cadena. Si no encuentra ninguna factura que coincida, devuelve una
+  /// cadena vacía.
+  ///
+  /// Parámetros:
+  /// - numeroPedido: El número de pedido de la factura a buscar.
+  /// - facturas: La lista de facturas en la que buscar la factura.
+  ///
+  /// Retorna:
+  /// - Una cadena con el medio de pago de la factura encontrada, si se encuentra
+  ///   una factura que coincida con el número de pedido.
+  /// - Una cadena vacía si no se encuentra ninguna factura que coincida con el
+  ///   número de pedido.
   String medioVentaFactura(int numeroPedido, List<FacturaModel> facturas) {
+    // Inicializa una cadena vacía para almacenar el medio de pago.
     String medioVenta = "";
 
+    // Recorre la lista de facturas buscando la factura correspondiente.
     for (var factura in facturas) {
+      // Verifica si el número de pedido de la factura coincide con el buscado.
       if (factura.pedido.numeroPedido == numeroPedido) {
+        // Obtiene el medio de pago de la factura.
         medioVenta = factura.medioPago.nombre;
+        // Salta el bucle para evitar buscar más facturas.
+        break;
       }
     }
 
+    // Devuelve el medio de pago de la factura encontrada o una cadena vacía.
     return medioVenta;
   }
 
+  /// Crea un objeto [FacturaUsuarioDataGridSource] a partir de una lista de
+  /// facturas y una lista de productos.
+  ///
   FacturaUsuarioDataGridSource({
     required List<AuxPedidoModel> facturas,
     required List<ProductoModel> listaProductos,
@@ -292,11 +487,14 @@ class FacturaUsuarioDataGridSource extends DataGridSource {
     }).toList();
   }
 
+  /// Lista que almacena las filas de datos para la grilla.
   List<DataGridRow> _facturaData = [];
 
+  /// Obtiene las filas de datos de la grilla.
   @override
   List<DataGridRow> get rows => _facturaData;
 
+  // Retorna la lista de datos
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(cells: [
@@ -329,10 +527,13 @@ class FacturaUsuarioDataGridSource extends DataGridSource {
           child: (row.getCells()[i].value is Widget)
               ? row.getCells()[i].value
               : Text(i == 5
-                  ? "\$${formatter.format(row.getCells()[i].value)}"
+                  ? "\$${formatter.format(row.getCells()[i].value)}" // Formateo de valores de moneda
                   : i == 4
-                      ? "${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).day)}-${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).month)}-${DateTime.parse(row.getCells()[i].value.toString()).year.toString()} ${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).hour)}:${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).minute)}"
-                      : row.getCells()[i].value.toString()),
+                      ? formatFechaHora(row
+                          .getCells()[i]
+                          .value
+                          .toString()) // Formateo de fechas
+                      : row.getCells()[i].value.toString()), // Celdas restantes
         ),
     ]);
   }

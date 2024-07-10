@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import '../source.dart';
 import 'categoriaModel.dart';
 import 'puntoVentaModel.dart';
@@ -9,12 +11,27 @@ import 'sedeModel.dart';
 import 'unidadProduccionModel.dart';
 import 'usuarioModel.dart';
 
+/// Clase que representa una bodega en la aplicación.
+///
+/// Contiene información sobre la cantidad de productos en la bodega, el
+/// producto que se encuentra en la bodega y el punto de venta al que está
+/// asociada.
 class BodegaModel {
+  /// Identificador único de la bodega.
   final int id;
+
+  /// Cantidad de productos que hay en la bodega.
   final int cantidad;
+
+  /// Producto que se encuentra en la bodega.
   final ProductoModel producto;
+
+  /// Punto de venta al que está asociada la bodega.
   final PuntoVentaModel puntoVenta;
 
+  /// Crea una nueva instancia de [BodegaModel].
+  ///
+  /// Los parámetros [id], [cantidad], [producto] y [puntoVenta] son obligatorios.
   BodegaModel({
     required this.id,
     required this.cantidad,
@@ -23,17 +40,41 @@ class BodegaModel {
   });
 }
 
+/// Lista que almacena las instancias de [BodegaModel] obtenidas de la API.
+///
+/// Esta lista se utiliza para almacenar y acceder a los datos de las bodegas
+/// proporcionadas por la API.
 List<BodegaModel> bodegas = [];
 
-// Futuro para traer los datos de la api
+/// Lista que almacena las instancias de [BodegaModel].
+///
+/// Esta lista se utiliza para almacenar y acceder a los datos de las bodegas
+/// obtenidas de la API. La lista se inicializa vacía y se llenará con los
+/// datos obtenidos de la API utilizando el método [getBodegas].
+
+// Metodo para obtener los datos de las bodegas
 
 Future<List<BodegaModel>> getBodegas() async {
+  // Url de la API
   String url = "";
 
+  // Construir la URL de la API para obtener los datos de las bodegas
   url = "$sourceApi/api/bodegas/";
 
+  /// Realiza una solicitud GET a la URL de la API para obtener los datos
+  /// de las bodegas.
+  ///
+  /// Esta función hace una solicitud GET a la URL de la API para obtener los
+  /// datos de las bodegas. Luego, decodifica la respuesta JSON a UTF-8 y
+  /// los datos obtenidos se utilizan para llenar la lista [bodegas].
+  ///
+  /// No se requiere ningún parámetro.
+  ///
+  /// Devuelve una [Future] que contiene una lista de [BodegaModel] con los
+  /// datos de las bodegas.
   final response = await http.get(Uri.parse(url));
 
+  // Verificar el estado de la respuesta
   if (response.statusCode == 200) {
     // Limpiar la lista antes de llenarla con datos actualizados
     bodegas.clear();
@@ -42,6 +83,7 @@ Future<List<BodegaModel>> getBodegas() async {
     String responseBodyUtf8 = utf8.decode(response.bodyBytes);
     List<dynamic> decodedData = jsonDecode(responseBodyUtf8);
 
+    // Llenar la lista de bodegas
     for (var bodegaData in decodedData) {
       bodegas.add(
         BodegaModel(
@@ -152,9 +194,10 @@ Future<List<BodegaModel>> getBodegas() async {
         ),
       );
     }
-    // Devolver la lista de bodegas llena.
+    // Devolver la lista de bodegas
     return bodegas;
   } else {
+    // Lanzar una excepción si la respuesta no es exitosa
     throw Exception(
         'Fallo la solicitud HTTP con código ${response.statusCode}');
   }

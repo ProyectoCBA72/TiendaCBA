@@ -3,36 +3,49 @@
 import 'dart:async';
 import 'package:tienda_app/Details/detailScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/constantsDesign.dart';
 
+/// Widget para mostrar la tarjeta de un producto individual.
 class ProductoCardUnidad extends StatefulWidget {
-  const ProductoCardUnidad({Key? key}) : super(key: key);
+  final List<String> images; // Lista de URLs de imágenes del producto
+  final ProductoModel producto; // Modelo del producto a mostrar
+
+  const ProductoCardUnidad({
+    Key? key,
+    required this.images,
+    required this.producto,
+  }) : super(key: key);
 
   @override
   _ProductoCardUnidadState createState() => _ProductoCardUnidadState();
 }
 
 class _ProductoCardUnidadState extends State<ProductoCardUnidad> {
-  int _currentImageIndex = 0;
-  Timer? _timer;
-  final List<String> _images = [
-    'https://definicion.de/wp-content/uploads/2011/02/carne-1.jpg',
-    'https://media.gq.com.mx/photos/620bcf7243f71a078a355280/16:9/w_2560%2Cc_limit/carnes-85650597.jpg',
-    'https://www.cocinista.es/download/bancorecursos/recetas/cocinar-la-carne-de-vacuno.jpg',
-  ];
+  int _currentImageIndex = 0; // Índice de la imagen actual en la lista
+  Timer? _timer; // Temporizador para cambiar automáticamente la imagen
+  List<String> _images = []; // Lista local de imágenes
 
-  bool _isOnSale = true; // Variable que indica si el producto está en oferta
+  bool _isOnSale = true; // Indica si el producto está en oferta
 
   @override
   void initState() {
     super.initState();
+    _loadImages(); // Carga las imágenes al inicializarse
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _timer?.cancel(); // Cancela el temporizador al destruir el widget
     super.dispose();
   }
 
+  /// Carga las imágenes del widget padre al estado local.
+  void _loadImages() {
+    _images = widget.images;
+  }
+
+  /// Inicia el temporizador para cambiar automáticamente la imagen cada 3 segundos.
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       setState(() {
@@ -43,6 +56,7 @@ class _ProductoCardUnidadState extends State<ProductoCardUnidad> {
 
   @override
   Widget build(BuildContext context) {
+    final producto = widget.producto;
     return Padding(
       padding: const EdgeInsets.all(20),
       child: SizedBox(
@@ -50,16 +64,20 @@ class _ProductoCardUnidadState extends State<ProductoCardUnidad> {
         height: 200,
         child: InkWell(
           onTap: () {
-            /*
-            Navigator.push(context,
-                MaterialPageRoute(builder: (builder) => const DetailsScreen()));
-              */
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (builder) => DetailsScreen(
+                  producto: producto,
+                ),
+              ),
+            );
           },
           onHover: (isHovered) {
             if (isHovered) {
-              _startTimer();
+              _startTimer(); // Inicia el temporizador al pasar el ratón sobre la tarjeta
             } else {
-              _timer?.cancel();
+              _timer?.cancel(); // Cancela el temporizador al dejar de pasar el ratón sobre la tarjeta
             }
           },
           child: Stack(
@@ -100,10 +118,9 @@ class _ProductoCardUnidadState extends State<ProductoCardUnidad> {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: IconButton(
-                                icon: const Icon(Icons.edit,
-                                    color: Colors.white),
+                                icon: const Icon(Icons.edit, color: Colors.white),
                                 onPressed: () {
-                                  // Acción al presionar el favorito
+                                  // Acción al presionar el botón de editar (favorito)
                                 },
                               ),
                             ),
@@ -117,10 +134,9 @@ class _ProductoCardUnidadState extends State<ProductoCardUnidad> {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: IconButton(
-                                icon: const Icon(Icons.delete,
-                                    color: Colors.white),
+                                icon: const Icon(Icons.delete, color: Colors.white),
                                 onPressed: () {
-                                  // Acción al presionar el carrito de compra
+                                  // Acción al presionar el botón de eliminar (carrito de compra)
                                 },
                               ),
                             ),
@@ -140,9 +156,9 @@ class _ProductoCardUnidadState extends State<ProductoCardUnidad> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      "Carne de res",
-                                      style: TextStyle(
+                                    Text(
+                                      producto.nombre,
+                                      style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20,
                                         fontFamily: 'Calibri-Bold',
@@ -151,7 +167,9 @@ class _ProductoCardUnidadState extends State<ProductoCardUnidad> {
                                     ),
                                     const SizedBox(height: 5),
                                     Text(
-                                      _isOnSale ? "\$ 8.000 COP" : "\$ 11.000 COP",
+                                      _isOnSale
+                                          ? '\$${formatter.format(producto.precioOferta)}'
+                                          : '\$${formatter.format(producto.precio)}',
                                       style: TextStyle(
                                         fontSize: 16,
                                         color: _isOnSale ? Colors.white : Colors.red,
@@ -185,5 +203,4 @@ class _ProductoCardUnidadState extends State<ProductoCardUnidad> {
     );
   }
 }
-
 

@@ -45,23 +45,60 @@ class DashboardScreenPunto extends StatefulWidget {
 }
 
 class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
+  /// Índice del ítem seleccionado en el Dashboard.
+  ///
+  /// Este valor se utiliza para determinar qué pestaña está seleccionada actualmente
+  /// en el Dashboard. Cada índice representa una pestaña diferente. Se utiliza para
+  /// mantener la selección de la pestaña entre las actualizaciones del Dashboard.
+  ///
+  /// El valor predeterminado es nulo, lo que significa que no hay ninguna pestaña seleccionada.
+  ///
+  /// Este valor se utiliza en el método [_scrollToNextTab] para determinar si se puede
+  /// navegar a la siguiente pestaña o no.
+  ///
+  /// Esta variable es privada y solo se utiliza en esta clase.
   int? _selectedItem;
 
+  /// Navega hacia la siguiente pestaña en la pantalla del dashboard y actualiza el valor
+  /// del índice seleccionado.
+  ///
+  /// Utiliza el [DefaultTabController.of] para obtener el controlador de la pestaña actual y
+  /// luego llama al método [animateTo] para navegar a la siguiente pestaña.
+  ///
+  /// Luego actualiza el valor de [_selectedItem] con el nuevo índice de la pestaña.
+  ///
+  /// Si el índice actual es menor que el número de pestañas - 1, se navega a la siguiente pestaña.
   void _scrollToNextTab(BuildContext context) {
+    // Obtiene el controlador de la pestaña actual
     final tabController = DefaultTabController.of(context);
+    // Si el controlador existe y el índice actual es menor que el número de pestañas - 1
     if (tabController != null &&
         tabController.index < tabController.length - 1) {
+      // Navega hacia la siguiente pestaña
       tabController.animateTo(tabController.index + 1);
+      // Actualiza el valor del índice seleccionado
       setState(() {
         _selectedItem = tabController.index;
       });
     }
   }
 
+  /// Navega hacia la pestaña anterior en la pantalla del dashboard y actualiza el valor
+  /// del índice seleccionado.
+  ///
+  /// Utiliza el [DefaultTabController.of] para obtener el controlador de la pestaña actual y
+  /// luego llama al método [animateTo] para navegar a la pestaña anterior.
+  ///
+  /// Si el índice actual es mayor que 0, se actualiza el valor de [_selectedItem] con el nuevo
+  /// índice de la pestaña.
   void _scrollToPreviousTab(BuildContext context) {
+    // Obtiene el controlador de la pestaña actual
     final tabController = DefaultTabController.of(context);
+    // Si el controlador existe y el índice actual es mayor que 0
     if (tabController != null && tabController.index > 0) {
+      // Navega hacia la pestaña anterior
       tabController.animateTo(tabController.index - 1);
+      // Actualiza el valor del índice seleccionado
       setState(() {
         _selectedItem = tabController.index;
       });
@@ -70,13 +107,16 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
 
   @override
   Widget build(BuildContext context) {
+    // Obtiene el estado de la aplicación
     return Consumer<AppState>(builder: (context, appState, _) {
+      // Si el estado de la aplicación no es nulo y el usuario autenticado no es nulo
       if (appState == null || appState.usuarioAutenticado == null) {
         return const Center(
           child: CircularProgressIndicator(),
         );
       }
 
+      // Obtiene el usuario autenticado
       final usuarioAutenticado = appState.usuarioAutenticado;
       return SafeArea(
         child: ListView(
@@ -87,1036 +127,1107 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
           children: [
             Column(
               children: [
+                // Encabezado
                 const Header(),
                 const SizedBox(height: defaultPadding),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Contenido principal
                     Expanded(
                       flex: 5,
                       child: Column(
                         children: [
-                          SizedBox(
-                            height: 1300,
-                            child: ListView(
-                              scrollDirection: Axis.vertical,
+                          // Cards de pedidos del punto de venta
+                          CardsPedidoPunto(
+                            usuario: usuarioAutenticado!,
+                          ),
+                          const SizedBox(height: defaultPadding),
+                          // Estadísticas
+                          if (!Responsive.isMobile(context))
+                            const Divider(
+                              height: 1,
+                              color: Colors.grey,
+                            ),
+                          if (!Responsive.isMobile(context))
+                            const SizedBox(height: defaultPadding),
+                          if (!Responsive.isMobile(context))
+                            Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
                               children: [
-                                Column(
-                                  children: [
-                                    CardsPedidoPunto(
-                                      usuario: usuarioAutenticado!,
-                                    ),
-                                    const SizedBox(height: defaultPadding),
-                                    if (!Responsive.isMobile(context))
-                                      const Divider(
-                                        height: 1,
-                                        color: Colors.grey,
-                                      ),
-                                    if (!Responsive.isMobile(context))
-                                      const SizedBox(height: defaultPadding),
-                                    if (!Responsive.isMobile(context))
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              "Estadísticas",
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleLarge
-                                                  ?.copyWith(
-                                                      fontFamily:
-                                                          'Calibri-Bold'),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    if (!Responsive.isMobile(context))
-                                      const SizedBox(height: defaultPadding),
-                                    if (!Responsive.isMobile(context))
-                                      DefaultTabController(
-                                          length: 8,
-                                          child: Column(
-                                            children: [
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 16,
-                                                        vertical: 8),
-                                                // Contenedor que alberga la barra de pestañas.
-                                                child:
-                                                    Builder(builder: (context) {
-                                                  return Row(
-                                                    children: [
-                                                      IconButton(
-                                                        icon: const Icon(
-                                                          Icons.arrow_back_ios,
-                                                          color: primaryColor,
-                                                        ),
-                                                        onPressed: () =>
-                                                            _scrollToPreviousTab(
-                                                                context),
-                                                      ),
-                                                      Expanded(
-                                                        child: TabBar(
-                                                          indicatorColor:
-                                                              primaryColor,
-                                                          isScrollable: true,
-                                                          tabAlignment:
-                                                              TabAlignment
-                                                                  .center,
-                                                          onTap: (index) {
-                                                            setState(() {
-                                                              _selectedItem =
-                                                                  index;
-                                                            });
-                                                          },
-                                                          tabs: [
-                                                            Tooltip(
-                                                              message:
-                                                                  "Productos más vendidos por año",
-                                                              child: Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        left:
-                                                                            12,
-                                                                        right:
-                                                                            12,
-                                                                        bottom:
-                                                                            4,
-                                                                        top: 4),
-                                                                // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                                child: Column(
-                                                                  children: [
-                                                                    SvgPicture
-                                                                        .asset(
-                                                                      "assets/icons/productosVendidos.svg",
-                                                                      width: 24,
-                                                                      height:
-                                                                          24,
-                                                                      colorFilter: const ColorFilter
-                                                                          .mode(
-                                                                          Color(
-                                                                              0xFF4682B4),
-                                                                          BlendMode
-                                                                              .srcIn),
-                                                                    ),
-                                                                    const Text(
-                                                                      "Año",
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        fontSize:
-                                                                            14,
-                                                                        color:
-                                                                            primaryColor,
-                                                                      ),
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Tooltip(
-                                                              message:
-                                                                  "Productos más vendidos por mes",
-                                                              child: Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        left:
-                                                                            12,
-                                                                        right:
-                                                                            12,
-                                                                        bottom:
-                                                                            4,
-                                                                        top: 4),
-                                                                // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                                child: Column(
-                                                                  children: [
-                                                                    SvgPicture
-                                                                        .asset(
-                                                                      "assets/icons/productosVendidos.svg",
-                                                                      width: 24,
-                                                                      height:
-                                                                          24,
-                                                                      colorFilter: const ColorFilter
-                                                                          .mode(
-                                                                          Color(
-                                                                              0xFF4682B4),
-                                                                          BlendMode
-                                                                              .srcIn),
-                                                                    ),
-                                                                    const Text(
-                                                                      "Mes",
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        fontSize:
-                                                                            14,
-                                                                        color:
-                                                                            primaryColor,
-                                                                      ),
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Tooltip(
-                                                              message:
-                                                                  "Balance de ventas por año",
-                                                              child: Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        left:
-                                                                            12,
-                                                                        right:
-                                                                            12,
-                                                                        bottom:
-                                                                            4,
-                                                                        top: 4),
-                                                                // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                                child: Column(
-                                                                  children: [
-                                                                    SvgPicture
-                                                                        .asset(
-                                                                      "assets/icons/ventas.svg",
-                                                                      width: 24,
-                                                                      height:
-                                                                          24,
-                                                                      colorFilter: const ColorFilter
-                                                                          .mode(
-                                                                          Color(
-                                                                              0xFF50C878),
-                                                                          BlendMode
-                                                                              .srcIn),
-                                                                    ),
-                                                                    const Text(
-                                                                      "Año",
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        fontSize:
-                                                                            14,
-                                                                        color:
-                                                                            primaryColor,
-                                                                      ),
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Tooltip(
-                                                              message:
-                                                                  "Balance de ventas por mes",
-                                                              child: Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        left:
-                                                                            12,
-                                                                        right:
-                                                                            12,
-                                                                        bottom:
-                                                                            4,
-                                                                        top: 4),
-                                                                // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                                child: Column(
-                                                                  children: [
-                                                                    SvgPicture
-                                                                        .asset(
-                                                                      "assets/icons/ventas.svg",
-                                                                      width: 24,
-                                                                      height:
-                                                                          24,
-                                                                      colorFilter: const ColorFilter
-                                                                          .mode(
-                                                                          Color(
-                                                                              0xFF50C878),
-                                                                          BlendMode
-                                                                              .srcIn),
-                                                                    ),
-                                                                    const Text(
-                                                                      "Mes",
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        fontSize:
-                                                                            14,
-                                                                        color:
-                                                                            primaryColor,
-                                                                      ),
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Tooltip(
-                                                              message:
-                                                                  "Devoluciones por año",
-                                                              child: Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        left:
-                                                                            12,
-                                                                        right:
-                                                                            12,
-                                                                        bottom:
-                                                                            4,
-                                                                        top: 4),
-                                                                // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                                child: Column(
-                                                                  children: [
-                                                                    SvgPicture
-                                                                        .asset(
-                                                                      "assets/icons/devoluciones.svg",
-                                                                      width: 24,
-                                                                      height:
-                                                                          24,
-                                                                      colorFilter: const ColorFilter
-                                                                          .mode(
-                                                                          Color(
-                                                                              0xFFFF7F50),
-                                                                          BlendMode
-                                                                              .srcIn),
-                                                                    ),
-                                                                    const Text(
-                                                                      "Año",
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        fontSize:
-                                                                            14,
-                                                                        color:
-                                                                            primaryColor,
-                                                                      ),
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Tooltip(
-                                                              message:
-                                                                  "Devoluciones por mes",
-                                                              child: Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        left:
-                                                                            12,
-                                                                        right:
-                                                                            12,
-                                                                        bottom:
-                                                                            4,
-                                                                        top: 4),
-                                                                // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                                child: Column(
-                                                                  children: [
-                                                                    SvgPicture
-                                                                        .asset(
-                                                                      "assets/icons/devoluciones.svg",
-                                                                      width: 24,
-                                                                      height:
-                                                                          24,
-                                                                      colorFilter: const ColorFilter
-                                                                          .mode(
-                                                                          Color(
-                                                                              0xFFFF7F50),
-                                                                          BlendMode
-                                                                              .srcIn),
-                                                                    ),
-                                                                    const Text(
-                                                                      "Mes",
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        fontSize:
-                                                                            14,
-                                                                        color:
-                                                                            primaryColor,
-                                                                      ),
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Tooltip(
-                                                              message:
-                                                                  "Producciones recibidas por año",
-                                                              child: Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        left:
-                                                                            12,
-                                                                        right:
-                                                                            12,
-                                                                        bottom:
-                                                                            4,
-                                                                        top: 4),
-                                                                // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                                child: Column(
-                                                                  children: [
-                                                                    SvgPicture
-                                                                        .asset(
-                                                                      "assets/icons/recibidas.svg",
-                                                                      width: 24,
-                                                                      height:
-                                                                          24,
-                                                                      colorFilter: const ColorFilter
-                                                                          .mode(
-                                                                          Color(
-                                                                              0xFFBA55D3),
-                                                                          BlendMode
-                                                                              .srcIn),
-                                                                    ),
-                                                                    const Text(
-                                                                      "Año",
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        fontSize:
-                                                                            14,
-                                                                        color:
-                                                                            primaryColor,
-                                                                      ),
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Tooltip(
-                                                              message:
-                                                                  "Producciones recibidas por mes",
-                                                              child: Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        left:
-                                                                            12,
-                                                                        right:
-                                                                            12,
-                                                                        bottom:
-                                                                            4,
-                                                                        top: 4),
-                                                                // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                                child: Column(
-                                                                  children: [
-                                                                    SvgPicture
-                                                                        .asset(
-                                                                      "assets/icons/recibidas.svg",
-                                                                      width: 24,
-                                                                      height:
-                                                                          24,
-                                                                      colorFilter: const ColorFilter
-                                                                          .mode(
-                                                                          Color(
-                                                                              0xFFBA55D3),
-                                                                          BlendMode
-                                                                              .srcIn),
-                                                                    ),
-                                                                    const Text(
-                                                                      "Mes",
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        fontSize:
-                                                                            14,
-                                                                        color:
-                                                                            primaryColor,
-                                                                      ),
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      IconButton(
-                                                        icon: const Icon(
-                                                          Icons
-                                                              .arrow_forward_ios,
-                                                          color: primaryColor,
-                                                        ),
-                                                        onPressed: () =>
-                                                            _scrollToNextTab(
-                                                                context),
-                                                      ),
-                                                    ],
-                                                  );
-                                                }),
-                                              ),
-                                            ],
-                                          )),
-                                    if (!Responsive.isMobile(context))
-                                      const SizedBox(height: defaultPadding),
-                                    if (!Responsive.isMobile(context))
-                                      _selectedItem == 0
-                                          ? ReporteProductosMasVendidosAgnoPunto(
-                                              usuario: usuarioAutenticado,
-                                            )
-                                          : _selectedItem == 1
-                                              ? ReporteProductosMasVendidosMesPunto(
-                                                  usuario: usuarioAutenticado,
-                                                )
-                                              : _selectedItem == 2
-                                                  ? ReportePuntoVentasAgnoPunto(
-                                                      usuario:
-                                                          usuarioAutenticado,
-                                                    )
-                                                  : _selectedItem == 3
-                                                      ? ReportePuntoVentasMesPunto(
-                                                          usuario:
-                                                              usuarioAutenticado,
-                                                        )
-                                                      : _selectedItem == 4
-                                                          ? ReporteDevolucionesPuntoAgnoPunto(
-                                                              usuario:
-                                                                  usuarioAutenticado,
-                                                            )
-                                                          : _selectedItem == 5
-                                                              ? ReporteDevolucionesPuntoMesPunto(
-                                                                  usuario:
-                                                                      usuarioAutenticado,
-                                                                )
-                                                              : _selectedItem ==
-                                                                      6
-                                                                  ? ReporteRecibidoAgnoPunto(
-                                                                      usuario:
-                                                                          usuarioAutenticado,
-                                                                    )
-                                                                  : _selectedItem ==
-                                                                          7
-                                                                      ? ReporteRecibidoMesPunto(
-                                                                          usuario:
-                                                                              usuarioAutenticado,
-                                                                        )
-                                                                      : ReporteProductosMasVendidosAgnoPunto(
-                                                                          usuario:
-                                                                              usuarioAutenticado,
-                                                                        ),
-                                    if (!Responsive.isMobile(context))
-                                      const SizedBox(height: defaultPadding),
-                                    const Divider(
-                                      height: 1,
-                                      color: Colors.grey,
-                                    ),
-                                    const SizedBox(height: defaultPadding),
-                                    const CardsProductoPunto(),
-                                    const SizedBox(height: defaultPadding),
-                                    const Divider(
-                                      height: 1,
-                                      color: Colors.grey,
-                                    ),
-                                    const SizedBox(height: defaultPadding),
-                                    const CardsAnuncioPunto(),
-                                    const SizedBox(height: defaultPadding),
-                                    FutureBuilder(
-                                        future: getBoletas(),
-                                        builder: (context,
-                                            AsyncSnapshot<List<BoletaModel>>
-                                                snapshotBoleta) {
-                                          if (snapshotBoleta.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return const CircularProgressIndicator();
-                                          } else if (snapshotBoleta.hasError) {
-                                            return Text(
-                                                'Error al cargar inscripciones: ${snapshotBoleta.error}');
-                                          } else if (snapshotBoleta.data ==
-                                              null) {
-                                            return const Text(
-                                                'No se encontraron inscripciones');
-                                          } else {
-                                            List<BoletaModel> boletaPunto = [];
-
-                                            boletaPunto = snapshotBoleta.data!
-                                                .where((boleta) =>
-                                                    boleta.anuncio.usuario
-                                                        .puntoVenta ==
-                                                    usuarioAutenticado
-                                                        .puntoVenta)
-                                                .toList();
-
-                                            return EventosPunto(
-                                              boletas: boletaPunto,
-                                            );
-                                          }
-                                        }),
-                                    const SizedBox(height: defaultPadding),
-                                    FutureBuilder(
-                                        future: getPuntosVenta(),
-                                        builder: (context,
-                                            AsyncSnapshot<List<PuntoVentaModel>>
-                                                snapshotPunto) {
-                                          if (snapshotPunto.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return const CircularProgressIndicator();
-                                          } else if (snapshotPunto.hasError) {
-                                            return Text(
-                                                'Error al cargar puntos: ${snapshotPunto.error}');
-                                          } else if (snapshotPunto.data ==
-                                              null) {
-                                            return const Text(
-                                                'No se encontraron puntos');
-                                          } else {
-                                            return FutureBuilder(
-                                                future: getAuxPedidos(),
-                                                builder: (context,
-                                                    AsyncSnapshot<
-                                                            List<
-                                                                AuxPedidoModel>>
-                                                        snapshotAuxiliar) {
-                                                  if (snapshotAuxiliar
-                                                          .connectionState ==
-                                                      ConnectionState.waiting) {
-                                                    return const CircularProgressIndicator();
-                                                  } else if (snapshotAuxiliar
-                                                      .hasError) {
-                                                    return Text(
-                                                        'Error al cargar pedidos: ${snapshotAuxiliar.error}');
-                                                  } else if (snapshotAuxiliar
-                                                          .data ==
-                                                      null) {
-                                                    return const Text(
-                                                        'No se encontraron pedidos');
-                                                  } else {
-                                                    List<AuxPedidoModel>
-                                                        pedidosPendientes = [];
-
-                                                    for (var p = 0;
-                                                        p <
-                                                            snapshotPunto
-                                                                .data!.length;
-                                                        p++) {
-                                                      pedidosPendientes = snapshotAuxiliar
-                                                          .data!
-                                                          .where((auxiliar) =>
-                                                              auxiliar.pedido
-                                                                      .estado ==
-                                                                  "PENDIENTE" &&
-                                                              auxiliar.pedido
-                                                                  .pedidoConfirmado &&
-                                                              auxiliar.pedido
-                                                                      .puntoVenta ==
-                                                                  snapshotPunto
-                                                                      .data![p]
-                                                                      .id &&
-                                                              usuarioAutenticado
-                                                                      .puntoVenta ==
-                                                                  snapshotPunto
-                                                                      .data![p]
-                                                                      .id)
-                                                          .toList();
-                                                    }
-
-                                                    return PendientePunto(
-                                                      auxPedido:
-                                                          pedidosPendientes,
-                                                    );
-                                                  }
-                                                });
-                                          }
-                                        }),
-                                    const SizedBox(height: defaultPadding),
-                                    FutureBuilder(
-                                        future: getPuntosVenta(),
-                                        builder: (context,
-                                            AsyncSnapshot<List<PuntoVentaModel>>
-                                                snapshotPunto) {
-                                          if (snapshotPunto.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return const CircularProgressIndicator();
-                                          } else if (snapshotPunto.hasError) {
-                                            return Text(
-                                                'Error al cargar puntos: ${snapshotPunto.error}');
-                                          } else if (snapshotPunto.data ==
-                                              null) {
-                                            return const Text(
-                                                'No se encontraron puntos');
-                                          } else {
-                                            return FutureBuilder(
-                                                future: getAuxPedidos(),
-                                                builder: (context,
-                                                    AsyncSnapshot<
-                                                            List<
-                                                                AuxPedidoModel>>
-                                                        snapshotAuxiliar) {
-                                                  if (snapshotAuxiliar
-                                                          .connectionState ==
-                                                      ConnectionState.waiting) {
-                                                    return const CircularProgressIndicator();
-                                                  } else if (snapshotAuxiliar
-                                                      .hasError) {
-                                                    return Text(
-                                                        'Error al cargar pedidos: ${snapshotAuxiliar.error}');
-                                                  } else if (snapshotAuxiliar
-                                                          .data ==
-                                                      null) {
-                                                    return const Text(
-                                                        'No se encontraron pedidos');
-                                                  } else {
-                                                    List<AuxPedidoModel>
-                                                        pedidosEntregados = [];
-
-                                                    for (var p = 0;
-                                                        p <
-                                                            snapshotPunto
-                                                                .data!.length;
-                                                        p++) {
-                                                      pedidosEntregados = snapshotAuxiliar
-                                                          .data!
-                                                          .where((auxiliar) =>
-                                                              auxiliar.pedido
-                                                                      .estado ==
-                                                                  "COMPLETADO" &&
-                                                              auxiliar.pedido
-                                                                  .entregado &&
-                                                              auxiliar.pedido
-                                                                      .puntoVenta ==
-                                                                  snapshotPunto
-                                                                      .data![p]
-                                                                      .id &&
-                                                              usuarioAutenticado
-                                                                      .puntoVenta ==
-                                                                  snapshotPunto
-                                                                      .data![p]
-                                                                      .id)
-                                                          .toList();
-                                                    }
-
-                                                    return EntregadoPunto(
-                                                      auxPedido:
-                                                          pedidosEntregados,
-                                                    );
-                                                  }
-                                                });
-                                          }
-                                        }),
-                                    const SizedBox(height: defaultPadding),
-                                    FutureBuilder(
-                                        future: getPuntosVenta(),
-                                        builder: (context,
-                                            AsyncSnapshot<List<PuntoVentaModel>>
-                                                snapshotPunto) {
-                                          if (snapshotPunto.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return const CircularProgressIndicator();
-                                          } else if (snapshotPunto.hasError) {
-                                            return Text(
-                                                'Error al cargar puntos: ${snapshotPunto.error}');
-                                          } else if (snapshotPunto.data ==
-                                              null) {
-                                            return const Text(
-                                                'No se encontraron puntos');
-                                          } else {
-                                            return FutureBuilder(
-                                                future: getAuxPedidos(),
-                                                builder: (context,
-                                                    AsyncSnapshot<
-                                                            List<
-                                                                AuxPedidoModel>>
-                                                        snapshotAuxiliar) {
-                                                  if (snapshotAuxiliar
-                                                          .connectionState ==
-                                                      ConnectionState.waiting) {
-                                                    return const CircularProgressIndicator();
-                                                  } else if (snapshotAuxiliar
-                                                      .hasError) {
-                                                    return Text(
-                                                        'Error al cargar pedidos: ${snapshotAuxiliar.error}');
-                                                  } else if (snapshotAuxiliar
-                                                          .data ==
-                                                      null) {
-                                                    return const Text(
-                                                        'No se encontraron pedidos');
-                                                  } else {
-                                                    List<AuxPedidoModel>
-                                                        pedidosCancelados = [];
-
-                                                    for (var p = 0;
-                                                        p <
-                                                            snapshotPunto
-                                                                .data!.length;
-                                                        p++) {
-                                                      pedidosCancelados = snapshotAuxiliar
-                                                          .data!
-                                                          .where((auxiliar) =>
-                                                              auxiliar.pedido
-                                                                      .estado ==
-                                                                  "CANCELADO" &&
-                                                              auxiliar.pedido
-                                                                      .puntoVenta ==
-                                                                  snapshotPunto
-                                                                      .data![p]
-                                                                      .id &&
-                                                              usuarioAutenticado
-                                                                      .puntoVenta ==
-                                                                  snapshotPunto
-                                                                      .data![p]
-                                                                      .id)
-                                                          .toList();
-                                                    }
-                                                    return CanceladoPunto(
-                                                      auxPedido:
-                                                          pedidosCancelados,
-                                                    );
-                                                  }
-                                                });
-                                          }
-                                        }),
-                                    const SizedBox(height: defaultPadding),
-                                    FutureBuilder(
-                                        future: getPuntosVenta(),
-                                        builder: (context,
-                                            AsyncSnapshot<List<PuntoVentaModel>>
-                                                snapshotPunto) {
-                                          if (snapshotPunto.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return const CircularProgressIndicator();
-                                          } else if (snapshotPunto.hasError) {
-                                            return Text(
-                                                'Error al cargar puntos: ${snapshotPunto.error}');
-                                          } else if (snapshotPunto.data ==
-                                              null) {
-                                            return const Text(
-                                                'No se encontraron puntos');
-                                          } else {
-                                            return FutureBuilder(
-                                                future: getFacturas(),
-                                                builder: (context,
-                                                    AsyncSnapshot<
-                                                            List<FacturaModel>>
-                                                        snapshotFactura) {
-                                                  if (snapshotFactura
-                                                          .connectionState ==
-                                                      ConnectionState.waiting) {
-                                                    return const CircularProgressIndicator();
-                                                  } else if (snapshotFactura
-                                                      .hasError) {
-                                                    return Text(
-                                                        'Error al cargar ventas: ${snapshotFactura.error}');
-                                                  } else if (snapshotFactura
-                                                          .data ==
-                                                      null) {
-                                                    return const Text(
-                                                        'No se encontraron ventas');
-                                                  } else {
-                                                    return FutureBuilder(
-                                                        future: getAuxPedidos(),
-                                                        builder: (context,
-                                                            AsyncSnapshot<
-                                                                    List<
-                                                                        AuxPedidoModel>>
-                                                                snapshotAuxiliar) {
-                                                          if (snapshotAuxiliar
-                                                                  .connectionState ==
-                                                              ConnectionState
-                                                                  .waiting) {
-                                                            return const CircularProgressIndicator();
-                                                          } else if (snapshotAuxiliar
-                                                              .hasError) {
-                                                            return Text(
-                                                                'Error al cargar pedidos: ${snapshotAuxiliar.error}');
-                                                          } else if (snapshotAuxiliar
-                                                                  .data ==
-                                                              null) {
-                                                            return const Text(
-                                                                'No se encontraron pedidos');
-                                                          } else {
-                                                            List<AuxPedidoModel>
-                                                                pedidosFacturas =
-                                                                [];
-
-                                                            for (var p = 0;
-                                                                p <
-                                                                    snapshotPunto
-                                                                        .data!
-                                                                        .length;
-                                                                p++) {
-                                                              for (var f = 0;
-                                                                  f <
-                                                                      snapshotFactura
-                                                                          .data!
-                                                                          .length;
-                                                                  f++) {
-                                                                pedidosFacturas = snapshotAuxiliar
-                                                                    .data!
-                                                                    .where((pedido) =>
-                                                                        snapshotFactura.data![f].pedido.id == pedido.pedido.id &&
-                                                                        snapshotPunto.data![p].id ==
-                                                                            usuarioAutenticado
-                                                                                .puntoVenta &&
-                                                                        pedido.pedido.puntoVenta ==
-                                                                            snapshotPunto.data![p].id)
-                                                                    .toList();
-                                                              }
-                                                            }
-
-                                                            return FacturaPunto(
-                                                              auxPedido:
-                                                                  pedidosFacturas,
-                                                            );
-                                                          }
-                                                        });
-                                                  }
-                                                });
-                                          }
-                                        }),
-                                    const SizedBox(height: defaultPadding),
-                                    FutureBuilder(
-                                        future: getDevoluciones(),
-                                        builder: (context,
-                                            AsyncSnapshot<
-                                                    List<DevolucionesModel>>
-                                                snapshotDevolucion) {
-                                          if (snapshotDevolucion
-                                                  .connectionState ==
-                                              ConnectionState.waiting) {
-                                            return const CircularProgressIndicator();
-                                          } else if (snapshotDevolucion
-                                              .hasError) {
-                                            return Text(
-                                                'Error al cargar devoluciones: ${snapshotDevolucion.error}');
-                                          } else if (snapshotDevolucion.data ==
-                                              null) {
-                                            return const Text(
-                                                'No se encontraron devoluciones');
-                                          } else {
-                                            return FutureBuilder(
-                                                future: getPuntosVenta(),
-                                                builder: (context,
-                                                    AsyncSnapshot<
-                                                            List<
-                                                                PuntoVentaModel>>
-                                                        snapshotPunto) {
-                                                  if (snapshotPunto
-                                                          .connectionState ==
-                                                      ConnectionState.waiting) {
-                                                    return const CircularProgressIndicator();
-                                                  } else if (snapshotPunto
-                                                      .hasError) {
-                                                    return Text(
-                                                        'Error al cargar puntos: ${snapshotPunto.error}');
-                                                  } else if (snapshotPunto
-                                                          .data ==
-                                                      null) {
-                                                    return const Text(
-                                                        'No se encontraron puntos');
-                                                  } else {
-                                                    return FutureBuilder(
-                                                        future: getAuxPedidos(),
-                                                        builder: (context,
-                                                            AsyncSnapshot<
-                                                                    List<
-                                                                        AuxPedidoModel>>
-                                                                snapshotAuxiliar) {
-                                                          if (snapshotAuxiliar
-                                                                  .connectionState ==
-                                                              ConnectionState
-                                                                  .waiting) {
-                                                            return const CircularProgressIndicator();
-                                                          } else if (snapshotAuxiliar
-                                                              .hasError) {
-                                                            return Text(
-                                                                'Error al cargar pedidos: ${snapshotAuxiliar.error}');
-                                                          } else if (snapshotAuxiliar
-                                                                  .data ==
-                                                              null) {
-                                                            return const Text(
-                                                                'No se encontraron pedidos');
-                                                          } else {
-                                                            List<AuxPedidoModel>
-                                                                pedidosDevueltos =
-                                                                [];
-
-                                                            for (var p = 0;
-                                                                p <
-                                                                    snapshotPunto
-                                                                        .data!
-                                                                        .length;
-                                                                p++) {
-                                                              for (var d = 0;
-                                                                  d <
-                                                                      snapshotDevolucion
-                                                                          .data!
-                                                                          .length;
-                                                                  d++) {
-                                                                pedidosDevueltos = snapshotAuxiliar
-                                                                    .data!
-                                                                    .where((pedido) =>
-                                                                        snapshotDevolucion.data![d].factura.pedido.id == pedido.pedido.id &&
-                                                                        snapshotPunto.data![p].id ==
-                                                                            usuarioAutenticado
-                                                                                .puntoVenta &&
-                                                                        pedido.pedido.puntoVenta ==
-                                                                            snapshotPunto.data![p].id)
-                                                                    .toList();
-                                                              }
-                                                            }
-
-                                                            return DevolucionPunto(
-                                                              auxPedido:
-                                                                  pedidosDevueltos,
-                                                            );
-                                                          }
-                                                        });
-                                                  }
-                                                });
-                                          }
-                                        }),
-                                    const SizedBox(height: defaultPadding),
-                                    FutureBuilder(
-                                        future: getInventario(),
-                                        builder: (context,
-                                            AsyncSnapshot<List<InventarioModel>>
-                                                snapshotInventario) {
-                                          if (snapshotInventario
-                                                  .connectionState ==
-                                              ConnectionState.waiting) {
-                                            return const CircularProgressIndicator();
-                                          } else if (snapshotInventario
-                                              .hasError) {
-                                            return Text(
-                                                'Error al cargar inventarios: ${snapshotInventario.error}');
-                                          } else if (snapshotInventario.data ==
-                                              null) {
-                                            return const Text(
-                                                'No se encontraron inventarios');
-                                          } else {
-                                            final inventarioPunto =
-                                                snapshotInventario.data!
-                                                    .where((inventario) =>
-                                                        inventario.bodega
-                                                            .puntoVenta.id ==
-                                                        usuarioAutenticado
-                                                            .puntoVenta)
-                                                    .toList();
-
-                                            return BodegaPunto(
-                                              inventarioLista: inventarioPunto,
-                                            );
-                                          }
-                                        }),
-                                    const SizedBox(height: defaultPadding),
-                                  ],
+                                Expanded(
+                                  child: Text(
+                                    "Estadísticas",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                            fontFamily: 'Calibri-Bold'),
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                          if (!Responsive.isDesktop(context))
+                          if (!Responsive.isMobile(context))
                             const SizedBox(height: defaultPadding),
+                          if (!Responsive.isMobile(context))
+                            DefaultTabController(
+                                length: 8,
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      padding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                              vertical: 8),
+                                      // Contenedor que alberga la barra de pestañas.
+                                      child:
+                                          Builder(builder: (context) {
+                                        return Row(
+                                          children: [
+                                            // Botón de anterior pestaña.
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.arrow_back_ios,
+                                                color: primaryColor,
+                                              ),
+                                              onPressed: () =>
+                                                  _scrollToPreviousTab(
+                                                      context),
+                                            ),
+                                            Expanded(
+                                              child: TabBar(
+                                                indicatorColor:
+                                                    primaryColor,
+                                                isScrollable: true,
+                                                tabAlignment:
+                                                    TabAlignment.center,
+                                                onTap: (index) {
+                                                  // Actualiza el índice seleccionado
+                                                  setState(() {
+                                                    _selectedItem =
+                                                        index;
+                                                  });
+                                                },
+                                                tabs: [
+                                                  Tooltip(
+                                                    message:
+                                                        "Productos más vendidos por año",
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets
+                                                              .only(
+                                                              left: 12,
+                                                              right: 12,
+                                                              bottom: 4,
+                                                              top: 4),
+                                                      // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                      child: Column(
+                                                        children: [
+                                                          SvgPicture
+                                                              .asset(
+                                                            "assets/icons/productosVendidos.svg",
+                                                            width: 24,
+                                                            height: 24,
+                                                            colorFilter: const ColorFilter
+                                                                .mode(
+                                                                Color(
+                                                                    0xFF4682B4),
+                                                                BlendMode
+                                                                    .srcIn),
+                                                          ),
+                                                          const Text(
+                                                            "Año",
+                                                            style:
+                                                                TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize:
+                                                                  14,
+                                                              color:
+                                                                  primaryColor,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Tooltip(
+                                                    message:
+                                                        "Productos más vendidos por mes",
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets
+                                                              .only(
+                                                              left: 12,
+                                                              right: 12,
+                                                              bottom: 4,
+                                                              top: 4),
+                                                      // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                      child: Column(
+                                                        children: [
+                                                          SvgPicture
+                                                              .asset(
+                                                            "assets/icons/productosVendidos.svg",
+                                                            width: 24,
+                                                            height: 24,
+                                                            colorFilter: const ColorFilter
+                                                                .mode(
+                                                                Color(
+                                                                    0xFF4682B4),
+                                                                BlendMode
+                                                                    .srcIn),
+                                                          ),
+                                                          const Text(
+                                                            "Mes",
+                                                            style:
+                                                                TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize:
+                                                                  14,
+                                                              color:
+                                                                  primaryColor,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Tooltip(
+                                                    message:
+                                                        "Balance de ventas por año",
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets
+                                                              .only(
+                                                              left: 12,
+                                                              right: 12,
+                                                              bottom: 4,
+                                                              top: 4),
+                                                      // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                      child: Column(
+                                                        children: [
+                                                          SvgPicture
+                                                              .asset(
+                                                            "assets/icons/ventas.svg",
+                                                            width: 24,
+                                                            height: 24,
+                                                            colorFilter: const ColorFilter
+                                                                .mode(
+                                                                Color(
+                                                                    0xFF50C878),
+                                                                BlendMode
+                                                                    .srcIn),
+                                                          ),
+                                                          const Text(
+                                                            "Año",
+                                                            style:
+                                                                TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize:
+                                                                  14,
+                                                              color:
+                                                                  primaryColor,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Tooltip(
+                                                    message:
+                                                        "Balance de ventas por mes",
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets
+                                                              .only(
+                                                              left: 12,
+                                                              right: 12,
+                                                              bottom: 4,
+                                                              top: 4),
+                                                      // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                      child: Column(
+                                                        children: [
+                                                          SvgPicture
+                                                              .asset(
+                                                            "assets/icons/ventas.svg",
+                                                            width: 24,
+                                                            height: 24,
+                                                            colorFilter: const ColorFilter
+                                                                .mode(
+                                                                Color(
+                                                                    0xFF50C878),
+                                                                BlendMode
+                                                                    .srcIn),
+                                                          ),
+                                                          const Text(
+                                                            "Mes",
+                                                            style:
+                                                                TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize:
+                                                                  14,
+                                                              color:
+                                                                  primaryColor,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Tooltip(
+                                                    message:
+                                                        "Devoluciones por año",
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets
+                                                              .only(
+                                                              left: 12,
+                                                              right: 12,
+                                                              bottom: 4,
+                                                              top: 4),
+                                                      // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                      child: Column(
+                                                        children: [
+                                                          SvgPicture
+                                                              .asset(
+                                                            "assets/icons/devoluciones.svg",
+                                                            width: 24,
+                                                            height: 24,
+                                                            colorFilter: const ColorFilter
+                                                                .mode(
+                                                                Color(
+                                                                    0xFFFF7F50),
+                                                                BlendMode
+                                                                    .srcIn),
+                                                          ),
+                                                          const Text(
+                                                            "Año",
+                                                            style:
+                                                                TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize:
+                                                                  14,
+                                                              color:
+                                                                  primaryColor,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Tooltip(
+                                                    message:
+                                                        "Devoluciones por mes",
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets
+                                                              .only(
+                                                              left: 12,
+                                                              right: 12,
+                                                              bottom: 4,
+                                                              top: 4),
+                                                      // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                      child: Column(
+                                                        children: [
+                                                          SvgPicture
+                                                              .asset(
+                                                            "assets/icons/devoluciones.svg",
+                                                            width: 24,
+                                                            height: 24,
+                                                            colorFilter: const ColorFilter
+                                                                .mode(
+                                                                Color(
+                                                                    0xFFFF7F50),
+                                                                BlendMode
+                                                                    .srcIn),
+                                                          ),
+                                                          const Text(
+                                                            "Mes",
+                                                            style:
+                                                                TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize:
+                                                                  14,
+                                                              color:
+                                                                  primaryColor,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Tooltip(
+                                                    message:
+                                                        "Producciones recibidas por año",
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets
+                                                              .only(
+                                                              left: 12,
+                                                              right: 12,
+                                                              bottom: 4,
+                                                              top: 4),
+                                                      // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                      child: Column(
+                                                        children: [
+                                                          SvgPicture
+                                                              .asset(
+                                                            "assets/icons/recibidas.svg",
+                                                            width: 24,
+                                                            height: 24,
+                                                            colorFilter: const ColorFilter
+                                                                .mode(
+                                                                Color(
+                                                                    0xFFBA55D3),
+                                                                BlendMode
+                                                                    .srcIn),
+                                                          ),
+                                                          const Text(
+                                                            "Año",
+                                                            style:
+                                                                TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize:
+                                                                  14,
+                                                              color:
+                                                                  primaryColor,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Tooltip(
+                                                    message:
+                                                        "Producciones recibidas por mes",
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets
+                                                              .only(
+                                                              left: 12,
+                                                              right: 12,
+                                                              bottom: 4,
+                                                              top: 4),
+                                                      // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                      child: Column(
+                                                        children: [
+                                                          SvgPicture
+                                                              .asset(
+                                                            "assets/icons/recibidas.svg",
+                                                            width: 24,
+                                                            height: 24,
+                                                            colorFilter: const ColorFilter
+                                                                .mode(
+                                                                Color(
+                                                                    0xFFBA55D3),
+                                                                BlendMode
+                                                                    .srcIn),
+                                                          ),
+                                                          const Text(
+                                                            "Mes",
+                                                            style:
+                                                                TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize:
+                                                                  14,
+                                                              color:
+                                                                  primaryColor,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            // Botón de siguiente pestaña.
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.arrow_forward_ios,
+                                                color: primaryColor,
+                                              ),
+                                              onPressed: () =>
+                                                  _scrollToNextTab(
+                                                      context),
+                                            ),
+                                          ],
+                                        );
+                                      }),
+                                    ),
+                                  ],
+                                )),
+                          if (!Responsive.isMobile(context))
+                            const SizedBox(height: defaultPadding),
+                          if (!Responsive.isMobile(context))
+                            // Contenedor que alberga el contenido de la pestaña.
+                            _selectedItem == 0
+                                ? ReporteProductosMasVendidosAgnoPunto(
+                                    usuario: usuarioAutenticado,
+                                  )
+                                : _selectedItem == 1
+                                    ? ReporteProductosMasVendidosMesPunto(
+                                        usuario: usuarioAutenticado,
+                                      )
+                                    : _selectedItem == 2
+                                        ? ReportePuntoVentasAgnoPunto(
+                                            usuario: usuarioAutenticado,
+                                          )
+                                        : _selectedItem == 3
+                                            ? ReportePuntoVentasMesPunto(
+                                                usuario:
+                                                    usuarioAutenticado,
+                                              )
+                                            : _selectedItem == 4
+                                                ? ReporteDevolucionesPuntoAgnoPunto(
+                                                    usuario:
+                                                        usuarioAutenticado,
+                                                  )
+                                                : _selectedItem == 5
+                                                    ? ReporteDevolucionesPuntoMesPunto(
+                                                        usuario:
+                                                            usuarioAutenticado,
+                                                      )
+                                                    : _selectedItem == 6
+                                                        ? ReporteRecibidoAgnoPunto(
+                                                            usuario:
+                                                                usuarioAutenticado,
+                                                          )
+                                                        : _selectedItem ==
+                                                                7
+                                                            ? ReporteRecibidoMesPunto(
+                                                                usuario:
+                                                                    usuarioAutenticado,
+                                                              )
+                                                            : ReporteProductosMasVendidosAgnoPunto(
+                                                                usuario:
+                                                                    usuarioAutenticado,
+                                                              ),
+                          if (!Responsive.isMobile(context))
+                            const SizedBox(height: defaultPadding),
+                          const Divider(
+                            height: 1,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: defaultPadding),
+                          // Cartas de productos
+                          const CardsProductoPunto(),
+                          const SizedBox(height: defaultPadding),
+                          const Divider(
+                            height: 1,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: defaultPadding),
+                          // Cartas de anuncios
+                          CardsAnuncioPunto(
+                            usuario: usuarioAutenticado,
+                          ),
+                          const SizedBox(height: defaultPadding),
+                          // Tabla de anuncios
+                          FutureBuilder(
+                              future:
+                                  getBoletas(), // Obtener inscripciones
+                              builder: (context,
+                                  AsyncSnapshot<List<BoletaModel>>
+                                      snapshotBoleta) {
+                                // Validar estado de la petición
+                                if (snapshotBoleta.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const CircularProgressIndicator();
+                                  // Validar si hay un error
+                                } else if (snapshotBoleta.hasError) {
+                                  return Text(
+                                      'Error al cargar inscripciones: ${snapshotBoleta.error}');
+                                  // Validar si hay datos
+                                } else if (snapshotBoleta.data ==
+                                    null) {
+                                  return const Text(
+                                      'No se encontraron inscripciones');
+                                  // Mostrar datos
+                                } else {
+                                  List<BoletaModel> boletaPunto =
+                                      []; // Lista de boletas
+                                          
+                                  boletaPunto = snapshotBoleta.data!
+                                      .where((boleta) =>
+                                          boleta.anuncio.usuario
+                                              .puntoVenta ==
+                                          usuarioAutenticado.puntoVenta)
+                                      .toList(); // Filtrar las boletas por el punto de venta
+                                          
+                                  return EventosPunto(
+                                    boletas: boletaPunto,
+                                  );
+                                }
+                              }),
+                          const SizedBox(height: defaultPadding),
+                          // Tabla de pedidos pendientes
+                          FutureBuilder(
+                              future:
+                                  getPuntosVenta(), // Obtener puntos
+                              builder: (context,
+                                  AsyncSnapshot<List<PuntoVentaModel>>
+                                      snapshotPunto) {
+                                // Validar estado de la petición
+                                if (snapshotPunto.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const CircularProgressIndicator();
+                                  // Validar si hay un error
+                                } else if (snapshotPunto.hasError) {
+                                  return Text(
+                                      'Error al cargar puntos: ${snapshotPunto.error}');
+                                  // Validar si hay datos
+                                } else if (snapshotPunto.data == null) {
+                                  return const Text(
+                                      'No se encontraron puntos');
+                                  // Mostrar datos
+                                } else {
+                                  return FutureBuilder(
+                                      future:
+                                          getAuxPedidos(), // Obtener pedidos
+                                      builder: (context,
+                                          AsyncSnapshot<
+                                                  List<AuxPedidoModel>>
+                                              snapshotAuxiliar) {
+                                        // Validar estado de la petición
+                                        if (snapshotAuxiliar
+                                                .connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const CircularProgressIndicator();
+                                          // Validar si hay un error
+                                        } else if (snapshotAuxiliar
+                                            .hasError) {
+                                          return Text(
+                                              'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                          // Validar si hay datos
+                                        } else if (snapshotAuxiliar
+                                                .data ==
+                                            null) {
+                                          return const Text(
+                                              'No se encontraron pedidos');
+                                          // Mostrar datos
+                                        } else {
+                                          List<AuxPedidoModel>
+                                              pedidosPendientes =
+                                              []; // Lista de pedidos
+                                          
+                                          // Obtener pedidos pendientes del punto de venta
+                                          for (var p = 0;
+                                              p <
+                                                  snapshotPunto
+                                                      .data!.length;
+                                              p++) {
+                                            pedidosPendientes = snapshotAuxiliar
+                                                .data!
+                                                .where((auxiliar) =>
+                                                    auxiliar.pedido
+                                                            .estado ==
+                                                        "PENDIENTE" &&
+                                                    auxiliar.pedido
+                                                        .pedidoConfirmado &&
+                                                    auxiliar.pedido
+                                                            .puntoVenta ==
+                                                        snapshotPunto
+                                                            .data![p]
+                                                            .id &&
+                                                    usuarioAutenticado
+                                                            .puntoVenta ==
+                                                        snapshotPunto
+                                                            .data![p]
+                                                            .id)
+                                                .toList();
+                                          }
+                                          
+                                          return PendientePunto(
+                                            auxPedido:
+                                                pedidosPendientes,
+                                          );
+                                        }
+                                      });
+                                }
+                              }),
+                          const SizedBox(height: defaultPadding),
+                          // Tabla de pedidos entregados
+                          FutureBuilder(
+                              future:
+                                  getPuntosVenta(), // Obtener puntos
+                              builder: (context,
+                                  AsyncSnapshot<List<PuntoVentaModel>>
+                                      snapshotPunto) {
+                                // Validar estado de la petición
+                                if (snapshotPunto.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const CircularProgressIndicator();
+                                  // Validar si hay un error
+                                } else if (snapshotPunto.hasError) {
+                                  return Text(
+                                      'Error al cargar puntos: ${snapshotPunto.error}');
+                                  // Validar si hay datos
+                                } else if (snapshotPunto.data == null) {
+                                  return const Text(
+                                      'No se encontraron puntos');
+                                  // Mostrar datos
+                                } else {
+                                  return FutureBuilder(
+                                      future:
+                                          getAuxPedidos(), // Obtener pedidos
+                                      builder: (context,
+                                          AsyncSnapshot<
+                                                  List<AuxPedidoModel>>
+                                              snapshotAuxiliar) {
+                                        // Validar estado de la petición
+                                        if (snapshotAuxiliar
+                                                .connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const CircularProgressIndicator();
+                                          // Validar si hay un error
+                                        } else if (snapshotAuxiliar
+                                            .hasError) {
+                                          return Text(
+                                              'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                          // Validar si hay datos
+                                        } else if (snapshotAuxiliar
+                                                .data ==
+                                            null) {
+                                          return const Text(
+                                              'No se encontraron pedidos');
+                                          // Mostrar datos
+                                        } else {
+                                          List<AuxPedidoModel>
+                                              pedidosEntregados =
+                                              []; // Lista de pedidos entregados
+                                          
+                                          // Obtener pedidos entregados del punto de venta
+                                          for (var p = 0;
+                                              p <
+                                                  snapshotPunto
+                                                      .data!.length;
+                                              p++) {
+                                            pedidosEntregados = snapshotAuxiliar
+                                                .data!
+                                                .where((auxiliar) =>
+                                                    auxiliar.pedido
+                                                            .estado ==
+                                                        "COMPLETADO" &&
+                                                    auxiliar.pedido
+                                                        .entregado &&
+                                                    auxiliar.pedido
+                                                            .puntoVenta ==
+                                                        snapshotPunto
+                                                            .data![p]
+                                                            .id &&
+                                                    usuarioAutenticado
+                                                            .puntoVenta ==
+                                                        snapshotPunto
+                                                            .data![p]
+                                                            .id)
+                                                .toList();
+                                          }
+                                          
+                                          return EntregadoPunto(
+                                            auxPedido:
+                                                pedidosEntregados,
+                                          );
+                                        }
+                                      });
+                                }
+                              }),
+                          const SizedBox(height: defaultPadding),
+                          // Tabla de pedidos cancelados
+                          FutureBuilder(
+                              future:
+                                  getPuntosVenta(), // Obtener puntos
+                              builder: (context,
+                                  AsyncSnapshot<List<PuntoVentaModel>>
+                                      snapshotPunto) {
+                                // Validar estado de la petición
+                                if (snapshotPunto.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const CircularProgressIndicator();
+                                  // Validar si hay un error
+                                } else if (snapshotPunto.hasError) {
+                                  return Text(
+                                      'Error al cargar puntos: ${snapshotPunto.error}');
+                                  // Validar si hay datos
+                                } else if (snapshotPunto.data == null) {
+                                  return const Text(
+                                      'No se encontraron puntos');
+                                  // Mostrar datos
+                                } else {
+                                  return FutureBuilder(
+                                      future:
+                                          getAuxPedidos(), // Obtener pedidos
+                                      builder: (context,
+                                          AsyncSnapshot<
+                                                  List<AuxPedidoModel>>
+                                              snapshotAuxiliar) {
+                                        // Validar estado de la petición
+                                        if (snapshotAuxiliar
+                                                .connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const CircularProgressIndicator();
+                                          // Validar si hay un error
+                                        } else if (snapshotAuxiliar
+                                            .hasError) {
+                                          return Text(
+                                              'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                          // Validar si hay datos
+                                        } else if (snapshotAuxiliar
+                                                .data ==
+                                            null) {
+                                          return const Text(
+                                              'No se encontraron pedidos');
+                                          // Mostrar datos
+                                        } else {
+                                          List<AuxPedidoModel>
+                                              pedidosCancelados =
+                                              []; // Lista de pedidos cancelados
+                                          
+                                          // Obtener pedidos cancelados del punto de venta
+                                          for (var p = 0;
+                                              p <
+                                                  snapshotPunto
+                                                      .data!.length;
+                                              p++) {
+                                            pedidosCancelados = snapshotAuxiliar
+                                                .data!
+                                                .where((auxiliar) =>
+                                                    auxiliar.pedido
+                                                            .estado ==
+                                                        "CANCELADO" &&
+                                                    auxiliar.pedido
+                                                            .puntoVenta ==
+                                                        snapshotPunto
+                                                            .data![p]
+                                                            .id &&
+                                                    usuarioAutenticado
+                                                            .puntoVenta ==
+                                                        snapshotPunto
+                                                            .data![p]
+                                                            .id)
+                                                .toList();
+                                          }
+                                          return CanceladoPunto(
+                                            auxPedido:
+                                                pedidosCancelados,
+                                          );
+                                        }
+                                      });
+                                }
+                              }),
+                          const SizedBox(height: defaultPadding),
+                          // Tabla de facturas
+                          FutureBuilder(
+                              future:
+                                  getPuntosVenta(), // Obtener puntos
+                              builder: (context,
+                                  AsyncSnapshot<List<PuntoVentaModel>>
+                                      snapshotPunto) {
+                                // Validar estado de la petición
+                                if (snapshotPunto.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const CircularProgressIndicator();
+                                  // Validar si hay un error
+                                } else if (snapshotPunto.hasError) {
+                                  return Text(
+                                      'Error al cargar puntos: ${snapshotPunto.error}');
+                                  // Validar si hay datos
+                                } else if (snapshotPunto.data == null) {
+                                  return const Text(
+                                      'No se encontraron puntos');
+                                  // Mostrar datos
+                                } else {
+                                  return FutureBuilder(
+                                      future:
+                                          getFacturas(), // Obtener facturas
+                                      builder: (context,
+                                          AsyncSnapshot<
+                                                  List<FacturaModel>>
+                                              snapshotFactura) {
+                                        // Validar estado de la petición
+                                        if (snapshotFactura
+                                                .connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const CircularProgressIndicator();
+                                          // Validar si hay un error
+                                        } else if (snapshotFactura
+                                            .hasError) {
+                                          return Text(
+                                              'Error al cargar ventas: ${snapshotFactura.error}');
+                                          // Validar si hay datos
+                                        } else if (snapshotFactura
+                                                .data ==
+                                            null) {
+                                          return const Text(
+                                              'No se encontraron ventas');
+                                          // Mostrar datos
+                                        } else {
+                                          return FutureBuilder(
+                                              future:
+                                                  getAuxPedidos(), // Obtener pedidos
+                                              builder: (context,
+                                                  AsyncSnapshot<
+                                                          List<
+                                                              AuxPedidoModel>>
+                                                      snapshotAuxiliar) {
+                                                // Validar estado de la petición
+                                                if (snapshotAuxiliar
+                                                        .connectionState ==
+                                                    ConnectionState
+                                                        .waiting) {
+                                                  return const CircularProgressIndicator();
+                                                  // Validar si hay un error
+                                                } else if (snapshotAuxiliar
+                                                    .hasError) {
+                                                  return Text(
+                                                      'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                                  // Validar si hay datos
+                                                } else if (snapshotAuxiliar
+                                                        .data ==
+                                                    null) {
+                                                  return const Text(
+                                                      'No se encontraron pedidos');
+                                                  // Mostrar datos
+                                                } else {
+                                                  List<AuxPedidoModel>
+                                                      pedidosFacturas =
+                                                      []; // Lista de pedidos
+                                          
+                                                  // Obtener las facturas del punto de venta y la información relacionada
+                                                  for (var p = 0;
+                                                      p <
+                                                          snapshotPunto
+                                                              .data!
+                                                              .length;
+                                                      p++) {
+                                                    for (var f = 0;
+                                                        f <
+                                                            snapshotFactura
+                                                                .data!
+                                                                .length;
+                                                        f++) {
+                                                      pedidosFacturas = snapshotAuxiliar
+                                                          .data!
+                                                          .where((pedido) =>
+                                                              snapshotFactura
+                                                                      .data![
+                                                                          f]
+                                                                      .pedido
+                                                                      .id ==
+                                                                  pedido
+                                                                      .pedido
+                                                                      .id &&
+                                                              snapshotPunto
+                                                                      .data![
+                                                                          p]
+                                                                      .id ==
+                                                                  usuarioAutenticado
+                                                                      .puntoVenta &&
+                                                              pedido.pedido
+                                                                      .puntoVenta ==
+                                                                  snapshotPunto
+                                                                      .data![p]
+                                                                      .id)
+                                                          .toList();
+                                                    }
+                                                  }
+                                          
+                                                  return FacturaPunto(
+                                                    auxPedido:
+                                                        pedidosFacturas,
+                                                  );
+                                                }
+                                              });
+                                        }
+                                      });
+                                }
+                              }),
+                          const SizedBox(height: defaultPadding),
+                          // Tabla de devoluciones
+                          FutureBuilder(
+                              future:
+                                  getDevoluciones(), // Obtener devoluciones
+                              builder: (context,
+                                  AsyncSnapshot<List<DevolucionesModel>>
+                                      snapshotDevolucion) {
+                                // Validar estado de la petición
+                                if (snapshotDevolucion
+                                        .connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const CircularProgressIndicator();
+                                  // Validar si hay un error
+                                } else if (snapshotDevolucion
+                                    .hasError) {
+                                  return Text(
+                                      'Error al cargar devoluciones: ${snapshotDevolucion.error}');
+                                  // Validar si hay datos
+                                } else if (snapshotDevolucion.data ==
+                                    null) {
+                                  return const Text(
+                                      'No se encontraron devoluciones');
+                                  // Mostrar datos
+                                } else {
+                                  return FutureBuilder(
+                                      future:
+                                          getPuntosVenta(), // Obtener puntos
+                                      builder: (context,
+                                          AsyncSnapshot<
+                                                  List<PuntoVentaModel>>
+                                              snapshotPunto) {
+                                        // Validar estado de la petición
+                                        if (snapshotPunto
+                                                .connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const CircularProgressIndicator();
+                                          // Validar si hay un error
+                                        } else if (snapshotPunto
+                                            .hasError) {
+                                          return Text(
+                                              'Error al cargar puntos: ${snapshotPunto.error}');
+                                          // Validar si hay datos
+                                        } else if (snapshotPunto.data ==
+                                            null) {
+                                          return const Text(
+                                              'No se encontraron puntos');
+                                          // Mostrar datos
+                                        } else {
+                                          return FutureBuilder(
+                                              future:
+                                                  getAuxPedidos(), // Obtener pedidos
+                                              builder: (context,
+                                                  AsyncSnapshot<
+                                                          List<
+                                                              AuxPedidoModel>>
+                                                      snapshotAuxiliar) {
+                                                // Validar estado de la petición
+                                                if (snapshotAuxiliar
+                                                        .connectionState ==
+                                                    ConnectionState
+                                                        .waiting) {
+                                                  return const CircularProgressIndicator();
+                                                  // Validar si hay un error
+                                                } else if (snapshotAuxiliar
+                                                    .hasError) {
+                                                  return Text(
+                                                      'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                                  // Validar si hay datos
+                                                } else if (snapshotAuxiliar
+                                                        .data ==
+                                                    null) {
+                                                  return const Text(
+                                                      'No se encontraron pedidos');
+                                                  // Mostrar datos
+                                                } else {
+                                                  List<AuxPedidoModel>
+                                                      pedidosDevueltos =
+                                                      []; // Lista de pedidos
+                                          
+                                                  // Obtener las devoluciones del punto de venta y la información relacionada
+                                                  for (var p = 0;
+                                                      p <
+                                                          snapshotPunto
+                                                              .data!
+                                                              .length;
+                                                      p++) {
+                                                    for (var d = 0;
+                                                        d <
+                                                            snapshotDevolucion
+                                                                .data!
+                                                                .length;
+                                                        d++) {
+                                                      pedidosDevueltos = snapshotAuxiliar
+                                                          .data!
+                                                          .where((pedido) =>
+                                                              snapshotDevolucion
+                                                                      .data![
+                                                                          d]
+                                                                      .factura
+                                                                      .pedido
+                                                                      .id ==
+                                                                  pedido
+                                                                      .pedido
+                                                                      .id &&
+                                                              snapshotPunto
+                                                                      .data![
+                                                                          p]
+                                                                      .id ==
+                                                                  usuarioAutenticado
+                                                                      .puntoVenta &&
+                                                              pedido.pedido
+                                                                      .puntoVenta ==
+                                                                  snapshotPunto
+                                                                      .data![p]
+                                                                      .id)
+                                                          .toList();
+                                                    }
+                                                  }
+                                          
+                                                  return DevolucionPunto(
+                                                    auxPedido:
+                                                        pedidosDevueltos,
+                                                  );
+                                                }
+                                              });
+                                        }
+                                      });
+                                }
+                              }),
+                          const SizedBox(height: defaultPadding),
+                          // Tabla de inventario
+                          FutureBuilder(
+                              future:
+                                  getInventario(), // Obtener inventario
+                              builder: (context,
+                                  AsyncSnapshot<List<InventarioModel>>
+                                      snapshotInventario) {
+                                // Validar estado de la petición
+                                if (snapshotInventario
+                                        .connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const CircularProgressIndicator();
+                                  // Validar si hay un error
+                                } else if (snapshotInventario
+                                    .hasError) {
+                                  return Text(
+                                      'Error al cargar inventarios: ${snapshotInventario.error}');
+                                  // Validar si hay datos
+                                } else if (snapshotInventario.data ==
+                                    null) {
+                                  return const Text(
+                                      'No se encontraron inventarios');
+                                  // Mostrar datos
+                                } else {
+                                  final inventarioPunto = snapshotInventario
+                                      .data!
+                                      .where((inventario) =>
+                                          inventario
+                                              .bodega.puntoVenta.id ==
+                                          usuarioAutenticado.puntoVenta)
+                                      .toList(); // Filtrar inventario por punto de venta
+                                          
+                                  return BodegaPunto(
+                                    inventarioLista: inventarioPunto,
+                                  );
+                                }
+                              }),
+                          const SizedBox(height: defaultPadding),
+                          // Si el dispositivo no es de escritorio se muestra la sección de favoritos y visitados
                           if (!Responsive.isDesktop(context))
                             Column(
                               children: [
@@ -1130,6 +1241,7 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                         ],
                       ),
                     ),
+                    // Si el dispositivo es de escritorio se muestra la sección de favoritos y visitados en la parte derecha
                     if (Responsive.isDesktop(context))
                       const SizedBox(width: defaultPadding),
                     // On Mobile means if the screen is less than 850 we don't want to show it

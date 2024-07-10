@@ -3,16 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:universal_platform/universal_platform.dart';
 
-// Clase que define los componentes utilizados en la pantalla de bienvenida
+/// Clase que define los componentes utilizados en la pantalla de bienvenida.
 class Components {
-  String titulo; // Título del componente
-  String descripcion; // Descripción del componente
-  Widget?
-      backgroundColor; // Fondo del componente (puede ser un widget como Lottie)
-  String imagen2; // Segunda imagen relacionada al componente
-  Color background; // Color de fondo del componente
+  /// Título del componente.
+  String titulo;
 
-  // Constructor que inicializa los atributos de la clase
+  /// Descripción del componente.
+  String descripcion;
+
+  /// Fondo del componente (puede ser un widget como Lottie).
+  Widget? backgroundColor;
+
+  /// Segunda imagen relacionada al componente.
+  String imagen2;
+
+  /// Color de fondo del componente.
+  Color background;
+
+  /// Constructor que inicializa los atributos de la clase.
   Components(
       {required this.titulo,
       required this.descripcion,
@@ -21,7 +29,7 @@ class Components {
       required this.background});
 }
 
-// Lista que contiene instancias de la clase Components, representando cada componente de la pantalla
+/// Lista que contiene instancias de la clase [Components], representando cada componente de la pantalla.
 List<Components> listaComponents = [
   Components(
       titulo: "Formación Profesional Integral",

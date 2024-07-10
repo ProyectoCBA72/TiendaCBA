@@ -1,6 +1,7 @@
 // ignore_for_file: use_full_hex_values_for_flutter_colors
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
@@ -9,44 +10,103 @@ import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 
+/// Un widget de estado que representa la vista de devoluciones de un punto de venta.
+///
+/// Esta clase extiende [StatefulWidget] y proporciona un estado asociado
+/// [_DevolucionPuntoState]. Tiene una lista de [AuxPedidoModel] que representa
+/// las devoluciones del punto de venta.
 class DevolucionPunto extends StatefulWidget {
+  /// Lista de objetos [AuxPedidoModel] que representan las devoluciones del punto de venta.
   final List<AuxPedidoModel> auxPedido;
+
+  /// Crea un nuevo widget de estado de devoluciones para un punto de venta.
+  ///
+  /// El parámetro [auxPedido] es una lista de objetos [AuxPedidoModel] que
+  /// representan las devoluciones del punto de venta.
   const DevolucionPunto({super.key, required this.auxPedido});
 
+  /// Crea un nuevo estado asociado al widget [DevolucionPunto].
+  ///
+  /// Devuelve un objeto [_DevolucionPuntoState] que maneja los datos de la pantalla.
   @override
   State<DevolucionPunto> createState() => _DevolucionPuntoState();
 }
 
 class _DevolucionPuntoState extends State<DevolucionPunto> {
+  /// Lista de objetos [AuxPedidoModel] que representan las devoluciones del punto de venta.
   List<AuxPedidoModel> _devoluciones = [];
+
+  /// Lista de objetos [ProductoModel] que representan los productos del punto de venta.
   List<ProductoModel> listaProductos = [];
+
+  /// Lista de objetos [DevolucionesModel] que representan las devoluciones del punto de venta.
   List<DevolucionesModel> listaDevoluciones = [];
 
+  /// Un [DataGridSource] que proporciona los datos para la tabla de devoluciones.
   late DevolucionPuntoDataGridSource _dataGridSource;
 
   @override
+
+  /// Se llama cuando se inicia el estado.
+  ///
+  /// Crea un nuevo [DataGridSource] con los datos de las devoluciones, productos y pedidos.
+  /// Luego, se copia la lista de devoluciones recibida en el constructor en el campo [_devoluciones].
+  /// Finalmente, se llama a [_loadData] para cargar los datos necesarios.
+  @override
   void initState() {
     super.initState();
+
+    // Crea un nuevo DataGridSource con los datos de las devoluciones, productos y pedidos.
     _dataGridSource = DevolucionPuntoDataGridSource(
         devoluciones: _devoluciones,
         listaProductos: listaProductos,
         listaDevoluciones: listaDevoluciones);
+
+    // Copia la lista de devoluciones recibida en el constructor en el campo [_devoluciones].
     _devoluciones = widget.auxPedido;
+
+    // Carga los datos necesarios para mostrar la tabla de devoluciones.
     _loadData();
   }
 
+  /// Carga los datos necesarios para mostrar la tabla de devoluciones.
+  ///
+  /// Primero, obtiene la lista de productos y la lista de devoluciones de la API
+  /// y las asigna a las variables [listaProductos] y [listaDevoluciones],
+  /// respectivamente.
+  ///
+  /// Luego, actualiza [_dataGridSource] en el siguiente frame de la interfaz de usuario.
   Future<void> _loadData() async {
+    // Obtiene los productos de la API y los asigna a la variable [listaProductos]
     List<ProductoModel> productosCargados = await getProductos();
-    List<DevolucionesModel> devolucionesCargadas = await getDevoluciones();
-
     listaProductos = productosCargados;
+
+    // Obtiene las devoluciones de la API y los asigna a la variable [listaDevoluciones]
+    List<DevolucionesModel> devolucionesCargadas = await getDevoluciones();
     listaDevoluciones = devolucionesCargadas;
 
-    // Ahora inicializa _dataGridSource después de cargar los datos
-    _dataGridSource = DevolucionPuntoDataGridSource(
-        devoluciones: _devoluciones,
-        listaProductos: listaProductos,
-        listaDevoluciones: listaDevoluciones);
+    if (mounted) {
+      // Actualiza _dataGridSource en el siguiente frame de la interfaz de usuario
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          // Inicializa _dataGridSource con los datos de las devoluciones, productos y pedidos
+          _dataGridSource = DevolucionPuntoDataGridSource(
+              devoluciones: _devoluciones,
+              listaProductos: listaProductos,
+              listaDevoluciones: listaDevoluciones);
+        });
+      });
+    }
+  }
+
+  /// Se llama automáticamente cuando se elimina el widget.
+  ///
+  /// Se debe llamar a [dispose] para liberar los recursos utilizados por el widget.
+  /// Finalmente, se llama al método [dispose] del padre para liberar recursos adicionales.
+  @override
+  void dispose() {
+    // Llama al método [dispose] del widget base
+    super.dispose();
   }
 
   @override
@@ -60,6 +120,7 @@ class _DevolucionPuntoState extends State<DevolucionPunto> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Titulo de la tabla
           Text(
             "Devoluciones",
             style: Theme.of(context)
@@ -70,6 +131,7 @@ class _DevolucionPuntoState extends State<DevolucionPunto> {
           const SizedBox(
             height: defaultPadding,
           ),
+          // Contenedor de la tabla
           SizedBox(
             height: 300,
             width: double.infinity,
@@ -83,11 +145,12 @@ class _DevolucionPuntoState extends State<DevolucionPunto> {
                 shrinkWrapColumns: true,
                 shrinkWrapRows: true,
                 rowsPerPage: 10,
-                source: _dataGridSource,
+                source: _dataGridSource, // Asigna la fuente de datos a la tabla
                 selectionMode: SelectionMode.multiple,
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Columnas de la tabla
                 columns: <GridColumn>[
                   GridColumn(
                     columnName: 'Número Venta',
@@ -168,6 +231,7 @@ class _DevolucionPuntoState extends State<DevolucionPunto> {
           const SizedBox(
             height: defaultPadding,
           ),
+          // Botón para imprimir o cambiar el estado de las devoluciones
           if (!Responsive.isMobile(context))
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -196,40 +260,49 @@ class _DevolucionPuntoState extends State<DevolucionPunto> {
     );
   }
 
+  /// Construye un botón con el texto dado y la función de presionar dada.
+  ///
+  /// El botón tiene un diseño con bordes redondeados y un gradiente de colores.
+  /// Al presionar el botón se llama a la función [onPressed].
+  ///
+  /// El parámetro [text] es el texto que se mostrará en el botón.
+  /// El parámetro [onPressed] es la función que se ejecutará al presionar el botón.
   Widget _buildButton(String text, VoidCallback onPressed) {
     return Container(
       width: 200,
+      // Decoración del botón con bordes redondeados y gradiente de colores
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         gradient: const LinearGradient(
           colors: [
-            botonClaro,
-            botonOscuro,
+            botonClaro, // Verde más claro
+            botonOscuro, // Verde más oscuro
           ],
         ),
         boxShadow: const [
           BoxShadow(
-            color: botonSombra,
+            color: botonSombra, // Verde más claro para sombra
             blurRadius: 5,
             offset: Offset(0, 3),
           ),
         ],
       ),
       child: Material(
-        color: Colors.transparent,
+        color: Colors.transparent, // Color de fondo transparente
         child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(10),
+          onTap: onPressed, // Función a ejecutar al presionar el botón
+          borderRadius: BorderRadius.circular(10), // Bordes redondeados
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding:
+                const EdgeInsets.symmetric(vertical: 10), // Padding vertical
             child: Center(
               child: Text(
-                text,
+                text, // Texto del botón
                 style: const TextStyle(
-                  color: background1,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Calibri-Bold',
+                  color: background1, // Color del texto
+                  fontSize: 13, // Tamaño de fuente
+                  fontWeight: FontWeight.bold, // Fuente en negrita
+                  fontFamily: 'Calibri-Bold', // Fuente Calibri
                 ),
               ),
             ),
@@ -240,7 +313,26 @@ class _DevolucionPuntoState extends State<DevolucionPunto> {
   }
 }
 
+/// Clase que define la fuente de datos de la tabla de devoluciones del punto.
 class DevolucionPuntoDataGridSource extends DataGridSource {
+  /// Obtiene el número de venta de una devolución dado su número de pedido.
+  ///
+  /// El método recibe el número de pedido y una lista de devoluciones.
+  /// Recorre la lista de devoluciones buscando la devolución que corresponda
+  /// al número de pedido especificado. Si encuentra una devolución que
+  /// coincide con el número de pedido, obtiene el número de venta de la factura
+  /// asociada a esa devolución y lo devuelve como una cadena. Si no encuentra
+  /// ninguna devolución que coincida, devuelve una cadena vacía.
+  ///
+  /// Parámetros:
+  /// - numeroPedido: El número de pedido de la devolución a buscar.
+  /// - devoluciones: La lista de devoluciones en la que buscar la devolución.
+  ///
+  /// Retorna:
+  /// - Una cadena con el número de venta de la factura asociada a la devolución,
+  ///   si se encuentra una devolución que coincida con el número de pedido.
+  /// - Una cadena vacía si no se encuentra ninguna devolución que coincida con
+  ///   el número de pedido.
   String numeroVentaDevolucion(
       int numeroPedido, List<DevolucionesModel> devoluciones) {
     String numeroVenta = "";
@@ -254,71 +346,196 @@ class DevolucionPuntoDataGridSource extends DataGridSource {
     return numeroVenta;
   }
 
+  /// Obtiene el nombre del producto dado su id.
+  ///
+  /// El método recibe el id del producto y una lista de productos.
+  /// Recorre la lista de productos buscando el producto que corresponda
+  /// al id especificado. Si encuentra un producto que coincide con el id,
+  /// obtiene el nombre del producto y lo devuelve como una cadena. Si no encuentra
+  /// ningún producto que coincida con el id, devuelve una cadena vacía.
+  ///
+  /// Parámetros:
+  /// - productoAxiliar: El id del producto a buscar.
+  /// - productos: La lista de productos en la que buscar el producto.
+  ///
+  /// Retorna:
+  /// - Una cadena con el nombre del producto correspondiente al id,
+  ///   si se encuentra un producto que coincida con el id.
+  /// - Una cadena vacía si no se encuentra ningún producto que coincida con
+  ///   el id.
   String productoNombre(int productoAxiliar, List<ProductoModel> productos) {
+    // Cadena para almacenar el nombre del producto
     String productName = "";
 
+    // Recorremos la lista de productos
     for (var producto in productos) {
+      // Verificamos si el id del producto coincide con el id especificado
       if (producto.id == productoAxiliar) {
+        // Si hay coincidencia, obtenemos el nombre del producto y salimos del bucle
         productName = producto.nombre;
         break;
       }
     }
 
+    // Retornamos el nombre del producto o una cadena vacía si no se encontró ninguno
     return productName;
   }
 
+  /// Obtiene la fecha de venta de una devolución dado su número de pedido.
+  ///
+  /// El método recibe el número de pedido de la devolución y una lista de
+  /// devoluciones. Recorre la lista de devoluciones buscando la devolución que
+  /// corresponda al número de pedido especificado. Si encuentra una devolución que
+  /// coincide con el número de pedido, obtiene la fecha de la factura asociada a
+  /// esa devolución y la devuelve como una cadena. Si no encuentra ninguna
+  /// devolución que coincida, devuelve una cadena vacía.
+  ///
+  /// Parámetros:
+  /// - numeroPedido: El número de pedido de la devolución a buscar.
+  /// - devoluciones: La lista de devoluciones en la que buscar la devolución.
+  ///
+  /// Retorna:
+  /// - Una cadena con la fecha de la factura asociada a la devolución encontrada,
+  ///   si se encuentra una devolución que coincida con el número de pedido.
+  /// - Una cadena vacía si no se encuentra ninguna devolución que coincida con
+  ///   el número de pedido.
   String fechaVentaDevolucion(
       int numeroPedido, List<DevolucionesModel> devoluciones) {
+    // Cadena para almacenar la fecha de venta de la devolución
     String fechaVenta = "";
 
+    // Recorremos la lista de devoluciones buscando la devolución correspondiente
     for (var devolucion in devoluciones) {
+      // Verificamos si el número de pedido de la devolución coincide con el
+      // número de pedido especificado
       if (devolucion.factura.pedido.numeroPedido == numeroPedido) {
+        // Si hay coincidencia, obtenemos la fecha de la factura asociada a la
+        // devolución y salimos del bucle
         fechaVenta = devolucion.factura.fecha;
+        break;
       }
     }
 
+    // Retornamos la fecha de venta de la devolución encontrada o una cadena vacía si
+    // no se encontró ninguna devolución que coincida con el número de pedido
     return fechaVenta;
   }
 
+  /// Obtiene el medio de pago de una devolución dado su número de pedido.
+  ///
+  /// El método recibe el número de pedido de la devolución y una lista de
+  /// devoluciones. Recorre la lista de devoluciones buscando la devolución que
+  /// corresponda al número de pedido especificado. Si encuentra una devolución que
+  /// coincide con el número de pedido, obtiene el medio de pago de la factura
+  /// asociada a esa devolución y lo devuelve como una cadena. Si no encuentra
+  /// ninguna devolución que coincida, devuelve una cadena vacía.
+  ///
+  /// Parámetros:
+  /// - numeroPedido: El número de pedido de la devolución a buscar.
+  /// - devoluciones: La lista de devoluciones en la que buscar la devolución.
+  ///
+  /// Retorna:
+  /// - Una cadena con el medio de pago de la factura asociada a la devolución,
+  ///   si se encuentra una devolución que coincida con el número de pedido.
+  /// - Una cadena vacía si no se encuentra ninguna devolución que coincida con
+  ///   el número de pedido.
   String medioVentaDevolucion(
       int numeroPedido, List<DevolucionesModel> devoluciones) {
+    // Cadena para almacenar el medio de pago de la devolución
     String medioVenta = "";
 
+    // Recorremos la lista de devoluciones buscando la devolución correspondiente
     for (var devolucion in devoluciones) {
+      // Verificamos si el número de pedido de la devolución coincide con el
+      // número de pedido especificado
       if (devolucion.factura.pedido.numeroPedido == numeroPedido) {
+        // Si hay coincidencia, obtenemos el medio de pago de la factura asociada a
+        // la devolución y salimos del bucle
         medioVenta = devolucion.factura.medioPago.nombre;
+        break;
       }
     }
 
+    // Retornamos el medio de pago de la devolución encontrada o una cadena vacía si
+    // no se encontró ninguna devolución que coincida con el número de pedido
     return medioVenta;
   }
 
+  /// Obtiene la fecha de devolución dado el número de pedido.
+  ///
+  /// El método recorre la lista de devoluciones buscando la devolución que
+  /// corresponda al número de pedido especificado. Si encuentra una devolución que
+  /// coincide con el número de pedido, obtiene la fecha de la devolución y la
+  /// devuelve como una cadena. Si no encuentra ninguna devolución que coincida,
+  /// devuelve una cadena vacía.
+  ///
+  /// Parámetros:
+  /// - numeroPedido: El número de pedido de la devolución a buscar.
+  /// - devoluciones: La lista de devoluciones en la que buscar la devolución.
+  ///
+  /// Retorna:
+  /// - Una cadena con la fecha de la devolución encontrada, si se encuentra una
+  ///   devolución que coincida con el número de pedido.
+  /// - Una cadena vacía si no se encuentra ninguna devolución que coincida con
+  ///   el número de pedido.
   String fechaDevolucion(
       int numeroPedido, List<DevolucionesModel> devoluciones) {
+    // Cadena para almacenar la fecha de la devolución
     String fechaDevolucion = "";
 
+    // Recorremos la lista de devoluciones buscando la devolución correspondiente
     for (var devolucion in devoluciones) {
+      // Verificamos si el número de pedido de la devolución coincide con el
+      // número de pedido especificado
       if (devolucion.factura.pedido.numeroPedido == numeroPedido) {
+        // Si hay coincidencia, obtenemos la fecha de la devolución y salimos del bucle
         fechaDevolucion = devolucion.fecha;
+        break;
       }
     }
 
+    // Retornamos la fecha de la devolución encontrada o una cadena vacía si no se
+    // encontró ninguna devolución que coincida con el número de pedido
     return fechaDevolucion;
   }
 
+  /// Obtiene el estado de devolución dado el número de pedido.
+  ///
+  /// El método recorre la lista de devoluciones buscando la devolución que
+  /// corresponda al número de pedido especificado. Si encuentra una devolución que
+  /// coincide con el número de pedido, obtiene su estado de devolución y lo devuelve.
+  /// Si no encuentra ninguna devolución que coincida, devuelve false.
+  ///
+  /// Parámetros:
+  /// - numeroPedido: El número de pedido de la devolución a buscar.
+  /// - devoluciones: La lista de devoluciones en la que buscar la devolución.
+  ///
+  /// Retorna:
+  /// - El estado de devolución de la devolución encontrada, si se encuentra una
+  ///   devolución que coincida con el número de pedido.
+  /// - False si no se encuentra ninguna devolución que coincida con el número de
+  ///   pedido.
   bool estadoDevolucion(
       int numeroPedido, List<DevolucionesModel> devoluciones) {
+    // Inicializa un booleano falso para almacenar el estado de devolución.
     bool estadoDevolucion = false;
 
+    // Recorre la lista de devoluciones buscando la devolución correspondiente.
     for (var devolucion in devoluciones) {
+      // Verifica si el número de pedido de la devolución coincide con el buscado.
       if (devolucion.factura.pedido.numeroPedido == numeroPedido) {
+        // Obtiene el estado de devolución de la devolución.
         estadoDevolucion = devolucion.estado;
+        // Salta el bucle para evitar buscar más devoluciones.
+        break;
       }
     }
 
+    // Devuelve el estado de devolución encontrado o falso.
     return estadoDevolucion;
   }
 
+  /// Crea un objeto de fuente de datos para la grilla de devoluciones.
   DevolucionPuntoDataGridSource({
     required List<AuxPedidoModel> devoluciones,
     required List<ProductoModel> listaProductos,
@@ -362,11 +579,14 @@ class DevolucionPuntoDataGridSource extends DataGridSource {
     }).toList();
   }
 
+  // Lista de filas de la grilla
   List<DataGridRow> _devolucionData = [];
 
+  // Celdas de la grilla
   @override
   List<DataGridRow> get rows => _devolucionData;
 
+  // retorna el valor de la celda
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(cells: [
@@ -399,10 +619,13 @@ class DevolucionPuntoDataGridSource extends DataGridSource {
           child: (row.getCells()[i].value is Widget)
               ? row.getCells()[i].value
               : Text(i == 5
-                  ? "\$${formatter.format(row.getCells()[i].value)}"
+                  ? "\$${formatter.format(row.getCells()[i].value)}" // formato de moneda
                   : i == 4 || i == 7
-                      ? "${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).day)}-${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).month)}-${DateTime.parse(row.getCells()[i].value.toString()).year.toString()} ${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).hour)}:${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).minute)}"
-                      : row.getCells()[i].value.toString()),
+                      ? formatFechaHora(row
+                          .getCells()[i]
+                          .value
+                          .toString()) // formato de fecha
+                      : row.getCells()[i].value.toString()), // formato de texto
         ),
     ]);
   }

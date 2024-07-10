@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'categoriaModel.dart';
@@ -7,11 +9,28 @@ import 'sedeModel.dart';
 import 'unidadProduccionModel.dart';
 import 'usuarioModel.dart';
 
+/// Clase FavoritoModel que representa un favorito en la aplicación.
+///
+/// Esta clase define una estructura de datos para representar un favorito.
+/// Un favorito es un producto que ha sido marcado como favorito por un usuario.
+///
+/// Atributos:
+/// - id: El identificador único del favorito.
+/// - usuario: El identificador del usuario que marcó el producto como favorito.
+/// - producto: El producto marcado como favorito.
 class FavoritoModel {
+  /// El identificador único del favorito.
   final int id;
+
+  /// El identificador del usuario que marcó el producto como favorito.
   final int usuario;
+
+  /// El producto marcado como favorito.
   final ProductoModel producto;
 
+  /// Constructor que crea un nuevo objeto FavoritoModel.
+  ///
+  /// Los parámetros son obligatorios.
   FavoritoModel({
     required this.id,
     required this.usuario,
@@ -19,17 +38,50 @@ class FavoritoModel {
   });
 }
 
+/// Lista que almacena todas las instancias de [FavoritoModel].
+///
+/// Esta lista se utiliza para almacenar todos los favoritos
+/// que se han marcado en la aplicación.
+/// Los elementos de esta lista son de tipo [FavoritoModel].
+/// Puedes agregar elementos a esta lista utilizando el método [add],
+/// y puedes iterar sobre sus elementos utilizando un bucle [for] o el método [index].
+///
+/// Ejemplo de uso:
+///   // Agregar un favorito a la lista
+///   favoritos.add(FavoritoModel(
+///     id: 1,
+///     usuario: 1,
+///     producto: ProductoModel(id: 1, titulo: "Producto de prueba"),
+///   ));
 List<FavoritoModel> favoritos = [];
 
-// Futuro para traer los datos de la api
-
+// Método para obtener los datos de los favoritos
 Future<List<FavoritoModel>> getFavoritos() async {
+  /// URL base para obtener los favoritos a través de la API.
+  /// Se utiliza para construir la URL completa para realizar la solicitud HTTP GET.
   String url = "";
 
+  // Construir la URL completa para obtener los favoritos
   url = "$sourceApi/api/favoritos/";
 
+  /// Solicitud HTTP GET para obtener los favoritos.
+  ///
+  /// Realiza una solicitud a la URL construida anteriormente y espera una respuesta.
+  /// Si la respuesta tiene un código de estado 200 (OK), se decodifica
+  /// la respuesta JSON a UTF-8 y se convierte en una lista de objetos [dynamic].
+  /// Luego, se limpia la lista de favoritos existentes y se llena con los
+  /// datos actualizados obtenidos de la respuesta.
+  ///
+  /// Si la respuesta no tiene un código de estado 200, se lanza una excepción
+  /// con el mensaje de error obtenido de la respuesta.
   final response = await http.get(Uri.parse(url));
 
+  // Comentario adicional:
+  // Es importante manejar casos de error en la respuesta HTTP.
+  // En este caso, se lanza una excepción con el mensaje de error obtenido
+  // de la respuesta si la respuesta no tiene un código de estado 200.
+
+  // Verificar el estado de la respuesta
   if (response.statusCode == 200) {
     // Limpiar la lista antes de llenarla con datos actualizados
     favoritos.clear();
@@ -38,6 +90,7 @@ Future<List<FavoritoModel>> getFavoritos() async {
     String responseBodyUtf8 = utf8.decode(response.bodyBytes);
     List<dynamic> decodedData = jsonDecode(responseBodyUtf8);
 
+    // Llenar la lista de favoritos con los datos decodificados
     for (var favoritoData in decodedData) {
       favoritos.add(
         FavoritoModel(
@@ -145,9 +198,10 @@ Future<List<FavoritoModel>> getFavoritos() async {
         ),
       );
     }
-    // Devolver la lista llena
+    // Devolver la lista de favoritos
     return favoritos;
   } else {
+    // Lanzar una excepción si la respuesta no es exitosa
     throw Exception(
         'Fallo la solicitud HTTP con código ${response.statusCode}');
   }

@@ -4,9 +4,19 @@ import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/responsive.dart';
 import 'package:flutter/material.dart';
 
+/// Widget que representa la sección de la misión en la app.
+///
+/// Esta clase extiende [StatefulWidget] y tiene un constructor vacío.
+/// Tiene un estado [_MisionSectionState] que se encarga de manejar los datos de la pantalla.
 class MisionSection extends StatefulWidget {
+  /// Construye un widget de la sección de la misión.
+  ///
+  /// No recibe parámetros.
   const MisionSection({super.key});
 
+  /// Crea el estado para este widget.
+  ///
+  /// Retorna un objeto [_MisionSectionState].
   @override
   State<MisionSection> createState() => _MisionSectionState();
 }
@@ -14,6 +24,7 @@ class MisionSection extends StatefulWidget {
 class _MisionSectionState extends State<MisionSection> {
   @override
   Widget build(BuildContext context) {
+    // Verifica si la pantalla es escritorio o tablet.
     return Responsive.isDesktop(context) || Responsive.isTablet(context)
         ? Column(
             children: [
@@ -210,6 +221,7 @@ class _MisionSectionState extends State<MisionSection> {
               ),
             ],
           )
+          // Pantalla si es dispositivo movil
         : Column(
             children: [
               Center(

@@ -14,20 +14,38 @@ import '../../Models/auxPedidoModel.dart';
 import '../../constantsDesign.dart';
 import 'package:http/http.dart' as http;
 
+/// Esta clase representa la pantalla del cuerpo del carrito de la aplicación.
+///
+/// Esta clase extiende [StatefulWidget] y proporciona un estado asociado
+/// [_CarritoBodyScreenState].
 class CarritoBodyScreen extends StatefulWidget {
+  /// Construye un [CarritoBodyScreen] con un [Key] opcional.
   const CarritoBodyScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   State<CarritoBodyScreen> createState() => _CarritoBodyScreenState();
 }
 
 class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
 // futuro para actualizar la cantidad y el precio del aux pedido.
+  /// Futuro para actualizar la cantidad, precio, producto y pedido de un aux pedido.
+  ///
+  /// Toma el ID del aux pedido, la cantidad, el precio, el ID del producto y el ID del pedido,
+  /// y realiza una solicitud PUT al API para actualizar el aux pedido con estos datos.
+  ///
+  /// @param id El ID del aux pedido a actualizar.
+  /// @param cantidad La nueva cantidad del aux pedido.
+  /// @param precio El nuevo precio del aux pedido.
+  /// @param producto El nuevo ID del producto del aux pedido.
+  /// @param pedido El nuevo ID del pedido del aux pedido.
   Future<void> _updateAuxPedido(
       int id, int cantidad, int precio, int producto, int pedido) async {
     try {
+      // Construir la URL para actualizar el aux pedido
       final url = Uri.parse('$sourceApi/api/aux-pedidos/$id/');
 
+      // Realizar la solicitud PUT al API
       final response = await http.put(
         url,
         headers: {
@@ -41,20 +59,29 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
         }),
       );
 
+      // Verificar la respuesta de la solicitud
       if (response.statusCode == 200) {
+        // Si la respuesta es exitosa, imprimir un mensaje de éxito
         print('Pedido actualizado con éxito.');
       } else {
+        // Si la respuesta no es exitosa, imprimir el mensaje de error
         print('Error al actualizar el pedido: ${response.body}');
       }
     } catch (e) {
+      // Si ocurre un error, imprimir el error
       print(e);
     }
   }
 
+  /// Elimina un producto del carrito.
+  ///
+  /// @param id El ID del producto a eliminar.
   Future<void> _removeProducto(int id) async {
     try {
+      // Construir la URL para eliminar el aux pedido
       final url = Uri.parse('$sourceApi/api/aux-pedidos/$id/');
 
+      // Realizar la solicitud DELETE al API
       final response = await http.delete(
         url,
         headers: {
@@ -62,24 +89,42 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
         },
       );
 
+      // Verificar la respuesta de la solicitud
       if (response.statusCode == 204) {
-        print('producto eliminado.');
+        // Si la respuesta es exitosa, imprimir un mensaje de éxito
+        print('Producto eliminado con éxito.');
+
+        // Actualizar la pantalla del carrito
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => const CarritoScreen()));
       } else {
+        // Si la respuesta no es exitosa, imprimir el mensaje de error
         print('Error al eliminar el producto: ${response.body}');
       }
     } catch (e) {
+      // Si ocurre un error, imprimir el error
       print(e);
     }
   }
 
 // funcion para calcular el total de los productos, aun se trabaja ( cambio )
+  /// Calcula el total de los productos.
+  ///
+  /// Toma una lista de [AuxPedidoModel] y calcula el total de los precios de
+  /// los productos. Devuelve el total formateado como cadena.
+  ///
+  /// @param pedidos La lista de aux pedidos.
+  /// @return El total formateado como cadena.
   String calcularTotal(List<AuxPedidoModel> pedidos) {
+    // Inicializar la variable de suma a 0.0
     double suma = 0.0;
+
+    // Iterar sobre cada aux pedido y sumar su precio
     for (AuxPedidoModel pedido in pedidos) {
       suma += pedido.precio;
     }
+
+    // Formatear el valor total y devolverlo
     final costoFinal = formatter.format(suma); // Formatea el valor
     return costoFinal;
   }
@@ -101,9 +146,12 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
               child: FutureBuilder(
                 future: getAuxPedidos(),
                 builder: (context, snapshot) {
+                  // Mostrar indicador de carga mientras se obtienen los datos
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
+                  }
+                  // Manejar errores en la obtención de los datos
+                  else if (snapshot.hasError) {
                     return Center(
                         child: Text(
                       'Error: ${snapshot.error}',
@@ -122,7 +170,9 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                       ),
                       textAlign: TextAlign.center,
                     ));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  }
+                  // Mostrar mensaje si no hay pedidos en el carrito
+                  else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return Center(
                         child: Text(
                       'No hay pedidos en el carrito.',
@@ -141,7 +191,9 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                       ),
                       textAlign: TextAlign.center,
                     ));
-                  } else {
+                  }
+                  // Si hay pedidos en el carrito, construir la vista
+                  else {
                     final auxPedidos = snapshot.data!
                         .where((auxPedido) =>
                             auxPedido.pedido.usuario.id ==
@@ -153,11 +205,14 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                     return FutureBuilder(
                       future: getProductos(),
                       builder: (context, snapshotProductos) {
+                        // Mostrar indicador de carga mientras se obtienen los productos
                         if (snapshotProductos.connectionState ==
                             ConnectionState.waiting) {
                           return const Center(
                               child: CircularProgressIndicator());
-                        } else if (snapshotProductos.hasError) {
+                        }
+                        // Manejar errores en la obtención de los productos
+                        else if (snapshotProductos.hasError) {
                           return Center(
                               child: Text(
                             'Error: ${snapshotProductos.error}',
@@ -180,11 +235,13 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                             ),
                             textAlign: TextAlign.center,
                           ));
-                        } else if (!snapshotProductos.hasData ||
+                        }
+                        // Mostrar mensaje si no hay productos relacionados
+                        else if (!snapshotProductos.hasData ||
                             snapshotProductos.data!.isEmpty) {
                           return Center(
                               child: Text(
-                            'No hay producto relaciondo error.',
+                            'No hay producto relacionado error.',
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge!
@@ -204,15 +261,20 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                             ),
                             textAlign: TextAlign.center,
                           ));
-                        } else {
+                        }
+                        // Si hay productos, construir la vista con productos e imágenes
+                        else {
                           return FutureBuilder(
                             future: getImagenProductos(),
                             builder: (context, snapshotImagenes) {
+                              // Mostrar indicador de carga mientras se obtienen las imágenes
                               if (snapshotImagenes.connectionState ==
                                   ConnectionState.waiting) {
                                 return const Center(
                                     child: CircularProgressIndicator());
-                              } else if (snapshotImagenes.hasError) {
+                              }
+                              // Manejar errores en la obtención de las imágenes
+                              else if (snapshotImagenes.hasError) {
                                 return Center(
                                     child: Text(
                                   'Error: ${snapshotImagenes.error}',
@@ -235,7 +297,9 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                                   ),
                                   textAlign: TextAlign.center,
                                 ));
-                              } else if (!snapshotImagenes.hasData ||
+                              }
+                              // Mostrar mensaje si no hay imágenes
+                              else if (!snapshotImagenes.hasData ||
                                   snapshotImagenes.data!.isEmpty) {
                                 return Center(
                                     child: Text(
@@ -259,8 +323,9 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                                   ),
                                   textAlign: TextAlign.center,
                                 ));
-                              } else {
-                                // donde contruimos las cards de los productos.
+                              }
+                              // Construir las tarjetas de productos si hay datos disponibles
+                              else {
                                 final imagenesTotal = snapshotImagenes.data!;
                                 return Column(
                                   children: [
@@ -317,12 +382,12 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                                               itemBuilder: (context, index) {
                                                 final auxPedido =
                                                     auxPedidos[index];
-                                                // buscamos el producto.
+                                                // Buscamos el producto.
                                                 final producto = productos
                                                     .firstWhere((prod) =>
                                                         prod.id ==
                                                         auxPedido.producto);
-                                                // buscamos la primera imagen del producto en cuestion.
+                                                // Buscamos la primera imagen del producto en cuestión.
                                                 final imagenProd = imagenesTotal
                                                     .firstWhere((imagen) =>
                                                         imagen.producto.id ==
@@ -336,6 +401,7 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                                               },
                                             ),
                                     ),
+                                    // Tarjeta para mostrar el total del carrito y botón de confirmación
                                     Card(
                                       color: Colors.black.withOpacity(0.5),
                                       margin: const EdgeInsets.all(10.0),
@@ -452,7 +518,16 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
     );
   }
 
-  confimacionPedidoModal(context, List<AuxPedidoModel> auxPedido) {
+  /// Muestra un diálogo que contiene la tabla de pedidos.
+  ///
+  /// El diálogo contiene una tabla con los productos agregados al pedido. Los
+  /// productos se pasan como parámetro en la lista [auxPedido].
+  ///
+  /// Parámetros:
+  ///
+  ///   - `context` (BuildContext): El contexto de la aplicación.
+  ///   - `auxPedido` (List<AuxPedidoModel>): Lista de productos del pedido.
+  confimacionPedidoModal(BuildContext context, List<AuxPedidoModel> auxPedido) {
     return showDialog(
       context: context,
       builder: (context) {
@@ -477,6 +552,14 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
     );
   }
 
+  /// Muestra un diálogo que avisa al usuario que no hay productos en el pedido.
+  ///
+  /// El diálogo contiene un título, un mensaje y una imagen. Si el usuario hace clic
+  /// en el botón "Ir a tienda", se navega a la pantalla de la tienda.
+  ///
+  /// Parámetros:
+  ///
+  ///   - `context` (BuildContext): El contexto de la aplicación.
   void mostrarPedidoVacio(BuildContext context) {
     showDialog(
       context: context,
@@ -493,6 +576,7 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
               const SizedBox(
                 height: 10,
               ),
+              // Muestra una imagen circular del logo de la aplicación
               ClipOval(
                 child: Container(
                   width: 100, // Ajusta el tamaño según sea necesario
@@ -516,7 +600,9 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                 Padding(
                   padding: const EdgeInsets.all(defaultPadding),
                   child: _buildButton("Ir a tienda", () {
+                    // Cierra el diálogo cuando se hace clic en el botón de aceptar
                     Navigator.pop(context);
+                    // Navega a la pantalla de la tienda
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -531,17 +617,29 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
     );
   }
 
+  /// Builds a button with a linear gradient and shadow.
+  ///
+  /// Returns a Container with a Material widget as a child. The Material widget
+  /// contains an InkWell widget with the specified `onTap` callback. The
+  /// Container has a BoxDecoration with a linear gradient and a shadow.
+  ///
+  /// Parameters:
+  ///   - `text`: The text to be displayed on the button.
+  ///   - `onPressed`: The callback function to be called when the button is
+  ///                   pressed.
   Widget _buildButton(String text, VoidCallback onPressed) {
     return Container(
       width: 200,
+      // The button has a linear gradient
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         gradient: const LinearGradient(
           colors: [
-            botonClaro,
-            botonOscuro,
+            botonClaro, // The light color of the gradient
+            botonOscuro, // The dark color of the gradient
           ],
         ),
+        // The button has a shadow
         boxShadow: const [
           BoxShadow(
             color: botonSombra,
@@ -550,21 +648,27 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
           ),
         ],
       ),
+      // The button contains a Material widget
       child: Material(
-        color: Colors.transparent,
+        color:
+            Colors.transparent, // The Material widget has a transparent color
         child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(10),
+          onTap:
+              onPressed, // The InkWell widget triggers the `onPressed` callback
+          borderRadius: BorderRadius.circular(
+              10), // The InkWell widget has rounded corners
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(
+                vertical:
+                    10), // The padding between the text and the button's edge
             child: Center(
               child: Text(
-                text,
+                text, // The text displayed on the button
                 style: const TextStyle(
-                  color: background1,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Calibri-Bold',
+                  color: background1, // The color of the text
+                  fontSize: 13, // The font size of the text
+                  fontWeight: FontWeight.bold, // The font weight of the text
+                  fontFamily: 'Calibri-Bold', // The font family of the text
                 ),
               ),
             ),
@@ -574,14 +678,26 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
     );
   }
 
+  /// Esta función crea una tarjeta deslizante (Dismissible) para mostrar un producto.
+  /// La tarjeta permite eliminar el producto al deslizarla hacia la izquierda o derecha.
+  /// Además, muestra información del producto y permite modificar la cantidad solicitada.
+  ///
+  /// @param context El contexto de la aplicación.
+  /// @param auxPedido El modelo de pedido auxiliar.
+  /// @param producto El modelo del producto.
+  /// @param imagen El modelo de imagen del producto.
+  /// @return Un widget Dismissible que representa la tarjeta del producto.
   Dismissible cardProduct(BuildContext context, AuxPedidoModel auxPedido,
       ProductoModel producto, ImagenProductoModel imagen) {
-    final double imageWidth = MediaQuery.of(context).size.width *
-        0.4; // Ajustar el ancho de la imagen relativo al tamaño de la pantalla
-    const double cardHeight = 150.0; // Altura fija para la tarjeta
+    // Ajustar el ancho de la imagen relativo al tamaño de la pantalla
+    final double imageWidth = MediaQuery.of(context).size.width * 0.4;
+    // Altura fija para la tarjeta
+    const double cardHeight = 150.0;
 
     return Dismissible(
+      // Clave única para el widget Dismissible
       key: Key(auxPedido.id.toString()),
+      // Fondo mostrado cuando se desliza a la izquierda
       background: Container(
         color: Colors.black.withOpacity(0.5),
         alignment: Alignment.centerLeft,
@@ -592,6 +708,7 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
           size: 32,
         ),
       ),
+      // Fondo mostrado cuando se desliza a la derecha
       secondaryBackground: Container(
         color: Colors.black.withOpacity(0.5),
         alignment: Alignment.centerRight,
@@ -602,11 +719,13 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
           size: 32,
         ),
       ),
+      // Acción al deslizar la tarjeta
       onDismissed: (direction) {
         setState(() {
           borrarProductoModal(context, auxPedido);
         });
       },
+      // Contenido de la tarjeta
       child: Card(
         color: Colors.black.withOpacity(0.5),
         margin: const EdgeInsets.all(10),
@@ -662,8 +781,8 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                           ),
                     ),
                     const SizedBox(height: 10),
+                    // Caja de texto para la cantidad solicitada
                     Container(
-                      width: imageWidth * 0.6,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         boxShadow: const [
@@ -676,61 +795,73 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                         borderRadius: BorderRadius.circular(40),
                       ),
                       margin: const EdgeInsets.symmetric(vertical: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                final cantidadFinal = auxPedido.cantidad - 1;
-                                if (cantidadFinal > 0) {
-                                  final precioFinal =
-                                      cantidadFinal * producto.precio;
-                                  _updateAuxPedido(
-                                    auxPedido.id,
-                                    cantidadFinal,
-                                    precioFinal,
-                                    auxPedido.producto,
-                                    auxPedido.pedido.id,
-                                  );
-                                } else {
-                                  borrarProductoModal(context, auxPedido);
-                                }
-                              });
-                            },
-                            icon: const Icon(Icons.remove),
-                          ),
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                auxPedido.cantidad.toString(),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Calibri-Bold',
-                                  fontSize: 20,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          // Ajusta el ancho basado en el tamaño del contenedor padre
+                          final containerWidth = constraints.maxWidth *
+                              0.9; // Puedes ajustar este valor según sea necesario
+                          return SizedBox(
+                            width: containerWidth,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      final cantidadFinal =
+                                          auxPedido.cantidad - 1;
+                                      if (cantidadFinal > 0) {
+                                        final precioFinal =
+                                            cantidadFinal * producto.precio;
+                                        _updateAuxPedido(
+                                          auxPedido.id,
+                                          cantidadFinal,
+                                          precioFinal,
+                                          auxPedido.producto,
+                                          auxPedido.pedido.id,
+                                        );
+                                      } else {
+                                        borrarProductoModal(context, auxPedido);
+                                      }
+                                    });
+                                  },
+                                  icon: const Icon(Icons.remove),
                                 ),
-                              ),
+                                Center(
+                                  child: Text(
+                                    auxPedido.cantidad.toString(),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Calibri-Bold',
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      if (auxPedido.cantidad <
+                                          producto.maxReserva) {
+                                        final cantidadFinal =
+                                            auxPedido.cantidad + 1;
+                                        final precioFinal =
+                                            cantidadFinal * producto.precio;
+                                        _updateAuxPedido(
+                                          auxPedido.id,
+                                          cantidadFinal,
+                                          precioFinal,
+                                          auxPedido.producto,
+                                          auxPedido.pedido.id,
+                                        );
+                                      }
+                                    });
+                                  },
+                                  icon: const Icon(Icons.add),
+                                ),
+                              ],
                             ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                if (auxPedido.cantidad < producto.maxReserva) {
-                                  final cantidadFinal = auxPedido.cantidad + 1;
-                                  final precioFinal =
-                                      cantidadFinal * producto.precio;
-                                  _updateAuxPedido(
-                                      auxPedido.id,
-                                      cantidadFinal,
-                                      precioFinal,
-                                      auxPedido.producto,
-                                      auxPedido.pedido.id);
-                                }
-                              });
-                            },
-                            icon: const Icon(Icons.add),
-                          ),
-                        ],
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -743,7 +874,19 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
     );
   }
 
+  /// Muestra un diálogo modal para confirmar la eliminación de un producto del carrito.
+  ///
+  /// El diálogo solicita al usuario que confirme la eliminación del producto. Si el
+  /// usuario hace clic en "Cancelar", se cierra el diálogo. Si el usuario hace clic
+  /// en "Eliminar", se elimina el producto del carrito.
+  ///
+  /// Parámetros:
+  ///
+  ///   - `context` (BuildContext): El contexto de la aplicación.
+  ///   - `auxPedido` (AuxPedidoModel): El modelo que representa el producto que se va
+  ///     a eliminar.
   void borrarProductoModal(BuildContext context, AuxPedidoModel auxPedido) {
+    // Muestra el diálogo modal para confirmar la eliminación del producto.
     showDialog(
       context: context,
       builder: (context) {
@@ -752,6 +895,7 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
+              // Muestra el logo de la aplicación en un contenedor circular.
               ClipOval(
                 child: Container(
                   width: 100, // Ajusta el tamaño según sea necesario

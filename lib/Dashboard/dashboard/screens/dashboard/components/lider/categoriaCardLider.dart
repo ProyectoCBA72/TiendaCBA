@@ -1,14 +1,21 @@
 // ignore_for_file: prefer_final_fields, file_names, use_super_parameters, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:tienda_app/Models/categoriaModel.dart';
 
+/// Widget para mostrar una tarjeta de categoría específica.
 class CategoriaCardLider extends StatefulWidget {
-  const CategoriaCardLider({Key? key}) : super(key: key);
+  final CategoriaModel categoria;
+
+  /// Constructor de CategoriaCardLider.
+  const CategoriaCardLider({Key? key, required this.categoria})
+      : super(key: key);
 
   @override
   _CategoriaCardLiderState createState() => _CategoriaCardLiderState();
 }
 
+/// Estado asociado al widget CategoriaCardLider.
 class _CategoriaCardLiderState extends State<CategoriaCardLider> {
   @override
   void initState() {
@@ -17,6 +24,7 @@ class _CategoriaCardLiderState extends State<CategoriaCardLider> {
 
   @override
   Widget build(BuildContext context) {
+    final categoria = widget.categoria;
     return Padding(
       padding: const EdgeInsets.all(20),
       child: SizedBox(
@@ -24,12 +32,13 @@ class _CategoriaCardLiderState extends State<CategoriaCardLider> {
         height: 200,
         child: Stack(
           children: [
+            // Contenedor principal que envuelve la imagen de la categoría
             Container(
               margin: const EdgeInsets.all(10),
               padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
-                image: const DecorationImage(
-                  image: NetworkImage('https://definicion.de/wp-content/uploads/2011/02/carne-1.jpg'),
+                image: DecorationImage(
+                  image: NetworkImage(categoria.imagen),
                   fit: BoxFit.fill,
                 ),
                 color: Colors.black12,
@@ -44,6 +53,7 @@ class _CategoriaCardLiderState extends State<CategoriaCardLider> {
               ),
               child: Stack(
                 children: [
+                  // Botón de edición en la esquina superior izquierda
                   Positioned(
                     top: 5,
                     left: 5,
@@ -60,6 +70,7 @@ class _CategoriaCardLiderState extends State<CategoriaCardLider> {
                       ),
                     ),
                   ),
+                  // Botón de eliminación en la esquina superior derecha
                   Positioned(
                     top: 5,
                     right: 5,
@@ -76,6 +87,7 @@ class _CategoriaCardLiderState extends State<CategoriaCardLider> {
                       ),
                     ),
                   ),
+                  // Texto de nombre de la categoría en la parte inferior central
                   Positioned(
                     bottom: 20,
                     left: 20,
@@ -93,10 +105,10 @@ class _CategoriaCardLiderState extends State<CategoriaCardLider> {
                           )
                         ],
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Text(
-                          "Carnicos",
-                          style: TextStyle(
+                          categoria.nombre,
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 24,
                             fontFamily: 'Calibri-Bold',
@@ -122,6 +134,3 @@ class _CategoriaCardLiderState extends State<CategoriaCardLider> {
     );
   }
 }
-
-
-

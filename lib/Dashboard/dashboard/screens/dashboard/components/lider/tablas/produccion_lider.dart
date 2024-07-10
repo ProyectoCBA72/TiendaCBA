@@ -1,43 +1,113 @@
 // ignore_for_file: use_full_hex_values_for_flutter_colors
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/produccionModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
+/// Widget de estado que representa la tabla de producciones de un líder.
+///
+/// Esta clase extiende [StatefulWidget] y proporciona un estado asociado
+/// [_ProduccionLiderState]. Tiene una lista de [ProduccionModel] que representa
+/// las producciones del líder.
+///
+/// El constructor [ProduccionLider] recibe una lista de [ProduccionModel] a través
+/// del parámetro [producciones], que contiene los datos de las producciones.
+///
+/// El método [createState] crea un estado [_ProduccionLiderState] para manejar los datos de la pantalla.
 class ProduccionLider extends StatefulWidget {
+  /// Lista de [ProduccionModel] que representa las producciones del líder.
   final List<ProduccionModel> producciones;
+
+  /// Constructor de [ProduccionLider].
+  ///
+  /// El parámetro [producciones] es obligatorio y debe ser una lista de objetos
+  /// [ProduccionModel] que representan las producciones del líder.
   const ProduccionLider({super.key, required this.producciones});
 
   @override
+
+  /// Crea un estado [_ProduccionLiderState] para manejar los datos de la pantalla.
   State<ProduccionLider> createState() => _ProduccionLiderState();
 }
 
 class _ProduccionLiderState extends State<ProduccionLider> {
+  /// Lista de objetos [ProduccionModel] que representan las producciones del líder.
+  ///
+  /// Esta lista se utiliza para mostrar los datos en la tabla de producciones.
   List<ProduccionModel> _producciones = [];
+
+  /// Lista de objetos [ProductoModel] que representan los productos disponibles.
+  ///
+  /// Esta lista se utiliza para obtener los nombres de los productos en la tabla de producciones.
   List<ProductoModel> listaProductos = [];
 
+  /// Objeto [ProduccionLiderDataGridSource] que contiene los datos de las producciones
+  /// utilizados para mostrar la tabla de producciones en la pantalla.
+  ///
+  /// Este objeto se inicializa en el método [initState] y se actualiza cada vez que se
+  /// recibe un nuevo objeto [ProduccionLider] a través de la propiedad [widget].
   late ProduccionLiderDataGridSource _dataGridSource;
 
   @override
+
+  /// Método [initState] que se ejecuta al inicio de la creación del widget.
+  ///
+  /// En este método se inicializa el objeto [_dataGridSource] con los datos de las
+  /// producciones recibidas a través de la propiedad [widget]. Además, se asigna la
+  /// lista de producciones recibida a la variable [_producciones] y se llama al
+  /// método [_loadData] para cargar los datos necesarios para la pantalla.
+  @override
   void initState() {
     super.initState();
+
+    // Inicializa _dataGridSource con los datos de las producciones recibidas
     _dataGridSource = ProduccionLiderDataGridSource(
         producciones: _producciones, listaProductos: listaProductos);
+
+    // Asigna la lista de producciones recibida a la variable _producciones
     _producciones = widget.producciones;
+
+    // Carga los datos necesarios para la pantalla
     _loadData();
   }
 
+  /// Método [_loadData] que se encarga de cargar los datos necesarios para la pantalla.
+  ///
+  /// Este método obtiene la lista de productos utilizando la función [getProductos] y
+  /// asigna la lista obtenida a la variable [listaProductos]. Luego, se actualiza
+  /// [_dataGridSource] en el siguiente frame de la interfaz de usuario utilizando
+  /// [SchedulerBinding.instance.addPostFrameCallback].
   Future<void> _loadData() async {
+    // Obtiene la lista de productos de la API
     List<ProductoModel> productosCargados = await getProductos();
 
+    // Asigna la lista de productos obtenida a la variable listaProductos
     listaProductos = productosCargados;
 
-    // Ahora inicializa _dataGridSource después de cargar los datos
-    _dataGridSource = ProduccionLiderDataGridSource(
-        producciones: _producciones, listaProductos: listaProductos);
+    if (mounted) {
+      // Actualiza _dataGridSource en el siguiente frame de la interfaz de usuario
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          // Inicializa _dataGridSource con los datos de las producciones y los productos
+          _dataGridSource = ProduccionLiderDataGridSource(
+              producciones: _producciones, listaProductos: listaProductos);
+        });
+      });
+    }
+  }
+
+  /// Método [dispose] que se llama automáticamente cuando se elimina el widget.
+  /// Se llama al método [super.dispose] para liberar recursos adicionales.
+  ///
+  /// No hay operaciones específicas que se realicen en este método.
+  /// Solo se llama al método [super.dispose] para liberar recursos adicionales.
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -51,6 +121,7 @@ class _ProduccionLiderState extends State<ProduccionLider> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Título de la tabla
           Text(
             "Producciones",
             style: Theme.of(context)
@@ -61,6 +132,7 @@ class _ProduccionLiderState extends State<ProduccionLider> {
           const SizedBox(
             height: defaultPadding,
           ),
+          // Tabla de producciones
           SizedBox(
             height: 300,
             width: double.infinity,
@@ -74,11 +146,12 @@ class _ProduccionLiderState extends State<ProduccionLider> {
                 shrinkWrapColumns: true,
                 shrinkWrapRows: true,
                 rowsPerPage: 10,
-                source: _dataGridSource,
+                source: _dataGridSource, // Inicializa _dataGridSource
                 selectionMode: SelectionMode.multiple,
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Columnas de la tabla
                 columns: <GridColumn>[
                   GridColumn(
                     columnName: 'Número',
@@ -170,6 +243,7 @@ class _ProduccionLiderState extends State<ProduccionLider> {
           const SizedBox(
             height: defaultPadding,
           ),
+          // Botón para imprimir el reporte
           Center(
             child: Column(
               children: [
@@ -182,40 +256,56 @@ class _ProduccionLiderState extends State<ProduccionLider> {
     );
   }
 
+  /// Construye un botón con el texto dado y la función onPressed dada.
+  ///
+  /// El botón tiene un ancho fijo de 200 píxeles y un estilo que incluye un
+  /// degradado de colores, un borde redondeado y una sombra. El texto del
+  /// botón está centrado verticalmente y tiene un estilo específico.
+  ///
+  /// Parámetros:
+  ///   - [text]: El texto que se mostrará en el botón.
+  ///   - [onPressed]: La acción que se ejecutará cuando el botón es presionado.
+  ///
+  /// Retorna:
+  ///   Un [Widget] que representa el botón construido.
   Widget _buildButton(String text, VoidCallback onPressed) {
     return Container(
-      width: 200,
+      width: 200, // Ancho fijo del botón.
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10), // Radio del borde redondeado.
         gradient: const LinearGradient(
+          // Estilo de degradado de colores.
           colors: [
-            botonClaro,
-            botonOscuro,
+            botonClaro, // Color inicial del degradado.
+            botonOscuro, // Color final del degradado.
           ],
         ),
         boxShadow: const [
+          // Estilo de sombra.
           BoxShadow(
-            color: botonSombra,
-            blurRadius: 5,
-            offset: Offset(0, 3),
+            color: botonSombra, // Color de la sombra.
+            blurRadius: 5, // Radio de la sombra.
+            offset: Offset(0, 3), // Posición de la sombra.
           ),
         ],
       ),
       child: Material(
-        color: Colors.transparent,
+        color: Colors.transparent, // Color transparente para el material.
         child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(10),
+          onTap: onPressed, // Acción que se ejecutará al presionar el botón.
+          borderRadius:
+              BorderRadius.circular(10), // Radio del borde redondeado.
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding:
+                const EdgeInsets.symmetric(vertical: 10), // Padding vertical.
             child: Center(
               child: Text(
-                text,
+                text, // Texto del botón.
                 style: const TextStyle(
-                  color: background1,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Calibri-Bold',
+                  color: background1, // Color del texto.
+                  fontSize: 13, // Tamaño de fuente.
+                  fontWeight: FontWeight.bold, // Peso de fuente.
+                  fontFamily: 'Calibri-Bold', // Fuente.
                 ),
               ),
             ),
@@ -226,20 +316,40 @@ class _ProduccionLiderState extends State<ProduccionLider> {
   }
 }
 
+// Clase que define los datos de la grilla
 class ProduccionLiderDataGridSource extends DataGridSource {
+  /// Obtiene el nombre del producto a partir de su id.
+  ///
+  /// Esta función recorre la lista de productos y busca el producto con el id
+  /// proporcionado. Si lo encuentra, devuelve el nombre del producto. Si no lo
+  /// encuentra, devuelve una cadena vacía.
+  ///
+  /// Parameters:
+  ///   - productoId: El id del producto a buscar.
+  ///   - productos: La lista de productos a través de la cual buscar el nombre.
+  ///
+  /// Returns:
+  ///   - El nombre del producto si se encuentra, o una cadena vacía si no se
+  ///     encuentra.
   String productoNombre(int productoId, List<ProductoModel> productos) {
+    // Inicializar variable con nombre del producto vacío.
     String productName = "";
 
+    // Recorrer la lista de productos.
     for (var producto in productos) {
+      // Verificar si el id del producto es igual al id proporcionado.
       if (producto.id == productoId) {
+        // Si es igual, guardar el nombre del producto en la variable y salir del bucle.
         productName = producto.nombre;
         break;
       }
     }
 
+    // Devolver el nombre del producto.
     return productName;
   }
 
+  // Crea un objeto de tipo DataGridRow para cada producción.
   ProduccionLiderDataGridSource(
       {required List<ProduccionModel> producciones,
       required List<ProductoModel> listaProductos}) {
@@ -276,11 +386,14 @@ class ProduccionLiderDataGridSource extends DataGridSource {
     }).toList();
   }
 
+  // Lista de datos de la grilla
   List<DataGridRow> _produccionData = [];
 
+  // Metodo para obtener los datos de la grilla
   @override
   List<DataGridRow> get rows => _produccionData;
 
+  // Retorna un objeto de tipo DataGridRow para cada línea
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(cells: [
@@ -313,10 +426,13 @@ class ProduccionLiderDataGridSource extends DataGridSource {
           child: (row.getCells()[i].value is Widget)
               ? row.getCells()[i].value
               : Text(i == 6
-                  ? "\$${formatter.format(row.getCells()[i].value)}"
+                  ? "\$${formatter.format(row.getCells()[i].value)}" // Formato de moneda
                   : i == 4 || i == 5 || i == 7
-                      ? "${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).day)}-${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).month)}-${DateTime.parse(row.getCells()[i].value.toString()).year.toString()} ${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).hour)}:${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).minute)}"
-                      : row.getCells()[i].value.toString()),
+                      ? formatFechaHora(row
+                          .getCells()[i]
+                          .value
+                          .toString()) // Formato de fecha y hora
+                      : row.getCells()[i].value.toString()), // Texto Normal
         ),
     ]);
   }

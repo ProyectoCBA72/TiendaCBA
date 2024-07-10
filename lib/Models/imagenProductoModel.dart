@@ -9,11 +9,23 @@ import 'sedeModel.dart';
 import 'unidadProduccionModel.dart';
 import 'usuarioModel.dart';
 
+/// Clase que representa una imagen de un producto.
+///
+/// Esta clase contiene los atributos necesarios para representar una imagen de un producto.
 class ImagenProductoModel {
+  /// Identificador único de la imagen.
   final int id;
+
+  /// Ruta de la imagen.
   final String imagen;
+
+  /// Producto al que pertenece la imagen.
   final ProductoModel producto;
 
+  /// Crea una nueva instancia de [ImagenProductoModel].
+  ///
+  /// Los parámetros [id] y [imagen] son obligatorios, mientras que [producto]
+  /// es obligatorio.
   ImagenProductoModel({
     required this.id,
     required this.imagen,
@@ -21,17 +33,34 @@ class ImagenProductoModel {
   });
 }
 
+/// Lista que almacena los objetos [ImagenProductoModel] representando las imágenes de los productos.
+///
+/// Esta lista se utiliza para almacenar los datos de las imágenes de los productos.
+/// Cada objeto [ImagenProductoModel] en la lista representa una imagen de un producto.
 List<ImagenProductoModel> imagenProductos = [];
 
-// Futuro para traer los datos de la api
+/// Lista que almacena los objetos [ImagenProductoModel] representando las imágenes de los productos.
+///
+/// Esta lista se utiliza para almacenar los datos de las imágenes de los productos.
+/// Cada objeto [ImagenProductoModel] en la lista representa una imagen de un producto.
+///
 
+// Método para obtener los datos de las imagenes
 Future<List<ImagenProductoModel>> getImagenProductos() async {
+  // URL base para la obtención de imágenes de productos
   String url = "";
 
+  /// URL que se utiliza para obtener las imágenes de los productos a través de una solicitud HTTP GET.
+  ///
+  /// La URL se construye concatenando la constante [sourceApi] con "/api/imagenes/".
   url = "$sourceApi/api/imagenes/";
 
+  /// Realiza una solicitud HTTP GET a la URL construida para obtener las imágenes de los productos.
+  ///
+  /// La respuesta de la solicitud se almacena en la variable [response].
   final response = await http.get(Uri.parse(url));
 
+  // Verifica si la respuesta fue exitosa
   if (response.statusCode == 200) {
     // Limpiar la lista antes de llenarla con datos actualizados
     imagenProductos.clear();
@@ -40,6 +69,7 @@ Future<List<ImagenProductoModel>> getImagenProductos() async {
     String responseBodyUtf8 = utf8.decode(response.bodyBytes);
     List<dynamic> decodedData = jsonDecode(responseBodyUtf8);
 
+    // Llenar la lista con los datos de las imagenes
     for (var imagenProductoData in decodedData) {
       imagenProductos.add(
         ImagenProductoModel(
@@ -158,8 +188,9 @@ Future<List<ImagenProductoModel>> getImagenProductos() async {
               sede: imagenProductoData['producto']['usuario']['sede'] ?? 0,
               puntoVenta:
                   imagenProductoData['producto']['usuario']['puntoVenta'] ?? 0,
-              unidadProduccion:
-                  imagenProductoData['producto']['usuario']['unidadProduccion'] ?? 0,
+              unidadProduccion: imagenProductoData['producto']['usuario']
+                      ['unidadProduccion'] ??
+                  0,
             ),
           ),
         ),
@@ -169,6 +200,7 @@ Future<List<ImagenProductoModel>> getImagenProductos() async {
     // Devolver la lista de imagenes
     return imagenProductos;
   } else {
+    // Lanzar una excepción si la respuesta no fue exitosa
     throw Exception(
         'Fallo la solicitud HTTP con código ${response.statusCode}');
   }

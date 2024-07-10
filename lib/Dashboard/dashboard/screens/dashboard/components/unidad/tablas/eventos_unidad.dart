@@ -1,43 +1,108 @@
 // ignore_for_file: use_full_hex_values_for_flutter_colors
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/boletaModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
+/// Esta clase representa un widget de estado que muestra una tabla de eventos de una unidad.
+///
+/// Esta clase extiende [StatefulWidget] y tiene un único método obligatorio:
+/// [createState] que crea un estado [_EventosUnidadState] para manejar los datos de la pantalla.
+///
+/// El atributo [boletas] es una lista de objetos [BoletaModel] que representan los eventos de la unidad.
 class EventosUnidad extends StatefulWidget {
+  /// Lista de objetos [BoletaModel] que representan los eventos de una unidad.
+  ///
+  /// Los eventos deben ser proporcionados al crear una instancia de [EventosUnidad].
   final List<BoletaModel> boletas;
+
+  /// Crea una instancia de [EventosUnidad] con los [boletas] proporcionados.
+  ///
+  /// El parámetro [boletas] es obligatorio y debe ser una lista de objetos [BoletaModel].
   const EventosUnidad({super.key, required this.boletas});
 
+  /// Crea un estado [_EventosUnidadState] para manejar los datos de la pantalla.
+  ///
+  /// Se utiliza para inicializar el estado en el método [createState].
   @override
   State<EventosUnidad> createState() => _EventosUnidadState();
 }
 
 class _EventosUnidadState extends State<EventosUnidad> {
+  /// Lista de objetos [BoletaModel] que representan los eventos de la unidad.
+  ///
+  /// Esta lista se inicializa en el constructor de [_EventosUnidadState].
   List<BoletaModel> _eventos = [];
+
+  /// Lista de objetos [UsuarioModel] que representan los usuarios de la aplicación.
+  ///
+  /// Esta lista se inicializa en el constructor de [_EventosUnidadState].
   List<UsuarioModel> listaUsuarios = [];
 
+  /// Fuente de datos para la tabla de eventos de la unidad.
+  ///
+  /// Esta variable se inicializa en el método [initState].
   late EventosUnidadDataGridSource _dataGridSource;
 
   @override
+
+  /// Método llamado cuando se crea el widget.
+  ///
+  /// Este método inicializa el estado del widget. Se llama una vez y solo una vez.
+  /// Se utiliza para realizar tareas de inicialización, como inicializar variables,
+  /// cargar datos asincrónicos, suscribirse a eventos, etc.
+  ///
+  /// El método [super.initState] se debe llamar siempre al inicio de este método.
+  @override
   void initState() {
+    // Llama al método initState de la superclase
     super.initState();
+
+    // Inicializa la fuente de datos para la tabla de eventos de la unidad
     _dataGridSource = EventosUnidadDataGridSource(
         eventos: _eventos, listaUsuarios: listaUsuarios);
+
+    // Actualiza la lista de eventos con los eventos proporcionados en el widget
     _eventos = widget.boletas;
+
+    // Llama al método _loadData para cargar los datos asincrónicos
     _loadData();
   }
 
+  /// Carga los datos necesarios para la pantalla, como los usuarios.
+  ///
+  /// Este método realiza una solicitud asíncrona a la API para obtener los usuarios
+  /// y luego actualiza [_dataGridSource] con los datos cargados.
   Future<void> _loadData() async {
+    // Realiza una solicitud asíncragona a la API para obtener los usuarios
     List<UsuarioModel> usuariosCargados = await getUsuarios();
 
+    // Actualiza la lista de usuarios con los datos cargados
     listaUsuarios = usuariosCargados;
 
-    // Ahora inicializa _dataGridSource después de cargar los datos
-    _dataGridSource = EventosUnidadDataGridSource(
-        eventos: _eventos, listaUsuarios: listaUsuarios);
+    if (mounted) {
+      // Ahora inicializa _dataGridSource después de cargar los datos
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          // Actualiza _dataGridSource con los datos cargados de usuarios y eventos
+          _dataGridSource = EventosUnidadDataGridSource(
+              eventos: _eventos, listaUsuarios: listaUsuarios);
+        });
+      });
+    }
+  }
+
+  /// Se llama automáticamente cuando se elimina el widget.
+  /// Se debe llamar a [dispose] para liberar los recursos utilizados por el widget.
+  /// Finalmente, se llama al método [dispose] del padre para liberar recursos adicionales.
+  @override
+  void dispose() {
+    // Llama al método [dispose] del widget base para liberar recursos adicionales
+    super.dispose();
   }
 
   @override
@@ -51,6 +116,7 @@ class _EventosUnidadState extends State<EventosUnidad> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Titulo de la tabla
           Text(
             "Asistencia Eventos",
             style: Theme.of(context)
@@ -61,6 +127,7 @@ class _EventosUnidadState extends State<EventosUnidad> {
           const SizedBox(
             height: defaultPadding,
           ),
+          // Tabla de eventos
           SizedBox(
             height: 300,
             width: double.infinity,
@@ -74,11 +141,12 @@ class _EventosUnidadState extends State<EventosUnidad> {
                 shrinkWrapColumns: true,
                 shrinkWrapRows: true,
                 rowsPerPage: 10,
-                source: _dataGridSource,
+                source: _dataGridSource, // Asigna la fuente de datos
                 selectionMode: SelectionMode.multiple,
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Define las columnas de la tabla
                 columns: <GridColumn>[
                   GridColumn(
                     columnName: 'Evento',
@@ -162,6 +230,7 @@ class _EventosUnidadState extends State<EventosUnidad> {
           const SizedBox(
             height: defaultPadding,
           ),
+          // Botón para imprimir el reporte
           Center(
             child: Column(
               children: [
@@ -174,17 +243,27 @@ class _EventosUnidadState extends State<EventosUnidad> {
     );
   }
 
+  /// Crea un botón con el texto dado y la función onPressed dada.
+  ///
+  /// El botón tiene un borde redondeado, un degradado de colores y sombra.
+  /// El texto del botón tiene un estilo con fuente negrita y tamaño específico.
+  ///
+  /// El parámetro [text] es el texto que se mostrará en el botón.
+  /// El parámetro [onPressed] es la función que se ejecutará cuando se presione el botón.
   Widget _buildButton(String text, VoidCallback onPressed) {
     return Container(
       width: 200,
       decoration: BoxDecoration(
+        // Establece un borde redondeado de 10 píxeles.
         borderRadius: BorderRadius.circular(10),
+        // Establece un degradado de colores.
         gradient: const LinearGradient(
           colors: [
             botonClaro,
             botonOscuro,
           ],
         ),
+        // Establece una sombra con un color y un borde redondeado.
         boxShadow: const [
           BoxShadow(
             color: botonSombra,
@@ -196,17 +275,26 @@ class _EventosUnidadState extends State<EventosUnidad> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
+          // Establece la función onTap para ejecutar cuando se presione el botón.
           onTap: onPressed,
+          // Establece un borde redondeado de 10 píxeles.
           borderRadius: BorderRadius.circular(10),
+          // Establece un relleno simétrico verticalmente de 10 píxeles.
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
+            // Centra el texto dentro del botón.
             child: Center(
+              // Muestra el texto con un estilo específico.
               child: Text(
                 text,
                 style: const TextStyle(
+                  // Establece el color del texto como background1.
                   color: background1,
+                  // Establece el tamaño del texto a 13 píxeles.
                   fontSize: 13,
+                  // Establece la fuente en negrita.
                   fontWeight: FontWeight.bold,
+                  // Establece la fuente como 'Calibri-Bold'.
                   fontFamily: 'Calibri-Bold',
                 ),
               ),
@@ -218,79 +306,165 @@ class _EventosUnidadState extends State<EventosUnidad> {
   }
 }
 
+/// Carga los datos necesarios para la pantalla, como los usuarios.
 class EventosUnidadDataGridSource extends DataGridSource {
+  /// Devuelve el nombre completo de un usuario dado su [usuarioId] y la lista de [usuarios].
+  ///
+  /// El nombre completo se obtiene concatenando los nombres y apellidos del usuario.
+  /// Si no se encuentra un usuario con el [usuarioId] dado, se devuelve una cadena vacía.
+  ///
+  /// El parámetro [usuarioId] es el identificador del usuario.
+  /// El parámetro [usuarios] es la lista de usuarios.
+  ///
+  /// Devuelve un [String] con el nombre completo del usuario o una cadena vacía si no se encuentra.
   String nombreUsuarioEvento(int usuarioId, List<UsuarioModel> usuarios) {
+    // Inicializamos la variable nombre con una cadena vacía
     String nombre = "";
 
+    // Iteramos sobre cada usuario en la lista de usuarios
     for (var usuario in usuarios) {
+      // Verificamos si el id del usuario coincide con el usuarioId dado
       if (usuario.id == usuarioId) {
+        // Concatenamos los nombres y apellidos del usuario para obtener el nombre completo
         nombre = "${usuario.nombres} ${usuario.apellidos}";
       }
     }
 
+    // Devolvemos el nombre completo del usuario o una cadena vacía si no se encuentra
     return nombre;
   }
 
+  /// Devuelve el tipo de documento de un usuario dado su [usuarioId] y la lista de [usuarios].
+  ///
+  /// El tipo de documento se obtiene del usuario correspondiente al [usuarioId] dado.
+  /// Si no se encuentra un usuario con el [usuarioId] dado, se devuelve una cadena vacía.
+  ///
+  /// El parámetro [usuarioId] es el identificador del usuario.
+  /// El parámetro [usuarios] es la lista de usuarios.
+  ///
+  /// Devuelve un [String] con el tipo de documento del usuario o una cadena vacía si no se encuentra.
   String tipoDocumentoEvento(int usuarioId, List<UsuarioModel> usuarios) {
+    // Inicializamos la variable tipoDocumento con una cadena vacía
     String tipoDocumento = "";
 
+    // Iteramos sobre cada usuario en la lista de usuarios
     for (var usuario in usuarios) {
+      // Verificamos si el id del usuario coincide con el usuarioId dado
       if (usuario.id == usuarioId) {
+        // Asignamos el tipo de documento del usuario a la variable tipoDocumento
         tipoDocumento = usuario.tipoDocumento;
       }
     }
 
+    // Devolvemos el tipo de documento del usuario o una cadena vacía si no se encuentra
     return tipoDocumento;
   }
 
+  /// Devuelve el número de documento de un usuario dado su [usuarioId] y la lista de [usuarios].
+  ///
+  /// El número de documento se obtiene del usuario correspondiente al [usuarioId] dado.
+  /// Si no se encuentra un usuario con el [usuarioId] dado, se devuelve una cadena vacía.
+  ///
+  /// El parámetro [usuarioId] es el identificador del usuario.
+  /// El parámetro [usuarios] es la lista de usuarios.
+  ///
+  /// Devuelve un [String] con el número de documento del usuario o una cadena vacía si no se encuentra.
   String numeroDocumentoEvento(int usuarioId, List<UsuarioModel> usuarios) {
+    // Inicializamos la variable numeroDocumento con una cadena vacía
     String numeroDocumento = "";
 
+    // Iteramos sobre cada usuario en la lista de usuarios
     for (var usuario in usuarios) {
+      // Verificamos si el id del usuario coincide con el usuarioId dado
       if (usuario.id == usuarioId) {
+        // Asignamos el número de documento del usuario a la variable numeroDocumento
         numeroDocumento = usuario.numeroDocumento;
       }
     }
 
+    // Devolvemos el número de documento del usuario o una cadena vacía si no se encuentra
     return numeroDocumento;
   }
 
+  /// Devuelve el correo electrónico de un usuario dado su [usuarioId] y la lista de [usuarios].
+  ///
+  /// El correo electrónico se obtiene del usuario correspondiente al [usuarioId] dado.
+  /// Si no se encuentra un usuario con el [usuarioId] dado, se devuelve una cadena vacía.
+  ///
+  /// El parámetro [usuarioId] es el identificador del usuario.
+  /// El parámetro [usuarios] es la lista de usuarios.
+  ///
+  /// Devuelve un [String] con el correo electrónico del usuario o una cadena vacía si no se encuentra.
   String correoEvento(int usuarioId, List<UsuarioModel> usuarios) {
+    // Inicializamos la variable correo con una cadena vacía
     String correo = "";
 
+    // Iteramos sobre cada usuario en la lista de usuarios
     for (var usuario in usuarios) {
+      // Verificamos si el id del usuario coincide con el usuarioId dado
       if (usuario.id == usuarioId) {
+        // Asignamos el correo electrónico del usuario a la variable correo
         correo = usuario.correoElectronico;
       }
     }
 
+    // Devolvemos el correo electrónico del usuario o una cadena vacía si no se encuentra
     return correo;
   }
 
+  /// Devuelve el número de teléfono fijo de un usuario dado su [usuarioId] y la lista de [usuarios].
+  ///
+  /// El número de teléfono fijo se obtiene del usuario correspondiente al [usuarioId] dado.
+  /// Si no se encuentra un usuario con el [usuarioId] dado, se devuelve una cadena vacía.
+  ///
+  /// El parámetro [usuarioId] es el identificador del usuario.
+  /// El parámetro [usuarios] es la lista de usuarios.
+  ///
+  /// Devuelve un [String] con el número de teléfono fijo del usuario o una cadena vacía si no se encuentra.
   String telefonoFijoEvento(int usuarioId, List<UsuarioModel> usuarios) {
+    // Inicializamos la variable telefonoFijo con una cadena vacía
     String telefonoFijo = "";
 
+    // Iteramos sobre cada usuario en la lista de usuarios
     for (var usuario in usuarios) {
+      // Verificamos si el id del usuario coincide con el usuarioId dado
       if (usuario.id == usuarioId) {
+        // Asignamos el número de teléfono fijo del usuario a la variable telefonoFijo
         telefonoFijo = usuario.telefono;
       }
     }
 
+    // Devolvemos el número de teléfono fijo del usuario o una cadena vacía si no se encuentra
     return telefonoFijo;
   }
 
+  /// Devuelve el número de teléfono celular de un usuario dado su [usuarioId] y la lista de [usuarios].
+  ///
+  /// El número de teléfono celular se obtiene del usuario correspondiente al [usuarioId] dado.
+  /// Si no se encuentra un usuario con el [usuarioId] dado, se devuelve una cadena vacía.
+  ///
+  /// El parámetro [usuarioId] es el identificador del usuario.
+  /// El parámetro [usuarios] es la lista de usuarios.
+  ///
+  /// Devuelve un [String] con el número de teléfono celular del usuario o una cadena vacía si no se encuentra.
   String telefonoCelularEvento(int usuarioId, List<UsuarioModel> usuarios) {
+    // Inicializamos la variable telefonoCelular con una cadena vacía
     String telefonoCelular = "";
 
+    // Iteramos sobre cada usuario en la lista de usuarios
     for (var usuario in usuarios) {
+      // Verificamos si el id del usuario coincide con el usuarioId dado
       if (usuario.id == usuarioId) {
+        // Asignamos el número de teléfono celular del usuario a la variable telefonoCelular
         telefonoCelular = usuario.telefonoCelular;
       }
     }
 
+    // Devolvemos el número de teléfono celular del usuario o una cadena vacía si no se encuentra
     return telefonoCelular;
   }
 
+  /// Crea una fuente de datos para la tabla de eventos.
   EventosUnidadDataGridSource(
       {required List<BoletaModel> eventos,
       required final List<UsuarioModel> listaUsuarios}) {
@@ -330,11 +504,14 @@ class EventosUnidadDataGridSource extends DataGridSource {
     }).toList();
   }
 
+  // Lista de eventos
   List<DataGridRow> _eventoData = [];
 
+  // Getter para obtener la lista de eventos
   @override
   List<DataGridRow> get rows => _eventoData;
 
+  // Retorna la lista de datos
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(cells: [
@@ -367,8 +544,11 @@ class EventosUnidadDataGridSource extends DataGridSource {
           child: (row.getCells()[i].value is Widget)
               ? row.getCells()[i].value
               : Text(i == 1
-                  ? "${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).day)}-${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).month)}-${DateTime.parse(row.getCells()[i].value.toString()).year.toString()} ${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).hour)}:${twoDigits(DateTime.parse(row.getCells()[i].value.toString()).minute)}"
-                  : row.getCells()[i].value.toString()),
+                  ? formatFechaHora(row
+                      .getCells()[i]
+                      .value
+                      .toString()) // Formato de fecha y hora
+                  : row.getCells()[i].value.toString()), // Formato de cadena
         ),
     ]);
   }

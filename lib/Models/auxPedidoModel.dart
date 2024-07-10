@@ -1,16 +1,46 @@
+// ignore_for_file: file_names
+
 import 'dart:convert';
 import '../source.dart';
 import 'pedidoModel.dart';
 import 'usuarioModel.dart';
 import 'package:http/http.dart' as http;
 
+/// Clase AuxPedidoModel que representa un auxiliar de un pedido.
+///
+/// Esta clase define una estructura de datos para representar un auxiliar de un pedido.
+/// Un auxiliar es un producto que se vende con un pedido, con una cantidad y un precio determinado.
+///
+/// Atributos:
+/// - id: El identificador único del auxiliar.
+/// - cantidad: La cantidad del producto vendido en el auxiliar.
+/// - precio: El precio del producto vendido en el auxiliar.
+/// - producto: El identificador del producto vendido en el auxiliar.
+/// - pedido: El pedido al que pertenece el auxiliar.
 class AuxPedidoModel {
+  /// El identificador único del auxiliar.
   final int id;
+
+  /// La cantidad del producto vendido en el auxiliar.
   int cantidad;
+
+  /// El precio del producto vendido en el auxiliar.
   final int precio;
+
+  /// El identificador del producto vendido en el auxiliar.
   final int producto;
+
+  /// El pedido al que pertenece el auxiliar.
   final PedidoModel pedido;
 
+  /// Constructor para crear un objeto de tipo AuxPedidoModel.
+  ///
+  /// Recibe los siguientes parámetros obligatorios:
+  /// - id: El identificador único del auxiliar.
+  /// - cantidad: La cantidad del producto vendido en el auxiliar.
+  /// - precio: El precio del producto vendido en el auxiliar.
+  /// - producto: El identificador del producto vendido en el auxiliar.
+  /// - pedido: El pedido al que pertenece el auxiliar.
   AuxPedidoModel({
     required this.id,
     required this.cantidad,
@@ -20,17 +50,32 @@ class AuxPedidoModel {
   });
 }
 
+/// Lista que almacena los objetos de tipo AuxPedidoModel.
+/// Esta lista se utiliza para almacenar los auxiliares de pedidos.
+/// Cada auxiliar representa un producto vendido y su información asociada.
 List<AuxPedidoModel> auxPedidos = [];
 
-// Futuro para traer los datos de la api
+/// Lista que almacena los objetos de tipo AuxPedidoModel.
+///
+/// Esta lista se utiliza para almacenar los auxiliares de pedidos.
+/// Cada auxiliar representa un producto vendido y su información asociada.
 
+/// Future para obtener los auxiliares de pedidos.
 Future<List<AuxPedidoModel>> getAuxPedidos() async {
+
+  /// URL para obtener los auxiliares de pedidos.
+  ///
+  /// Se utiliza para realizar una solicitud GET a la API y obtener los auxiliares de pedidos.
+  /// La URL se construye utilizando la variable [sourceApi] y se concatena con el endpoint "/api/aux-pedidos/".
   String url = "";
 
+  // Construir la URL para obtener los auxiliares de pedidos
   url = "$sourceApi/api/aux-pedidos/";
 
+  // Realizar una solicitud GET a la URL para obtener los auxiliares de pedidos
   final response = await http.get(Uri.parse(url));
 
+  // Verificar el estado de la respuesta
   if (response.statusCode == 200) {
     // Limpiar la lista antes de llenarla con datos actualizados
     auxPedidos.clear();
@@ -39,6 +84,7 @@ Future<List<AuxPedidoModel>> getAuxPedidos() async {
     String responseBodyUtf8 = utf8.decode(response.bodyBytes);
     List<dynamic> decodedData = jsonDecode(responseBodyUtf8);
 
+    // Llenar la lista de auxiliares de pedidos con los datos decodificados
     for (var auxPedidoData in decodedData) {
       auxPedidos.add(
         AuxPedidoModel(
@@ -91,9 +137,10 @@ Future<List<AuxPedidoModel>> getAuxPedidos() async {
       );
     }
 
-    // Devolver la lista de medios de pago con datos.
+    // Devolver la lista de auxiliares de pedidos
     return auxPedidos;
   } else {
+    // Lanza una excepción si la respuesta no es exitosa
     throw Exception(
         'Fallo la solicitud HTTP con código ${response.statusCode}');
   }

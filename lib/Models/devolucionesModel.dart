@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'dart:convert';
 
 import '../source.dart';
@@ -8,12 +10,29 @@ import 'medioPagoModel.dart';
 import 'pedidoModel.dart';
 import 'usuarioModel.dart';
 
+/// Clase que representa una devolución en la aplicación.
+///
+/// Esta clase contiene información sobre una devolución, como su identificador,
+/// fecha, estado y factura asociada.
 class DevolucionesModel {
+  /// Identificador único de la devolución.
   final int id;
+
+  /// Fecha de la devolución.
   final String fecha;
+
+  /// Estado de la devolución.
+  ///
+  /// Si es `true`, la devolución ha sido completada. Si es `false`, la devolución
+  /// está en proceso.
   final bool estado;
+
+  /// Factura asociada a la devolución.
   final FacturaModel factura;
 
+  /// Construye una instancia de [DevolucionesModel].
+  ///
+  /// Los parámetros requeridos son [id], [fecha], [estado] y [factura].
   DevolucionesModel({
     required this.id,
     required this.fecha,
@@ -22,17 +41,33 @@ class DevolucionesModel {
   });
 }
 
+/// Lista que almacena las instancias de [DevolucionesModel].
+///
+/// Esta lista se utiliza para almacenar y acceder a los datos de las
+/// devoluciones obtenidas de la API.
+/// Cada devolución representa una devolución registrada en la aplicación.
 List<DevolucionesModel> devoluciones = [];
 
-// Futuro para traer los datos de la api
-
+// Método para obtener los datos de las devoluciones
 Future<List<DevolucionesModel>> getDevoluciones() async {
+  /// URL base para obtener las devoluciones de la API.
+  ///
+  /// Esta variable almacena la URL completa para obtener las devoluciones.
+  /// Se construye utilizando la URL base del backend y la ruta específica para
+  /// obtener las devoluciones.
   String url = "";
 
+  /// Construye la URL completa para obtener las devoluciones.
+  ///
+  /// No tiene parámetros.
   url = "$sourceApi/api/devoluciones/";
 
+  /// Realiza una petición HTTP GET para obtener las devoluciones de la API.
+  ///
+  /// No tiene parámetros.
   final response = await http.get(Uri.parse(url));
 
+  /// Verifica el estado de la respuesta.
   if (response.statusCode == 200) {
     // Limpiar la lista antes de llenarla con datos actualizados
     devoluciones.clear();
@@ -41,6 +76,7 @@ Future<List<DevolucionesModel>> getDevoluciones() async {
     String responseBodyUtf8 = utf8.decode(response.bodyBytes);
     List<dynamic> decodedData = jsonDecode(responseBodyUtf8);
 
+    // Llenar la lista con los datos decodificados
     for (var devolucionData in decodedData) {
       devoluciones.add(
         DevolucionesModel(
@@ -137,9 +173,10 @@ Future<List<DevolucionesModel>> getDevoluciones() async {
       );
     }
 
-    // Devolver la lista con los valores llenos
+    // Devolver la lista actualizada de devoluciones
     return devoluciones;
   } else {
+    // En caso de que la respuesta no sea exitosa
     throw Exception(
         'Fallo la solicitud HTTP con código ${response.statusCode}');
   }
