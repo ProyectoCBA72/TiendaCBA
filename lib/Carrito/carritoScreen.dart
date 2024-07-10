@@ -64,7 +64,9 @@ class _CarritoScreenState extends State<CarritoScreen> {
                   padding: const EdgeInsets.only(left: 2.0),
                   child: IconButton(
                     onPressed: () {
-                      Navigator.pop(context);
+                      // Al pasar el parametro refresh al pop, lo que se hace es:
+                      // en la clase anterior se esta esperando a que se regrese  con el parametro para actualizar el estado.
+                      Navigator.pop(context, 'refresh');
                     },
                     icon: const Icon(
                       Icons.arrow_back_ios,

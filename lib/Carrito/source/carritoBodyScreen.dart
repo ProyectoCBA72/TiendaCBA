@@ -2,9 +2,8 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:tienda_app/Carrito/carritoScreen.dart';
 import 'package:tienda_app/Carrito/source/carritoTabla.dart';
+import 'package:provider/provider.dart';
 import 'package:tienda_app/Models/imagenProductoModel.dart';
 import 'package:tienda_app/Tienda/tiendaScreen.dart';
 import 'package:tienda_app/source.dart';
@@ -94,9 +93,9 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
         // Si la respuesta es exitosa, imprimir un mensaje de éxito
         print('Producto eliminado con éxito.');
 
-        // Actualizar la pantalla del carrito
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const CarritoScreen()));
+        // Actualizar la pantalla del carrito 
+        // en vez de contruir y remplazar la vista, se restablecen los valores de widget o se actualiza el estado.
+        setState(() {});
       } else {
         // Si la respuesta no es exitosa, imprimir el mensaje de error
         print('Error al eliminar el producto: ${response.body}');

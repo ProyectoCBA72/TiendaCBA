@@ -125,8 +125,17 @@ class _TiendaScreenState extends State<TiendaScreen> {
 
       // Si hay un pedido pendiente, navega a la pantalla de carrito
       if (pedidoPendiente != null) {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const CarritoScreen()));
+        // Navegar a la pantalla de carrito y esperar el resultado 
+        // de tal manera que al regresar tengamos el estado del contador recargado.
+        final result = await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const CarritoScreen()),
+        );
+
+        // Si el resultado es 'refresh', actualizar el contador de pedidos
+        if (result == 'refresh') {
+          _countPedidos();
+        }
       } else {
         // Si no hay pedidos pendientes, muestra un mensaje de alerta
         modalPedidosIsEmpy(context);
