@@ -83,15 +83,26 @@ class _FacturaPuntoState extends State<FacturaPunto> {
     listaProductos = productosCargados;
     listaFacturas = facturasCargadas;
 
-    // Actualiza _dataGridSource en el siguiente frame de la interfaz de usuario
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _dataGridSource = FacturaPuntoDataGridSource(
-            facturas: _facturas,
-            listaProductos: listaProductos,
-            listaFacturas: listaFacturas);
+    if (mounted) {
+      // Actualiza _dataGridSource en el siguiente frame de la interfaz de usuario
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _dataGridSource = FacturaPuntoDataGridSource(
+              facturas: _facturas,
+              listaProductos: listaProductos,
+              listaFacturas: listaFacturas);
+        });
       });
-    });
+    }
+  }
+
+  /// Libera los recursos utilizados por el widget.
+  ///
+  /// Llamar a este método es obligatorio para liberar los recursos utilizados
+  /// por el widget y evitar fugas de memoria.
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override

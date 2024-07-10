@@ -125,7 +125,7 @@ class _TiendaScreenState extends State<TiendaScreen> {
 
       // Si hay un pedido pendiente, navega a la pantalla de carrito
       if (pedidoPendiente != null) {
-        // Navegar a la pantalla de carrito y esperar el resultado 
+        // Navegar a la pantalla de carrito y esperar el resultado
         // de tal manera que al regresar tengamos el estado del contador recargado.
         final result = await Navigator.push(
           context,
@@ -294,7 +294,12 @@ class _TiendaScreenState extends State<TiendaScreen> {
                                 // Contenedor que envuelve un botón de búsqueda.
                                 color: primaryColor,
                                 child: IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    showSearch(
+                                      context: context,
+                                      delegate: SearchProductoDelegate(),
+                                    );
+                                  },
                                   icon: const Icon(
                                     Icons.search,
                                     color: Colors.white,

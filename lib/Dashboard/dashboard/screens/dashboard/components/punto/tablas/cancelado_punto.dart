@@ -106,16 +106,27 @@ class _CanceladoPuntoState extends State<CanceladoPunto> {
     listaProductos = productosCargados;
     listaPuntosVenta = puntosCargados;
 
-    // Actualiza _dataGridSource en el siguiente frame de la interfaz de usuario
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        // Inicializa _dataGridSource con los datos de los pedidos, productos y puntos de venta
-        _dataGridSource = CanceladoPuntoDataGridSource(
-            pedidos: _pedidos,
-            listaProductos: listaProductos,
-            listaPuntosVenta: listaPuntosVenta);
+    if (mounted) {
+      // Actualiza _dataGridSource en el siguiente frame de la interfaz de usuario
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          // Inicializa _dataGridSource con los datos de los pedidos, productos y puntos de venta
+          _dataGridSource = CanceladoPuntoDataGridSource(
+              pedidos: _pedidos,
+              listaProductos: listaProductos,
+              listaPuntosVenta: listaPuntosVenta);
+        });
       });
-    });
+    }
+  }
+
+  /// Se llama automáticamente cuando se elimina el widget.
+  /// Se debe llamar a [dispose] para liberar los recursos utilizados por el widget.
+  /// Finalmente, se llama al método [dispose] del padre para liberar recursos adicionales.
+  @override
+  void dispose() {
+    // Llama al método [dispose] del widget base
+    super.dispose();
   }
 
   @override

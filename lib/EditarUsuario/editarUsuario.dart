@@ -213,6 +213,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: defaultPadding),
                       // Titulo
                       Padding(
                         padding: const EdgeInsets.symmetric(

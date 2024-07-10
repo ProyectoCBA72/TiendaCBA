@@ -87,16 +87,29 @@ class _EntregadoUsuarioState extends State<EntregadoUsuario> {
     listaProductos = productosCargados;
     listaPuntosVenta = puntosCargados;
 
-    // Ahora inicializa _dataGridSource después de cargar los datos
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        // Inicializa _dataGridSource con los datos de los pedidos, productos y puntos de venta
-        _dataGridSource = EntregadoUsuarioDataGridSource(
-            pedidos: _pedidos,
-            listaProductos: listaProductos,
-            listaPuntosVenta: listaPuntosVenta);
+    if (mounted) {
+      // Ahora inicializa _dataGridSource después de cargar los datos
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          // Inicializa _dataGridSource con los datos de los pedidos, productos y puntos de venta
+          _dataGridSource = EntregadoUsuarioDataGridSource(
+              pedidos: _pedidos,
+              listaProductos: listaProductos,
+              listaPuntosVenta: listaPuntosVenta);
+        });
       });
-    });
+    }
+  }
+
+  /// Libera los recursos utilizados por el widget.
+  ///
+  /// Se llama automáticamente cuando el widget se elimina del árbol de widgets.
+  /// Libera los recursos utilizados por el widget.
+  ///
+  /// Llama al método [dispose] del widget base para liberar recursos adicionales.
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override

@@ -111,21 +111,23 @@ class _VisitadoDetailsState extends State<VisitadoDetails> {
         // Obtenemos el usuario autenticado
         final usuario = appState.usuarioAutenticado!;
         return Container(
-          padding: const EdgeInsets.symmetric(
-              horizontal: defaultPadding, vertical: 10.0),
           decoration: const BoxDecoration(
             color: Color(0xFFFF2F0F2),
             borderRadius: BorderRadius.all(Radius.circular(10)),
           ),
           child: SizedBox(
             height: 625,
-            child: ListView(
+            child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 10.0,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: defaultPadding),
+                    child: Text(
                       "Visitados",
                       style: TextStyle(
                         fontSize: 18,
@@ -133,139 +135,139 @@ class _VisitadoDetailsState extends State<VisitadoDetails> {
                         fontFamily: 'Calibri-Bold',
                       ),
                     ),
-                    const SizedBox(height: defaultPadding),
-                    Padding(
-                      padding: const EdgeInsets.all(5.0), // Reducido el padding
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height,
-                        // Traemos todas las imágenes de los productos
-                        child: FutureBuilder(
-                          future: getImagenProductos(),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<List<ImagenProductoModel>>
-                                  snapshotImagenes) {
-                            if (snapshotImagenes.connectionState ==
-                                ConnectionState.waiting) {
-                              // Mostramos un indicador de carga mientras se obtienen las imágenes
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            } else if (snapshotImagenes.hasError) {
-                              // Mostramos un indicador de error si hubo un problema al obtener las imágenes
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            } else {
-                              final allImages = snapshotImagenes.data!;
-                              // Traemos todos los productos
-                              return FutureBuilder(
-                                future: getProductos(),
-                                builder: (context, snapshotProductos) {
-                                  if (snapshotProductos.connectionState ==
-                                      ConnectionState.waiting) {
-                                    // Mostramos un indicador de carga mientras se obtienen los productos
-                                    return const Center(
-                                      child: CircularProgressIndicator(),
-                                    );
-                                  } else {
-                                    // Traemos los productos visitados y seleccionamos los que pertenecen al usuario actual
-                                    return FutureBuilder(
-                                      future: getVisitados(),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          // Mostramos un indicador de carga mientras se obtienen los productos visitados
-                                          return const Center(
-                                            child: CircularProgressIndicator(),
-                                          );
-                                        } else if (!snapshot.hasData ||
-                                            snapshot.data!.isEmpty) {
-                                          // Mostramos un mensaje si no hay productos visitados
-                                          return const Center(
-                                            child: Text(
-                                                'No hay productos visitados'),
-                                          );
-                                        } else if (snapshot.hasError) {
-                                          // Mostramos un mensaje de error si hubo un problema al obtener los productos visitados
-                                          return Center(
-                                            child: Text(
-                                                'Error al cargar productos visitados: ${snapshot.error}'),
-                                          );
-                                        } else {
-                                          // Obtenemos todos los productos
-                                          final productos =
-                                              snapshotProductos.data!;
-                                          // Obtenemos todos los productos visitados
-                                          final productosVisitados =
-                                              snapshot.data!;
-                                          // Filtramos los productos visitados que pertenecen al usuario actual
-                                          final visitadosUsuario =
-                                              productosVisitados
-                                                  .where((visitado) =>
-                                                      visitado.usuario ==
-                                                      usuario.id)
-                                                  .toList();
-                                          // Filtramos los productos donde el id es igual al del producto visitado y el producto está activo
-                                          final productosVisitadosList =
-                                              productos
-                                                  .where((producto) =>
-                                                      visitadosUsuario.any(
-                                                          (visitado) =>
-                                                              visitado.producto
-                                                                      .id ==
-                                                                  producto.id &&
-                                                              producto.estado))
-                                                  .toList();
-                                          return GridView.builder(
-                                            itemCount:
-                                                productosVisitadosList.length,
-                                            gridDelegate:
-                                                SliverGridDelegateWithFixedCrossAxisCount(
-                                              crossAxisCount:
-                                                  Responsive.isTablet(context)
-                                                      ? 2
-                                                      : 1,
-                                              crossAxisSpacing:
-                                                  5.0, // Ajuste del espacio entre columnas
-                                              mainAxisSpacing:
-                                                  10.0, // Ajuste del espacio entre filas
-                                            ),
-                                            itemBuilder: (context, index) {
-                                              final productovisitado =
-                                                  productosVisitadosList[index];
-                                              // Filtramos las imágenes correspondientes al producto visitado
-                                              List<String>
-                                                  imagenesProductoVisitado =
-                                                  allImages
-                                                      .where((imagen) =>
-                                                          imagen.producto.id ==
-                                                          productovisitado.id)
-                                                      .map((imagen) =>
-                                                          imagen.imagen)
-                                                      .toList();
-
-                                              // Retornamos el widget CardProducts con el producto visitado y sus imágenes
-                                              return CardProducts(
-                                                producto: productovisitado,
-                                                imagenes:
-                                                    imagenesProductoVisitado,
-                                              );
-                                            },
-                                          );
-                                        }
-                                      },
-                                    );
-                                  }
-                                },
-                              );
-                            }
-                          },
-                        ),
+                  ),
+                  const SizedBox(height: defaultPadding),
+                  Padding(
+                    padding: const EdgeInsets.all(5.0), // Reducido el padding
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height,
+                      // Traemos todas las imágenes de los productos
+                      child: FutureBuilder(
+                        future: getImagenProductos(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<List<ImagenProductoModel>>
+                                snapshotImagenes) {
+                          if (snapshotImagenes.connectionState ==
+                              ConnectionState.waiting) {
+                            // Mostramos un indicador de carga mientras se obtienen las imágenes
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else if (snapshotImagenes.hasError) {
+                            // Mostramos un indicador de error si hubo un problema al obtener las imágenes
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else {
+                            final allImages = snapshotImagenes.data!;
+                            // Traemos todos los productos
+                            return FutureBuilder(
+                              future: getProductos(),
+                              builder: (context, snapshotProductos) {
+                                if (snapshotProductos.connectionState ==
+                                    ConnectionState.waiting) {
+                                  // Mostramos un indicador de carga mientras se obtienen los productos
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else {
+                                  // Traemos los productos visitados y seleccionamos los que pertenecen al usuario actual
+                                  return FutureBuilder(
+                                    future: getVisitados(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        // Mostramos un indicador de carga mientras se obtienen los productos visitados
+                                        return const Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                      } else if (!snapshot.hasData ||
+                                          snapshot.data!.isEmpty) {
+                                        // Mostramos un mensaje si no hay productos visitados
+                                        return const Center(
+                                          child: Text(
+                                              'No hay productos visitados'),
+                                        );
+                                      } else if (snapshot.hasError) {
+                                        // Mostramos un mensaje de error si hubo un problema al obtener los productos visitados
+                                        return Center(
+                                          child: Text(
+                                              'Error al cargar productos visitados: ${snapshot.error}'),
+                                        );
+                                      } else {
+                                        // Obtenemos todos los productos
+                                        final productos =
+                                            snapshotProductos.data!;
+                                        // Obtenemos todos los productos visitados
+                                        final productosVisitados =
+                                            snapshot.data!;
+                                        // Filtramos los productos visitados que pertenecen al usuario actual
+                                        final visitadosUsuario =
+                                            productosVisitados
+                                                .where((visitado) =>
+                                                    visitado.usuario ==
+                                                    usuario.id)
+                                                .toList();
+                                        // Filtramos los productos donde el id es igual al del producto visitado y el producto está activo
+                                        final productosVisitadosList =
+                                            productos
+                                                .where((producto) =>
+                                                    visitadosUsuario.any(
+                                                        (visitado) =>
+                                                            visitado.producto
+                                                                    .id ==
+                                                                producto.id &&
+                                                            producto.estado))
+                                                .toList();
+                                        return GridView.builder(
+                                          itemCount:
+                                              productosVisitadosList.length,
+                                          gridDelegate:
+                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount:
+                                                Responsive.isTablet(context)
+                                                    ? 2
+                                                    : 1,
+                                            crossAxisSpacing:
+                                                5.0, // Ajuste del espacio entre columnas
+                                            mainAxisSpacing:
+                                                10.0, // Ajuste del espacio entre filas
+                                          ),
+                                          itemBuilder: (context, index) {
+                                            final productovisitado =
+                                                productosVisitadosList[index];
+                                            // Filtramos las imágenes correspondientes al producto visitado
+                                            List<String>
+                                                imagenesProductoVisitado =
+                                                allImages
+                                                    .where((imagen) =>
+                                                        imagen.producto.id ==
+                                                        productovisitado.id)
+                                                    .map((imagen) =>
+                                                        imagen.imagen)
+                                                    .toList();
+              
+                                            // Retornamos el widget CardProducts con el producto visitado y sus imágenes
+                                            return CardProducts(
+                                              producto: productovisitado,
+                                              imagenes:
+                                                  imagenesProductoVisitado,
+                                            );
+                                          },
+                                        );
+                                      }
+                                    },
+                                  );
+                                }
+                              },
+                            );
+                          }
+                        },
                       ),
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         );

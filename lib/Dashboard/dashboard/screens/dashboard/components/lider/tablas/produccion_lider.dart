@@ -88,14 +88,26 @@ class _ProduccionLiderState extends State<ProduccionLider> {
     // Asigna la lista de productos obtenida a la variable listaProductos
     listaProductos = productosCargados;
 
-    // Actualiza _dataGridSource en el siguiente frame de la interfaz de usuario
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        // Inicializa _dataGridSource con los datos de las producciones y los productos
-        _dataGridSource = ProduccionLiderDataGridSource(
-            producciones: _producciones, listaProductos: listaProductos);
+    if (mounted) {
+      // Actualiza _dataGridSource en el siguiente frame de la interfaz de usuario
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          // Inicializa _dataGridSource con los datos de las producciones y los productos
+          _dataGridSource = ProduccionLiderDataGridSource(
+              producciones: _producciones, listaProductos: listaProductos);
+        });
       });
-    });
+    }
+  }
+
+  /// Método [dispose] que se llama automáticamente cuando se elimina el widget.
+  /// Se llama al método [super.dispose] para liberar recursos adicionales.
+  ///
+  /// No hay operaciones específicas que se realicen en este método.
+  /// Solo se llama al método [super.dispose] para liberar recursos adicionales.
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override

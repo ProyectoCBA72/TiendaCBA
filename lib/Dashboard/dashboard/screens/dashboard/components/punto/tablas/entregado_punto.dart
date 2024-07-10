@@ -92,16 +92,28 @@ class _EntregadoPuntoState extends State<EntregadoPunto> {
     listaProductos = productosCargados;
     listaPuntosVenta = puntosCargados;
 
-    // Ahora inicializa _dataGridSource después de cargar los datos
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        // Inicializa _dataGridSource con los datos de los pedidos, productos y puntos de venta
-        _dataGridSource = EntregadoPuntoDataGridSource(
-            pedidos: _pedidos,
-            listaProductos: listaProductos,
-            listaPuntosVenta: listaPuntosVenta);
+    if (mounted) {
+      // Ahora inicializa _dataGridSource después de cargar los datos
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          // Inicializa _dataGridSource con los datos de los pedidos, productos y puntos de venta
+          _dataGridSource = EntregadoPuntoDataGridSource(
+              pedidos: _pedidos,
+              listaProductos: listaProductos,
+              listaPuntosVenta: listaPuntosVenta);
+        });
       });
-    });
+    }
+  }
+
+  /// Se llama automáticamente cuando se elimina el widget.
+  ///
+  /// Se debe llamar a [dispose] para liberar los recursos utilizados por el widget.
+  /// Finalmente, se llama al método [dispose] del padre para liberar recursos adicionales.
+  @override
+  void dispose() {
+    // Llama al método [dispose] del widget base
+    super.dispose();
   }
 
   @override

@@ -93,16 +93,29 @@ class _DevolucionLiderState extends State<DevolucionLider> {
     listaProductos = productosCargados;
     listaDevoluciones = devolucionesCargadas;
 
-    // Actualiza _dataGridSource en el siguiente frame de la interfaz de usuario
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        // Inicializa _dataGridSource con los datos de las devoluciones, productos y pedidos
-        _dataGridSource = DevolucionLiderDataGridSource(
-            devoluciones: _devoluciones,
-            listaProductos: listaProductos,
-            listaDevoluciones: listaDevoluciones);
+    if (mounted) {
+      // Actualiza _dataGridSource en el siguiente frame de la interfaz de usuario
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          // Inicializa _dataGridSource con los datos de las devoluciones, productos y pedidos
+          _dataGridSource = DevolucionLiderDataGridSource(
+              devoluciones: _devoluciones,
+              listaProductos: listaProductos,
+              listaDevoluciones: listaDevoluciones);
+        });
       });
-    });
+    }
+  }
+
+  /// Se llama automáticamente cuando se elimina el widget.
+  /// Se debe llamar a [dispose] para liberar los recursos utilizados por el widget.
+  /// Finalmente, se llama al método [dispose] del padre para liberar recursos adicionales.
+  @override
+  void dispose() {
+    // Libera los recursos utilizados por la operación si es necesario
+    // Este método se debe llamar para liberar los recursos utilizados por el widget.
+    // Se debe llamar al método [dispose] del padre para liberar recursos adicionales.
+    super.dispose();
   }
 
   @override

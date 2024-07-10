@@ -2,8 +2,8 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:tienda_app/Carrito/source/carritoTabla.dart';
 import 'package:provider/provider.dart';
+import 'package:tienda_app/Carrito/source/carritoTabla.dart';
 import 'package:tienda_app/Models/imagenProductoModel.dart';
 import 'package:tienda_app/Tienda/tiendaScreen.dart';
 import 'package:tienda_app/source.dart';
@@ -93,7 +93,7 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
         // Si la respuesta es exitosa, imprimir un mensaje de éxito
         print('Producto eliminado con éxito.');
 
-        // Actualizar la pantalla del carrito 
+        // Actualizar la pantalla del carrito
         // en vez de contruir y remplazar la vista, se restablecen los valores de widget o se actualiza el estado.
         setState(() {});
       } else {
@@ -780,8 +780,8 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                           ),
                     ),
                     const SizedBox(height: 10),
+                    // Caja de texto para la cantidad solicitada
                     Container(
-                      width: imageWidth * 0.6,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         boxShadow: const [
@@ -794,62 +794,73 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                         borderRadius: BorderRadius.circular(40),
                       ),
                       margin: const EdgeInsets.symmetric(vertical: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                final cantidadFinal = auxPedido.cantidad - 1;
-                                if (cantidadFinal > 0) {
-                                  final precioFinal =
-                                      cantidadFinal * producto.precio;
-                                  _updateAuxPedido(
-                                    auxPedido.id,
-                                    cantidadFinal,
-                                    precioFinal,
-                                    auxPedido.producto,
-                                    auxPedido.pedido.id,
-                                  );
-                                } else {
-                                  borrarProductoModal(context, auxPedido);
-                                }
-                              });
-                            },
-                            icon: const Icon(Icons.remove),
-                          ),
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                auxPedido.cantidad.toString(),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Calibri-Bold',
-                                  fontSize: 20,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          // Ajusta el ancho basado en el tamaño del contenedor padre
+                          final containerWidth = constraints.maxWidth *
+                              0.9; // Puedes ajustar este valor según sea necesario
+                          return SizedBox(
+                            width: containerWidth,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      final cantidadFinal =
+                                          auxPedido.cantidad - 1;
+                                      if (cantidadFinal > 0) {
+                                        final precioFinal =
+                                            cantidadFinal * producto.precio;
+                                        _updateAuxPedido(
+                                          auxPedido.id,
+                                          cantidadFinal,
+                                          precioFinal,
+                                          auxPedido.producto,
+                                          auxPedido.pedido.id,
+                                        );
+                                      } else {
+                                        borrarProductoModal(context, auxPedido);
+                                      }
+                                    });
+                                  },
+                                  icon: const Icon(Icons.remove),
                                 ),
-                              ),
+                                Center(
+                                  child: Text(
+                                    auxPedido.cantidad.toString(),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Calibri-Bold',
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      if (auxPedido.cantidad <
+                                          producto.maxReserva) {
+                                        final cantidadFinal =
+                                            auxPedido.cantidad + 1;
+                                        final precioFinal =
+                                            cantidadFinal * producto.precio;
+                                        _updateAuxPedido(
+                                          auxPedido.id,
+                                          cantidadFinal,
+                                          precioFinal,
+                                          auxPedido.producto,
+                                          auxPedido.pedido.id,
+                                        );
+                                      }
+                                    });
+                                  },
+                                  icon: const Icon(Icons.add),
+                                ),
+                              ],
                             ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                if (auxPedido.cantidad < producto.maxReserva) {
-                                  final cantidadFinal = auxPedido.cantidad + 1;
-                                  final precioFinal =
-                                      cantidadFinal * producto.precio;
-                                  _updateAuxPedido(
-                                    auxPedido.id,
-                                    cantidadFinal,
-                                    precioFinal,
-                                    auxPedido.producto,
-                                    auxPedido.pedido.id,
-                                  );
-                                }
-                              });
-                            },
-                            icon: const Icon(Icons.add),
-                          ),
-                        ],
+                          );
+                        },
                       ),
                     ),
                   ],

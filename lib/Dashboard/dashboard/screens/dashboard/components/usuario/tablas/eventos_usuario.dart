@@ -81,14 +81,26 @@ class _EventosUsuarioState extends State<EventosUsuario> {
     // Actualiza la lista de usuarios con los datos cargados
     listaUsuarios = usuariosCargados;
 
-    // Ahora inicializa _dataGridSource después de cargar los datos
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        // Actualiza _dataGridSource con los datos cargados de usuarios y eventos
-        _dataGridSource = EventosUsuarioDataGridSource(
-            eventos: _eventos, listaUsuarios: listaUsuarios);
+    if (mounted) {
+      // Ahora inicializa _dataGridSource después de cargar los datos
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          // Actualiza _dataGridSource con los datos cargados de usuarios y eventos
+          _dataGridSource = EventosUsuarioDataGridSource(
+              eventos: _eventos, listaUsuarios: listaUsuarios);
+        });
       });
-    });
+    }
+  }
+
+  /// Se llama automáticamente cuando se elimina el widget.
+  ///
+  /// Este método se llama automáticamente cuando el widget se elimina del árbol de widgets.
+  /// Se debe llamar al método [dispose] para liberar los recursos utilizados por el widget.
+  /// Finalmente, se llama al método [dispose] del padre para liberar recursos adicionales.
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override

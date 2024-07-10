@@ -87,16 +87,28 @@ class _EntregadoLiderState extends State<EntregadoLider> {
     listaProductos = productosCargados;
     listaPuntosVenta = puntosCargados;
 
-    // Ahora inicializa _dataGridSource después de cargar los datos
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        // Inicializa _dataGridSource con los datos de los pedidos, productos y puntos de venta
-        _dataGridSource = EntregadoLiderDataGridSource(
-            pedidos: _pedidos,
-            listaProductos: listaProductos,
-            listaPuntosVenta: listaPuntosVenta);
+    if (mounted) {
+      // Ahora inicializa _dataGridSource después de cargar los datos
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          // Inicializa _dataGridSource con los datos de los pedidos, productos y puntos de venta
+          _dataGridSource = EntregadoLiderDataGridSource(
+              pedidos: _pedidos,
+              listaProductos: listaProductos,
+              listaPuntosVenta: listaPuntosVenta);
+        });
       });
-    });
+    }
+  }
+
+  /// Libera los recursos utilizados por el widget.
+  ///
+  /// Esto se llama automáticamente cuando se elimina el widget de la interfaz de usuario.
+  /// Es necesario llamar a [super.dispose] para liberar los recursos utilizados por el widget base.
+  @override
+  void dispose() {
+    // Cancela cualquier operación si es necesario
+    super.dispose();
   }
 
   @override

@@ -86,14 +86,26 @@ class _ProduccionUnidadState extends State<ProduccionUnidad> {
     // Actualiza la lista de productos con los productos cargados
     listaProductos = productosCargados;
 
-    // Ahora inicializa _dataGridSource después de cargar los datos
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        // Actualiza _dataGridSource con los datos de las producciones y los productos
-        _dataGridSource = ProduccionUnidadDataGridSource(
-            producciones: _producciones, listaProductos: listaProductos);
+    if (mounted) {
+      // Ahora inicializa _dataGridSource después de cargar los datos
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          // Actualiza _dataGridSource con los datos de las producciones y los productos
+          _dataGridSource = ProduccionUnidadDataGridSource(
+              producciones: _producciones, listaProductos: listaProductos);
+        });
       });
-    });
+    }
+  }
+
+  /// Llama al método [super.dispose] para liberar los recursos utilizados por el widget.
+  ///
+  /// Este método se llama automáticamente cuando se elimina el widget.
+  /// Se debe llamar a [dispose] para liberar los recursos utilizados por el widget.
+  /// Finalmente, se llama al método [dispose] del padre para liberar recursos adicionales.
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override

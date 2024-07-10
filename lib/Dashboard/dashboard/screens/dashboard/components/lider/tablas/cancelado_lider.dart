@@ -91,16 +91,31 @@ class _CanceladoLiderState extends State<CanceladoLider> {
     listaProductos = productosCargados;
     listaPuntosVenta = puntosCargados;
 
-    // Ahora inicializa _dataGridSource después de cargar los datos
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        // Inicializa _dataGridSource con los datos de los pedidos, productos y puntos de venta
-        _dataGridSource = CanceladoLiderDataGridSource(
-            pedidos: _pedidos,
-            listaProductos: listaProductos,
-            listaPuntosVenta: listaPuntosVenta);
+    if (mounted) {
+      // Ahora inicializa _dataGridSource después de cargar los datos
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          // Inicializa _dataGridSource con los datos de los pedidos, productos y puntos de venta
+          _dataGridSource = CanceladoLiderDataGridSource(
+              pedidos: _pedidos,
+              listaProductos: listaProductos,
+              listaPuntosVenta: listaPuntosVenta);
+        });
       });
-    });
+    }
+  }
+
+  /// Se llama automáticamente cuando se elimina el widget.
+  ///
+  /// Se debe llamar a [dispose] para liberar los recursos utilizados por la
+  /// operación.
+  @override
+  void dispose() {
+    // Cancela cualquier operación en curso si es necesario.
+    // Este método se debe llamar automáticamente cuando se elimina el widget.
+    // Se debe llamar a [dispose] para liberar los recursos utilizados por la
+    // operación.
+    super.dispose();
   }
 
   @override

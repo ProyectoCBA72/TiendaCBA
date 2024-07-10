@@ -82,14 +82,25 @@ class _BodegaPuntoState extends State<BodegaPunto> {
     // Asignar las producciones a la variable listaProducciones
     listaProducciones = produccionesCargadas;
 
-    // Actualizar _dataGridSource en el siguiente frame de la interfaz de usuario
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        // Inicializar _dataGridSource con los datos de las producciones y los inventarios
-        _dataGridSource = BodegaPuntoDataGridSource(
-            bodegas: _bodegas, listaProducciones: listaProducciones);
+    if (mounted) {
+      // Actualizar _dataGridSource en el siguiente frame de la interfaz de usuario
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          // Inicializar _dataGridSource con los datos de las producciones y los inventarios
+          _dataGridSource = BodegaPuntoDataGridSource(
+              bodegas: _bodegas, listaProducciones: listaProducciones);
+        });
       });
-    });
+    }
+  }
+
+  /// Se llama automáticamente cuando se elimina el widget.
+  /// Se debe llamar a [dispose] para liberar los recursos utilizados por el widget.
+  /// Finalmente, se llama al método [dispose] del padre para liberar recursos adicionales.
+  @override
+  void dispose() {
+    // Llama al método [dispose] del widget base para liberar recursos adicionales
+    super.dispose();
   }
 
   @override
