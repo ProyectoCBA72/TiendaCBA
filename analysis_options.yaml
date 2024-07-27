@@ -9,6 +9,7 @@
 # packages, and plugins designed to encourage good coding practices.
 analyzer:
   errors:
+    avoid_print: ignore
     avoid_web_libraries_in_flutter: ignore
     deprecated_member_use: ignore
     file_names: ignore

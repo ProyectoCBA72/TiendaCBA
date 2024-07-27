@@ -1,7 +1,10 @@
 // ignore_for_file: file_names
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tienda_app/Models/bodegaModel.dart';
 import 'package:tienda_app/Models/imagenProductoModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/Tienda/tiendaController.dart';
 import 'package:tienda_app/Tienda/tiendaScreen.dart';
 import 'package:tienda_app/cardProducts.dart';
 import 'package:tienda_app/constantsDesign.dart';
@@ -11,7 +14,14 @@ class SearchProductoDelegate extends SearchDelegate {
   List<ProductoModel> filterProducts =
       []; // Lista de productos filtrados inicialmente vacía.
 
-  SearchProductoDelegate(); // Constructor de la clase.
+  List<ProductoModel> suggestionProducts =
+      []; // Lista de productos filtrados inicialmente vacía.
+
+  Future<List<dynamic>> futureDataSearch;
+
+  SearchProductoDelegate(
+    this.futureDataSearch,
+  ); // Constructor de la clase.
 
   @override
   String get searchFieldLabel =>
@@ -95,14 +105,6 @@ class SearchProductoDelegate extends SearchDelegate {
     );
   }
 
-  Future<List<dynamic>> fechData() {
-    // Crea un futuro para obtener datos de productos e imágenes de productos.
-    return Future.wait([
-      getProductos(), // Llama a la función getProductos para obtener la lista de productos.
-      getImagenProductos(), // Llama a la función getImagenProductos para obtener la lista de imágenes de productos.
-    ]);
-  }
-
   @override
   List<Widget>? buildActions(BuildContext context) {
     // Construye la acción de limpiar el texto de búsqueda.
@@ -141,14 +143,16 @@ class SearchProductoDelegate extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     // Construye las sugerencias mientras se escribe en el campo de búsqueda.
-    return _buildFutureBuilder(context);
+    return _buildSuggestions(context);
   }
 
   Widget _buildFutureBuilder(BuildContext context) {
+    final puntoVenta =
+        Provider.of<PuntoVentaProvider>(context, listen: false).puntoVenta;
     // Construye un FutureBuilder para manejar la carga de datos de búsqueda.
     return FutureBuilder(
       future:
-          fechData(), // Llama al método fechData para obtener los datos necesarios.
+          futureDataSearch, // Llama al método fechData para obtener los datos necesarios.
       builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Muestra un indicador de progreso mientras se cargan los datos.
@@ -167,13 +171,33 @@ class SearchProductoDelegate extends SearchDelegate {
           );
         } else {
           // Si hay datos disponibles, filtra los productos según la consulta actual y construye una cuadrícula de resultados.
+          // Primera lista del snapshot que almacena los productos, Indice [0]
           List<ProductoModel> productos = snapshot.data![0];
+          // Segunda lista del snapshot que almacena las imagenes, Indice [1]
           List<ImagenProductoModel> allImagenProductos = snapshot.data![1];
-          filterProducts = productos.where((producto) {
-            return (producto.nombre.toLowerCase().contains(query.trim()) ||
+          // tercera lista del snapshot que almacena las bodegas, Indice [2]
+          List<BodegaModel> bodegas = snapshot.data![2];
+
+          // Lista de bodegas donde el punto de venta sea igual al seleccionado en la tienda
+
+          final bodegasPunto = bodegas
+              .where((bodega) => bodega.puntoVenta.id == puntoVenta!.id)
+              .toList();
+
+          // Lista de los productos disponibles, es decir los que hay uno o mas  en bodega.
+          final productosDisponibles = productos.where((producto) {
+            return bodegasPunto.any((bodega) =>
+                bodega.producto.id == producto.id && bodega.cantidad > 1);
+          }).toList();
+
+          // Actualizamos la lista definida anteriormente.
+          filterProducts = productosDisponibles.where((producto) {
+            return (producto.nombre
+                        .toLowerCase()
+                        .contains(query.toLowerCase()) ||
                     producto.categoria.nombre
                         .toLowerCase()
-                        .contains(query.trim())) &&
+                        .contains(query.toLowerCase())) &&
                 producto.estado;
           }).toList();
           return GridView.builder(
@@ -189,6 +213,135 @@ class SearchProductoDelegate extends SearchDelegate {
             ),
             itemBuilder: (context, index) {
               final producto = filterProducts[index];
+              List<String> imagenesProducto = allImagenProductos
+                  .where((imagen) => imagen.producto.id == producto.id)
+                  .map((imagen) => imagen.imagen)
+                  .toList();
+              return CardProducts(
+                producto: producto,
+                imagenes: imagenesProducto,
+              );
+            },
+          );
+        }
+      },
+    );
+  }
+
+  // construye la lista de sugerencias
+  Widget _buildSuggestions(BuildContext context) {
+    final puntoVenta =
+        Provider.of<PuntoVentaProvider>(context, listen: false).puntoVenta;
+    return FutureBuilder<List>(
+      future: futureDataSearch,
+      builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No data available'));
+        } else {
+          List<ProductoModel> productos = snapshot.data![0];
+          List<BodegaModel> bodegas = snapshot.data![2];
+
+          // Lista de bodegas donde el punto de venta sea igual al seleccionado en la tienda
+
+          final bodegasPunto = bodegas
+              .where((bodega) => bodega.puntoVenta.id == puntoVenta!.id)
+              .toList();
+
+          // Lista de los productos disponibles, es decir los que hay uno o mas  en bodega.
+          final productosDisponibles = productos.where((producto) {
+            return bodegasPunto.any((bodega) =>
+                bodega.producto.id == producto.id && bodega.cantidad > 1);
+          }).toList();
+
+          suggestionProducts = productosDisponibles.where((prod) {
+            return prod.nombre.toLowerCase().contains(query.toLowerCase()) ||
+                prod.categoria.nombre
+                    .toLowerCase()
+                    .contains(query.toLowerCase());
+          }).toList();
+
+          return Stack(
+            children: [
+              _buildAllProducts(context),
+              if (query.isNotEmpty)
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Container(
+                    color: Colors.white.withOpacity(0.9),
+                    height: 200, // Limita la altura de las sugerencias
+                    child: ListView.builder(
+                      itemCount: suggestionProducts.length,
+                      itemBuilder: (context, index) {
+                        final producto = suggestionProducts[index];
+                        return ListTile(
+                          title: Text(producto.nombre),
+                          selectedTileColor: Colors.grey[200],
+                          subtitle: Text(producto.categoria.nombre),
+                          onTap: () {
+                            query = producto.nombre;
+                            showResults(context);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+            ],
+          );
+        }
+      },
+    );
+  }
+
+  // construye todos los productos para colocar en el fondo de las sugerencias.
+  Widget _buildAllProducts(BuildContext context) {
+    final puntoVenta =
+        Provider.of<PuntoVentaProvider>(context, listen: false).puntoVenta;
+    return FutureBuilder<List<dynamic>>(
+      future: futureDataSearch,
+      builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No data available'));
+        } else {
+          List<ProductoModel> productos = snapshot.data![0];
+          List<ImagenProductoModel> allImagenProductos = snapshot.data![1];
+          List<BodegaModel> bodegas = snapshot.data![2];
+
+          // Lista de bodegas donde el punto de venta sea igual al seleccionado en la tienda
+
+          final bodegasPunto = bodegas
+              .where((bodega) => bodega.puntoVenta.id == puntoVenta!.id)
+              .toList();
+
+          // Lista de los productos disponibles, es decir los que hay uno o mas  en bodega.
+          final productosDisponibles = productos.where((producto) {
+            return bodegasPunto.any((bodega) =>
+                bodega.producto.id == producto.id && bodega.cantidad > 1);
+          }).toList();
+
+          final allProductos =
+              productosDisponibles.where((prod) => prod.estado).toList();
+          return GridView.builder(
+            itemCount: allProductos.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: Responsive.isMobile(context)
+                  ? 1
+                  : Responsive.isTablet(context)
+                      ? 3
+                      : 4,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 20,
+            ),
+            itemBuilder: (context, index) {
+              final producto = allProductos[index];
               List<String> imagenesProducto = allImagenProductos
                   .where((imagen) => imagen.producto.id == producto.id)
                   .map((imagen) => imagen.imagen)

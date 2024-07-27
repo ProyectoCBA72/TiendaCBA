@@ -4,7 +4,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tienda_app/Carrito/source/carritoTabla.dart';
+import 'package:tienda_app/Models/bodegaModel.dart';
 import 'package:tienda_app/Models/imagenProductoModel.dart';
+import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/Tienda/tiendaScreen.dart';
 import 'package:tienda_app/source.dart';
 import '../../Models/productoModel.dart';
@@ -18,8 +20,10 @@ import 'package:http/http.dart' as http;
 /// Esta clase extiende [StatefulWidget] y proporciona un estado asociado
 /// [_CarritoBodyScreenState].
 class CarritoBodyScreen extends StatefulWidget {
+  final PuntoVentaModel puntoVenta;
+
   /// Construye un [CarritoBodyScreen] con un [Key] opcional.
-  const CarritoBodyScreen({super.key});
+  const CarritoBodyScreen({super.key, required this.puntoVenta});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -27,6 +31,15 @@ class CarritoBodyScreen extends StatefulWidget {
 }
 
 class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
+  // Varible para no perder el contexto del árbol de widgets
+  late ScaffoldMessengerState scaffoldMessenger;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    scaffoldMessenger = ScaffoldMessenger.of(context);
+  }
+
 // futuro para actualizar la cantidad y el precio del aux pedido.
   /// Futuro para actualizar la cantidad, precio, producto y pedido de un aux pedido.
   ///
@@ -38,49 +51,226 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
   /// @param precio El nuevo precio del aux pedido.
   /// @param producto El nuevo ID del producto del aux pedido.
   /// @param pedido El nuevo ID del pedido del aux pedido.
-  Future<void> _updateAuxPedido(
-      int id, int cantidad, int precio, int producto, int pedido) async {
-    try {
-      // Construir la URL para actualizar el aux pedido
-      final url = Uri.parse('$sourceApi/api/aux-pedidos/$id/');
+  Future<void> _updateAuxPedido(BuildContext context, int id, int cantidad,
+      int precio, int producto, int pedido) async {
+    // traermos las bodegas
+    final bodegas = await getBodegas();
 
-      // Realizar la solicitud PUT al API
-      final response = await http.put(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'precio': precio,
-          'cantidad': cantidad,
-          'producto': producto,
-          'pedido': pedido,
-        }),
-      );
+    final bodega = bodegas
+        .where((item) =>
+            item.producto.id == producto &&
+            item.puntoVenta.id == widget.puntoVenta.id)
+        .firstOrNull;
 
-      // Verificar la respuesta de la solicitud
-      if (response.statusCode == 200) {
-        // Si la respuesta es exitosa, imprimir un mensaje de éxito
-        print('Pedido actualizado con éxito.');
-      } else {
-        // Si la respuesta no es exitosa, imprimir el mensaje de error
-        print('Error al actualizar el pedido: ${response.body}');
+    if (bodega!.cantidad >= cantidad) {
+      try {
+        // Construir la URL para actualizar el aux pedido
+        final url = Uri.parse('$sourceApi/api/aux-pedidos/$id/');
+
+        // Realizar la solicitud PUT al API
+        final response = await http.put(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'precio': precio,
+            'cantidad': cantidad,
+            'producto': producto,
+            'pedido': pedido,
+          }),
+        );
+
+        // Verificar la respuesta de la solicitud
+        if (response.statusCode == 200) {
+          // Si la respuesta es exitosa, imprimir un mensaje de éxito
+          print('Pedido actualizado con éxito.');
+          // Mostrar un mensaje de confirmación utilizando ScaffoldMessenger
+          scaffoldMessenger.showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Pedido actualizado con éxito',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          );
+          setState(() {});
+        } else {
+          // Si la respuesta no es exitosa, imprimir el mensaje de error
+          print('Error al actualizar el pedido: ${response.body}');
+        }
+      } catch (e) {
+        // Si ocurre un error, imprimir el error
+        print(e);
       }
-    } catch (e) {
-      // Si ocurre un error, imprimir el error
-      print(e);
+    } else {
+      if (bodega.cantidad == 0) {
+        // si la cantidad en la bodega es de 0 se elimina automaticamente
+        scaffoldMessenger.showSnackBar(
+          const SnackBar(
+            content: Text(
+              'La cantidad disponible es 0 se eliminara el producto',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        );
+        _eliminarProducto(id);
+      } else {
+        // pero si la bodega tiene valor se actualiza el pedido con ese valor.
+        try {
+          // Construir la URL para actualizar el aux pedido
+          final url = Uri.parse('$sourceApi/api/aux-pedidos/$id/');
+
+          // Realizar la solicitud PUT al API
+          final response = await http.put(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({
+              'precio': precio,
+              'cantidad': bodega.cantidad,
+              'producto': producto,
+              'pedido': pedido,
+            }),
+          );
+
+          // Verificar la respuesta de la solicitud
+          if (response.statusCode == 200) {
+            // Si la respuesta es exitosa, imprimir un mensaje de éxito
+            print('Pedido actualizado con éxito. Con el maximo disponible');
+
+            // Mostrar un mensaje de confirmación utilizando ScaffoldMessenger
+            scaffoldMessenger.showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Pedido actualizado con éxito. Con el maximo disponible',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            );
+            setState(() {});
+          } else {
+            // Si la respuesta no es exitosa, imprimir el mensaje de error
+            print('Error al actualizar el pedido: ${response.body}');
+          }
+        } catch (e) {
+          // Si ocurre un error, imprimir el error
+          print(e);
+        }
+      }
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            'La cantidad disponible en el momento es: ${bodega.cantidad} unidades, ',
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      );
     }
+  }
+
+  // funcion para verificar si el producto que resta de la eliminacion es eclusivo
+  // en caso de que lo sea muestra la modal, si no se elimina
+
+  Future<void> _removeProducto(
+      AuxPedidoModel auxPedido, List<AuxPedidoModel> auxPedidos) async {
+    final productos = await getProductos();
+
+    if (auxPedidos.length == 2) {
+      final auxPedidoRestante = auxPedidos
+          .where((item) => item.producto != auxPedido.producto)
+          .firstOrNull;
+
+      final productoRestante = productos
+          .where((item) => item.id == auxPedidoRestante!.producto)
+          .firstOrNull;
+      if (productoRestante!.exclusivo) {
+        modalEliminarExclusivo();
+      } else {
+        _eliminarProducto(auxPedido.id);
+      }
+    } else {
+      _eliminarProducto(auxPedido.id);
+    }
+  }
+
+  // modal de que no se puede eliminar un producto si solo queda un exclusivo.
+  void modalEliminarExclusivo() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("No se puede eliminar "),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const Text(
+                "¡No puede llevar un producto exclusivo sin compañia de otro producto!",
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              // Muestra una imagen circular del logo de la aplicación
+              ClipOval(
+                child: Container(
+                  width: 100, // Ajusta el tamaño según sea necesario
+                  height: 100, // Ajusta el tamaño según sea necesario
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: primaryColor,
+                  ),
+                  child: Image.asset(
+                    "assets/img/logo.png",
+                    fit: BoxFit.cover, // Ajusta la imagen al contenedor
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            ButtonBar(
+              alignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(defaultPadding),
+                  child: _buildButton(
+                    "Aceptar",
+                    () {
+                      // Cierra el diálogo cuando se hace clic en el botón de aceptar
+                      Navigator.pop(context);
+                      // Navega a la pantalla de la tienda
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
   }
 
   /// Elimina un producto del carrito.
   ///
   /// @param id El ID del producto a eliminar.
-  Future<void> _removeProducto(int id) async {
-    try {
-      // Construir la URL para eliminar el aux pedido
-      final url = Uri.parse('$sourceApi/api/aux-pedidos/$id/');
 
-      // Realizar la solicitud DELETE al API
+  Future<void> _eliminarProducto(int id) async {
+    try {
+      final url = Uri.parse('$sourceApi/api/aux-pedidos/$id/');
       final response = await http.delete(
         url,
         headers: {
@@ -88,20 +278,13 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
         },
       );
 
-      // Verificar la respuesta de la solicitud
       if (response.statusCode == 204) {
-        // Si la respuesta es exitosa, imprimir un mensaje de éxito
         print('Producto eliminado con éxito.');
-
-        // Actualizar la pantalla del carrito
-        // en vez de contruir y remplazar la vista, se restablecen los valores de widget o se actualiza el estado.
         setState(() {});
       } else {
-        // Si la respuesta no es exitosa, imprimir el mensaje de error
         print('Error al eliminar el producto: ${response.body}');
       }
     } catch (e) {
-      // Si ocurre un error, imprimir el error
       print(e);
     }
   }
@@ -392,11 +575,11 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                                                         imagen.producto.id ==
                                                         auxPedido.producto);
                                                 return cardProduct(
-                                                  context,
-                                                  auxPedido,
-                                                  producto,
-                                                  imagenProd,
-                                                );
+                                                    context,
+                                                    auxPedido,
+                                                    producto,
+                                                    imagenProd,
+                                                    auxPedidos);
                                               },
                                             ),
                                     ),
@@ -544,6 +727,7 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                     // Llamar el formulario para hacer un comentario
                     child: CarritoTabla(
                   auxPedido: auxPedido,
+                  puntoVenta: widget.puntoVenta,
                 ))),
           ),
         );
@@ -686,8 +870,12 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
   /// @param producto El modelo del producto.
   /// @param imagen El modelo de imagen del producto.
   /// @return Un widget Dismissible que representa la tarjeta del producto.
-  Dismissible cardProduct(BuildContext context, AuxPedidoModel auxPedido,
-      ProductoModel producto, ImagenProductoModel imagen) {
+  Dismissible cardProduct(
+      BuildContext context,
+      AuxPedidoModel auxPedido,
+      ProductoModel producto,
+      ImagenProductoModel imagen,
+      List<AuxPedidoModel> auxPedidos) {
     // Ajustar el ancho de la imagen relativo al tamaño de la pantalla
     final double imageWidth = MediaQuery.of(context).size.width * 0.4;
     // Altura fija para la tarjeta
@@ -721,7 +909,7 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
       // Acción al deslizar la tarjeta
       onDismissed: (direction) {
         setState(() {
-          borrarProductoModal(context, auxPedido);
+          borrarProductoModal(context, auxPedido, auxPedidos);
         });
       },
       // Contenido de la tarjeta
@@ -813,6 +1001,7 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                                         final precioFinal =
                                             cantidadFinal * producto.precio;
                                         _updateAuxPedido(
+                                          context,
                                           auxPedido.id,
                                           cantidadFinal,
                                           precioFinal,
@@ -820,7 +1009,8 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                                           auxPedido.pedido.id,
                                         );
                                       } else {
-                                        borrarProductoModal(context, auxPedido);
+                                        borrarProductoModal(
+                                            context, auxPedido, auxPedidos);
                                       }
                                     });
                                   },
@@ -846,12 +1036,18 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                                         final precioFinal =
                                             cantidadFinal * producto.precio;
                                         _updateAuxPedido(
+                                          context,
                                           auxPedido.id,
                                           cantidadFinal,
                                           precioFinal,
                                           auxPedido.producto,
                                           auxPedido.pedido.id,
                                         );
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                                content: Text(
+                                                    'El limite de reserva del producto son ${producto.maxReserva} unidades.')));
                                       }
                                     });
                                   },
@@ -884,7 +1080,8 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
   ///   - `context` (BuildContext): El contexto de la aplicación.
   ///   - `auxPedido` (AuxPedidoModel): El modelo que representa el producto que se va
   ///     a eliminar.
-  void borrarProductoModal(BuildContext context, AuxPedidoModel auxPedido) {
+  void borrarProductoModal(BuildContext context, AuxPedidoModel auxPedido,
+      List<AuxPedidoModel> auxPedidos) {
     // Muestra el diálogo modal para confirmar la eliminación del producto.
     showDialog(
       context: context,
@@ -923,9 +1120,9 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(defaultPadding),
-                  child: _buildButton("Eliminar", () {
+                  child: _buildButton("Eliminar", () async {
                     Navigator.pop(context);
-                    _removeProducto(auxPedido.id);
+                    _removeProducto(auxPedido, auxPedidos);
                   }),
                 ),
               ],

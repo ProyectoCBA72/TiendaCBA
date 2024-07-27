@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:tienda_app/Carrito/source/carritoBodyScreen.dart';
+import 'package:tienda_app/Models/puntoVentaModel.dart';
 import '../Home/profileCard.dart';
 import '../constantsDesign.dart';
 
@@ -9,10 +10,12 @@ import '../constantsDesign.dart';
 ///
 /// Esta clase extiende [StatefulWidget] y se utiliza para mostrar la pantalla de carrito.
 class CarritoScreen extends StatefulWidget {
+  final PuntoVentaModel puntoVenta;
+
   /// Constructor de la clase [CarritoScreen].
   ///
   /// El parámetro [key] es opcional y se utiliza para identificar el widget en la árbol de widgets.
-  const CarritoScreen({super.key});
+  const CarritoScreen({super.key, required this.puntoVenta});
 
   /// Retorna el estado de la pantalla de carrito.
   @override
@@ -94,12 +97,14 @@ class _CarritoScreenState extends State<CarritoScreen> {
           ),
 
           // Cuerpo del carrito
-          const Positioned(
+          Positioned(
             top: 110,
             left: 0,
             right: 0,
             bottom: 0,
-            child: CarritoBodyScreen(),
+            child: CarritoBodyScreen(
+              puntoVenta: widget.puntoVenta,
+            ),
           ),
         ],
       ),

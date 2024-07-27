@@ -507,6 +507,7 @@ class _CardProductsState extends State<CardProducts> {
   /// @param userID El ID del usuario.
   /// @return Un Future que completa cuando el pedido ha sido añadido.
   Future addPedido(int anteriorPedido, int userID) async {
+    final puntoVenta = Provider.of<PuntoVentaProvider>(context, listen: false).puntoVenta;
     final String url = "$sourceApi/api/pedidos/";
     final headers = {
       'Content-Type': 'application/json',
@@ -519,7 +520,8 @@ class _CardProductsState extends State<CardProducts> {
       'estado': 'PENDIENTE',
       'entregado': false,
       'pedidoConfirmado': false,
-      'usuario': userID
+      'usuario': userID,
+      'puntoVenta': puntoVenta!.id
     };
 
     // Enviar la solicitud POST para agregar el nuevo pedido

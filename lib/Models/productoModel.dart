@@ -88,6 +88,18 @@ class ProductoModel {
   });
 }
 
+
+// clase para almacenar los datos del buscador, ( temas de carga )
+class ProductoConImagenes {
+  final ProductoModel producto;
+  final List<String> imagenes;
+
+  ProductoConImagenes({
+    required this.producto,
+    required this.imagenes,
+  });
+}
+
 /// Lista que almacena los objetos de tipo [ProductoModel].
 ///
 /// Esta lista se utiliza para almacenar los productos obtenidos de la API.

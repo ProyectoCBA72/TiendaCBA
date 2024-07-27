@@ -49,6 +49,8 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
   /// URL de la imagen principal.
   String mainImageUrl = '';
 
+  bool _isInscrito = false;
+
   /// Lista de URL de miniaturas de imágenes.
   ///
   /// Cada URL representa una imagen en miniatura del anuncio.
@@ -77,7 +79,15 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
   @override
   void initState() {
     super.initState();
-    _loadImages();
+    _loadData();
+  }
+
+  // cambia el estado del widget una vez que este este en el arbol de los mismo
+  // con el fin de no perder el contexto
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    setData();
   }
 
   /// Carga las imágenes del anuncio.
@@ -86,12 +96,36 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
   /// y la URL de la imagen principal.
   ///
   /// No devuelve nada.
-  void _loadImages() {
+  void _loadData() {
     // Establece la lista de URL de miniaturas de imágenes del anuncio.
     thumbnailUrls = widget.images;
-
     // Establece la URL de la imagen principal como la primera URL de miniatura.
     mainImageUrl = thumbnailUrls.first;
+  }
+
+  Future setData() async {
+    final usuarioAutenticado =
+        Provider.of<AppState>(context).usuarioAutenticado;
+    if (usuarioAutenticado != null) {
+      final isInscrito = await isUserAddedBoleta(usuarioAutenticado);
+      setState(() {
+        _isInscrito = isInscrito;
+      });
+    }
+  }
+
+  // futuro que retorna un bool para verificar si el usuario ya tiene boleta.
+  Future<bool> isUserAddedBoleta(UsuarioModel user) async {
+    final boletas = await getBoletas();
+    // verificamos si el usuario ya ha reservado una boleta en este anuncio.
+
+    if (boletas == null || boletas.isEmpty) {
+      return false;
+    }
+
+    // si nunguna coincide se retorna el false automaticamente
+    return boletas.any((boleta) =>
+        boleta.usuario == user.id && boleta.anuncio.id == widget.anuncio.id);
   }
 
   /// Función asincrónica para obtener los datos necesarios para mostrar los comentarios, las imágenes de los usuarios y los usuarios.
@@ -132,7 +166,7 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
     };
     // contamos las boletas relacionadas al anuncio.
     final boletasAnuncio =
-        boletas.where((anuncio) => anuncio.anuncio.id == anuncio.id).toList();
+        boletas.where((boleta) => boleta.anuncio.id == anuncio.id).toList();
     // verificamos si el usuario ya ha reservado una boleta en este anuncio.
     final siAdded = boletas.any((boleta) => boleta.usuario == userID);
 
@@ -142,7 +176,13 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
         final http.Response responde = await http.post(Uri.parse(url),
             headers: headers, body: jsonEncode(body));
         if (responde.statusCode == 201) {
-          print('¡boleta reservada!');
+          // Si la sulicitud fue correcta se muestra
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Se guardo su inscripción a este evento')));
+
+          setState(() {
+            _isInscrito = true;
+          });
         } else {
           print('Error al enviar datos ${responde.body}');
         }
@@ -955,9 +995,11 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                               BorderRadius.circular(50),
                                         ),
                                         alignment: Alignment.center,
-                                        child: const Text(
-                                          "Inscribirme",
-                                          style: TextStyle(
+                                        child: Text(
+                                          _isInscrito
+                                              ? "Incrito"
+                                              : "Inscribirme",
+                                          style: const TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
                                             fontFamily: 'Calibri-Bold',
@@ -1761,9 +1803,11 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                                     BorderRadius.circular(50),
                                               ),
                                               alignment: Alignment.center,
-                                              child: const Text(
-                                                "Inscribirme",
-                                                style: TextStyle(
+                                              child: Text(
+                                                _isInscrito
+                                                    ? "Inscrito"
+                                                    : "Inscribirme",
+                                                style: const TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
                                                   fontFamily: 'Calibri-Bold',

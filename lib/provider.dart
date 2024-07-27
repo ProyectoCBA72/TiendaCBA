@@ -60,6 +60,8 @@ class AppState extends ChangeNotifier {
   }
 }
 
+
+
 /// La clase `AppProvider` configura los proveedores para la aplicación.
 /// Proporciona el estado global (`AppState`) y el controlador de la tienda (`TiendaController`).
 class AppProvider extends StatelessWidget {
@@ -75,8 +77,12 @@ class AppProvider extends StatelessWidget {
       providers: [
         /// Proveedor para el estado global de la aplicación (`AppState`)
         ChangeNotifierProvider(create: (context) => AppState()),
+
         /// Proveedor para el controlador de la tienda (`TiendaController`)
         ChangeNotifierProvider(create: (context) => Tiendacontroller()),
+
+        // Provider para el controlador del punto de venta en la tienda
+        ChangeNotifierProvider(create: (context) => PuntoVentaProvider()),
       ],
       child: child,
     );
