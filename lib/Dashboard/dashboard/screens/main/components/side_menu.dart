@@ -8,6 +8,7 @@ import 'package:tienda_app/Dashboard/dashboard/screens/main/main_screen_lider.da
 import 'package:tienda_app/Dashboard/dashboard/screens/main/main_screen_punto.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/main/main_screen_unidad.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/main/main_screen_usuario.dart';
+import 'package:tienda_app/Dashboard/dashboard/screens/main/main_screen_vendedor.dart';
 import 'package:tienda_app/Home/homePage.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/provider.dart';
@@ -118,6 +119,28 @@ class _SideMenuState extends State<SideMenu> {
                                 create: (context) => MenuAppController()),
                           ],
                           child: const MainScreenUnidad(),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+            // Panel de Punto de Venta para usuarios con rol de punto de venta
+            if (usuarioAutenticado != null)
+              if (usuarioAutenticado.rol3 == "VENDEDOR" &&
+                  usuarioAutenticado.puntoVenta != null)
+                DrawerListTile(
+                  title: "Panel Vendedor",
+                  svgSrc: "assets/icons/factura.svg",
+                  press: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MultiProvider(
+                          providers: [
+                            ChangeNotifierProvider(
+                                create: (context) => MenuAppController()),
+                          ],
+                          child: const MainScreenVendedor(),
                         ),
                       ),
                     );

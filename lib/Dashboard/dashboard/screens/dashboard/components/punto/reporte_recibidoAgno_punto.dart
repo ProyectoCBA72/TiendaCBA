@@ -47,7 +47,10 @@ class ReporteRecibidoAgnoPunto extends StatelessWidget {
                   // Mostrar mensaje de error si ocurre algún problema al cargar los datos
                 } else if (snapshot.hasError) {
                   return Center(
-                    child: Text('Error al cargar datos: ${snapshot.error}'),
+                    child: Text(
+                      'Error al cargar datos: ${snapshot.error}',
+                      textAlign: TextAlign.center,
+                    ),
                   );
                 } else {
                   // Cuando los datos están disponibles, procesarlos
@@ -61,8 +64,7 @@ class ReporteRecibidoAgnoPunto extends StatelessWidget {
                   // Crear el gráfico con los datos procesados
                   return SfCartesianChart(
                     tooltipBehavior: TooltipBehavior(enable: true),
-                    legend: const Legend(
-                        isVisible: true),
+                    legend: const Legend(isVisible: true),
                     primaryXAxis: const CategoryAxis(
                       title: AxisTitle(text: 'Año'),
                     ),

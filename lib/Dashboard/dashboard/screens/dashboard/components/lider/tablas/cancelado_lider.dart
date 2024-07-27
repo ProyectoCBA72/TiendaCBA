@@ -7,7 +7,10 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+import 'package:tienda_app/pdf/Lider/pdfCanceladoLider.dart';
+import 'package:tienda_app/pdf/modalsPdf.dart';
 
 /// Esta clase representa un widget de estado que muestra una tabla de pedidos cancelados de un lider.
 ///
@@ -21,12 +24,15 @@ class CanceladoLider extends StatefulWidget {
   /// Lista de objetos [AuxPedidoModel] que representan los pedidos cancelados del lider.
   final List<AuxPedidoModel> auxPedido;
 
+  final UsuarioModel usuario;
+
   /// Constructor del widget.
   ///
   /// Los parámetros obligatorios son:
   /// - [key] clave única del widget.
   /// - [auxPedido] lista de objetos [AuxPedidoModel] que representan los pedidos cancelados del lider.
-  const CanceladoLider({super.key, required this.auxPedido});
+  const CanceladoLider(
+      {super.key, required this.auxPedido, required this.usuario});
 
   /// Crea un estado [_CanceladoLiderState] para manejar los datos de la pantalla.
   @override
@@ -48,6 +54,8 @@ class _CanceladoLiderState extends State<CanceladoLider> {
   /// Se inicializa en el método [initState] con los parámetros [_pedidos],
   /// [listaProductos] y [listaPuntosVenta].
   late CanceladoLiderDataGridSource _dataGridSource;
+
+  List<DataGridRow> registros = [];
 
   @override
 
@@ -159,6 +167,19 @@ class _CanceladoLiderState extends State<CanceladoLider> {
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Cambia la firma del callback
+                onSelectionChanged: (List<DataGridRow> addedRows,
+                    List<DataGridRow> removedRows) {
+                  setState(() {
+                    // Añadir filas a la lista de registros seleccionados
+                    registros.addAll(addedRows);
+
+                    // Eliminar filas de la lista de registros seleccionados
+                    for (var row in removedRows) {
+                      registros.remove(row);
+                    }
+                  });
+                },
                 // Columnas
                 columns: <GridColumn>[
                   GridColumn(
@@ -246,7 +267,17 @@ class _CanceladoLiderState extends State<CanceladoLider> {
           Center(
             child: Column(
               children: [
-                _buildButton('Imprimir Reporte', () {}),
+                _buildButton('Imprimir Reporte', () {
+                  if (registros.isEmpty) {
+                    noHayPDFModal(context);
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PdfCanceladoLiderScreen(
+                                usuario: widget.usuario, registro: registros)));
+                  }
+                }),
               ],
             ),
           ),
@@ -428,7 +459,7 @@ class CanceladoLiderDataGridSource extends DataGridSource {
     return DataGridRowAdapter(cells: [
       Container(
         padding: const EdgeInsets.all(8.0),
-        alignment: Alignment.center,
+        alignment: Alignment.centerLeft,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(

@@ -53,7 +53,10 @@ class ReporteDevolucionesPuntoMesPunto extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   // Si ocurre un error al cargar los datos, muestra un mensaje de error
                   return Center(
-                    child: Text('Error al cargar datos: ${snapshot.error}'),
+                    child: Text(
+                      'Error al cargar datos: ${snapshot.error}',
+                      textAlign: TextAlign.center,
+                    ),
                   );
                 } else {
                   // Cuando los datos están disponibles

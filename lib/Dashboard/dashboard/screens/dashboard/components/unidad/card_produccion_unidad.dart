@@ -78,7 +78,7 @@ class CardProduccionUnidad extends StatelessWidget {
                     color: primaryColor), // Estilo de texto con color primario
               ),
               Text(
-                info.totalReservas!, // Total de reservas mostrado
+                info.totalProducciones!, // Total de producciones mostradas
                 style: Theme.of(context).textTheme.bodySmall!.copyWith(
                     color: primaryColor), // Estilo de texto con color primario
               ),

@@ -146,8 +146,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                             const SizedBox(height: defaultPadding),
                           if (!Responsive.isMobile(context))
                             Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
                                   child: Text(
@@ -155,8 +154,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleLarge
-                                        ?.copyWith(
-                                            fontFamily: 'Calibri-Bold'),
+                                        ?.copyWith(fontFamily: 'Calibri-Bold'),
                                   ),
                                 ),
                               ],
@@ -169,13 +167,10 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                 child: Column(
                                   children: [
                                     Container(
-                                      padding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 16,
-                                              vertical: 8),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 8),
                                       // Contenedor que alberga la barra de pestañas.
-                                      child:
-                                          Builder(builder: (context) {
+                                      child: Builder(builder: (context) {
                                         return Row(
                                           children: [
                                             // Botón de anterior pestaña.
@@ -185,21 +180,18 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                 color: primaryColor,
                                               ),
                                               onPressed: () =>
-                                                  _scrollToPreviousTab(
-                                                      context),
+                                                  _scrollToPreviousTab(context),
                                             ),
                                             Expanded(
                                               child: TabBar(
-                                                indicatorColor:
-                                                    primaryColor,
+                                                indicatorColor: primaryColor,
                                                 isScrollable: true,
                                                 tabAlignment:
                                                     TabAlignment.center,
                                                 onTap: (index) {
                                                   // Actualiza el índice seleccionado
                                                   setState(() {
-                                                    _selectedItem =
-                                                        index;
+                                                    _selectedItem = index;
                                                   });
                                                 },
                                                 tabs: [
@@ -208,8 +200,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                         "Costo de producción por año",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -217,27 +208,25 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                       // Contenedor que alberga el ícono y el nombre de la categoría.
                                                       child: Column(
                                                         children: [
-                                                          SvgPicture
-                                                              .asset(
+                                                          SvgPicture.asset(
                                                             "assets/icons/costoProduccion.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFCD5C5C),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFCD5C5C),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Año",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize:
-                                                                  14,
+                                                              fontSize: 14,
                                                               color:
                                                                   primaryColor,
                                                             ),
@@ -251,8 +240,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                         "Costo de producción por mes",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -260,27 +248,25 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                       // Contenedor que alberga el ícono y el nombre de la categoría.
                                                       child: Column(
                                                         children: [
-                                                          SvgPicture
-                                                              .asset(
+                                                          SvgPicture.asset(
                                                             "assets/icons/costoProduccion.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFCD5C5C),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFCD5C5C),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Mes",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize:
-                                                                  14,
+                                                              fontSize: 14,
                                                               color:
                                                                   primaryColor,
                                                             ),
@@ -294,8 +280,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                         "Productos más vendidos por año",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -303,27 +288,25 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                       // Contenedor que alberga el ícono y el nombre de la categoría.
                                                       child: Column(
                                                         children: [
-                                                          SvgPicture
-                                                              .asset(
+                                                          SvgPicture.asset(
                                                             "assets/icons/productosVendidos.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFF4682B4),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFF4682B4),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Año",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize:
-                                                                  14,
+                                                              fontSize: 14,
                                                               color:
                                                                   primaryColor,
                                                             ),
@@ -337,8 +320,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                         "Productos más vendidos por mes",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -346,27 +328,25 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                       // Contenedor que alberga el ícono y el nombre de la categoría.
                                                       child: Column(
                                                         children: [
-                                                          SvgPicture
-                                                              .asset(
+                                                          SvgPicture.asset(
                                                             "assets/icons/productosVendidos.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFF4682B4),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFF4682B4),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Mes",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize:
-                                                                  14,
+                                                              fontSize: 14,
                                                               color:
                                                                   primaryColor,
                                                             ),
@@ -380,8 +360,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                         "Producciones despachadas por año",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -389,27 +368,25 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                       // Contenedor que alberga el ícono y el nombre de la categoría.
                                                       child: Column(
                                                         children: [
-                                                          SvgPicture
-                                                              .asset(
+                                                          SvgPicture.asset(
                                                             "assets/icons/produccion.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFB8860B),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFB8860B),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Año",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize:
-                                                                  14,
+                                                              fontSize: 14,
                                                               color:
                                                                   primaryColor,
                                                             ),
@@ -423,8 +400,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                         "Producciones despachadas por mes",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -432,27 +408,25 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                       // Contenedor que alberga el ícono y el nombre de la categoría.
                                                       child: Column(
                                                         children: [
-                                                          SvgPicture
-                                                              .asset(
+                                                          SvgPicture.asset(
                                                             "assets/icons/produccion.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFB8860B),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFB8860B),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Mes",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize:
-                                                                  14,
+                                                              fontSize: 14,
                                                               color:
                                                                   primaryColor,
                                                             ),
@@ -466,8 +440,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                         "Producciones recibidas por año",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -475,27 +448,25 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                       // Contenedor que alberga el ícono y el nombre de la categoría.
                                                       child: Column(
                                                         children: [
-                                                          SvgPicture
-                                                              .asset(
+                                                          SvgPicture.asset(
                                                             "assets/icons/recibidas.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFBA55D3),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFBA55D3),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Año",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize:
-                                                                  14,
+                                                              fontSize: 14,
                                                               color:
                                                                   primaryColor,
                                                             ),
@@ -509,8 +480,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                         "Producciones recibidas por mes",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -518,27 +488,25 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                       // Contenedor que alberga el ícono y el nombre de la categoría.
                                                       child: Column(
                                                         children: [
-                                                          SvgPicture
-                                                              .asset(
+                                                          SvgPicture.asset(
                                                             "assets/icons/recibidas.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFBA55D3),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFBA55D3),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Mes",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize:
-                                                                  14,
+                                                              fontSize: 14,
                                                               color:
                                                                   primaryColor,
                                                             ),
@@ -557,8 +525,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                 color: primaryColor,
                                               ),
                                               onPressed: () =>
-                                                  _scrollToNextTab(
-                                                      context),
+                                                  _scrollToNextTab(context),
                                             ),
                                           ],
                                         );
@@ -586,13 +553,11 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                           )
                                         : _selectedItem == 3
                                             ? ReporteProductosMasVendidosMesUnidad(
-                                                usuario:
-                                                    usuarioAutenticado,
+                                                usuario: usuarioAutenticado,
                                               )
                                             : _selectedItem == 4
                                                 ? ReporteProduccionAgnoUnidad(
-                                                    usuario:
-                                                        usuarioAutenticado,
+                                                    usuario: usuarioAutenticado,
                                                   )
                                                 : _selectedItem == 5
                                                     ? ReporteProduccionMesUnidad(
@@ -604,8 +569,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                             usuario:
                                                                 usuarioAutenticado,
                                                           )
-                                                        : _selectedItem ==
-                                                                7
+                                                        : _selectedItem == 7
                                                             ? ReporteRecibidoMesUnidad(
                                                                 usuario:
                                                                     usuarioAutenticado,
@@ -636,8 +600,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                           const SizedBox(height: defaultPadding),
                           // Tabla de anuncios
                           FutureBuilder(
-                              future:
-                                  getBoletas(), // Obtiene las boletas
+                              future: getBoletas(), // Obtiene las boletas
                               builder: (context,
                                   AsyncSnapshot<List<BoletaModel>>
                                       snapshotBoleta) {
@@ -648,27 +611,30 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                   // Muestra un mensaje de error si ocurre un problema al cargar las boletas
                                 } else if (snapshotBoleta.hasError) {
                                   return Text(
-                                      'Error al cargar inscripciones: ${snapshotBoleta.error}');
+                                    'Error al cargar inscripciones: ${snapshotBoleta.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra un mensaje de que no se encontraron boletas
-                                } else if (snapshotBoleta.data ==
-                                    null) {
+                                } else if (snapshotBoleta.data == null) {
                                   return const Text(
-                                      'No se encontraron inscripciones');
+                                    'No se encontraron inscripciones',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra el contenido de las boletas
                                 } else {
                                   List<BoletaModel> boletaUnidad =
                                       []; // Lista de boletas
-                                          
-                                  boletaUnidad = snapshotBoleta.data!
+
+                                  boletaUnidad.addAll(snapshotBoleta.data!
                                       .where((boleta) =>
                                           boleta.anuncio.usuario
                                               .unidadProduccion ==
                                           usuarioAutenticado
-                                              .unidadProduccion)
-                                      .toList(); // Filtra las boletas por la unidad de usuario
-                                          
+                                              .unidadProduccion)); // Filtra las boletas por la unidad de usuario
+
                                   return EventosUnidad(
                                     boletas: boletaUnidad,
+                                    usuario: usuarioAutenticado,
                                   );
                                 }
                               }),
@@ -681,34 +647,35 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                   AsyncSnapshot<List<ProduccionModel>>
                                       snapshotProduccion) {
                                 // Muestra un CircularProgressIndicator mientras se obtienen las producciones
-                                if (snapshotProduccion
-                                        .connectionState ==
+                                if (snapshotProduccion.connectionState ==
                                     ConnectionState.waiting) {
                                   return const CircularProgressIndicator();
                                   // Muestra un mensaje de error si ocurre un problema al cargar las producciones
-                                } else if (snapshotProduccion
-                                    .hasError) {
+                                } else if (snapshotProduccion.hasError) {
                                   return Text(
-                                      'Error al cargar producciones: ${snapshotProduccion.error}');
+                                    'Error al cargar producciones: ${snapshotProduccion.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra un mensaje de que no se encontraron producciones
-                                } else if (snapshotProduccion.data ==
-                                    null) {
+                                } else if (snapshotProduccion.data == null) {
                                   return const Text(
-                                      'No se encontraron producciones');
+                                    'No se encontraron producciones',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra el contenido de las producciones
                                 } else {
-                                  final produccionUnidad =
-                                      snapshotProduccion.data!
-                                          .where((produccion) =>
-                                              produccion
-                                                  .unidadProduccion
-                                                  .id ==
-                                              usuarioAutenticado
-                                                  .unidadProduccion)
-                                          .toList(); // Filtra las producciones por la unidad de usuario
-                                          
+                                  List<ProduccionModel> produccionUnidad = [];
+
+                                  produccionUnidad.addAll(snapshotProduccion
+                                      .data!
+                                      .where((produccion) =>
+                                          produccion.unidadProduccion.id ==
+                                          usuarioAutenticado
+                                              .unidadProduccion)); // Filtra las producciones por la unidad de usuario
+
                                   return ProduccionUnidad(
                                     producciones: produccionUnidad,
+                                    usuario: usuarioAutenticado,
                                   );
                                 }
                               }),
@@ -721,35 +688,35 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                   AsyncSnapshot<List<ProduccionModel>>
                                       snapshotProduccion) {
                                 // Muestra un CircularProgressIndicator mientras se obtienen las producciones
-                                if (snapshotProduccion
-                                        .connectionState ==
+                                if (snapshotProduccion.connectionState ==
                                     ConnectionState.waiting) {
                                   return const CircularProgressIndicator();
                                   // Muestra un mensaje de error si ocurre un problema al cargar las producciones
-                                } else if (snapshotProduccion
-                                    .hasError) {
+                                } else if (snapshotProduccion.hasError) {
                                   return Text(
-                                      'Error al cargar producciones: ${snapshotProduccion.error}');
+                                    'Error al cargar producciones: ${snapshotProduccion.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra un mensaje de que no se encontraron producciones
-                                } else if (snapshotProduccion.data ==
-                                    null) {
+                                } else if (snapshotProduccion.data == null) {
                                   return const Text(
-                                      'No se encontraron producciones');
+                                    'No se encontraron producciones',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra el contenido de las producciones
                                 } else {
-                                  final produccionRecibidaUnidad =
-                                      snapshotProduccion.data!
-                                          .where((produccion) =>
-                                              produccion
-                                                  .unidadProduccion
-                                                  .id ==
-                                              usuarioAutenticado
-                                                  .unidadProduccion)
-                                          .toList(); // Filtra las producciones por la unidad de usuario
-                                          
+                                  List<ProduccionModel>
+                                      produccionRecibidaUnidad = [];
+
+                                  produccionRecibidaUnidad.addAll(
+                                      snapshotProduccion.data!.where((produccion) =>
+                                          produccion.unidadProduccion.id ==
+                                          usuarioAutenticado
+                                              .unidadProduccion)); // Filtra las producciones por la unidad de usuario
+
                                   return ProduccionRecibidaUnidad(
-                                    producciones:
-                                        produccionRecibidaUnidad,
+                                    producciones: produccionRecibidaUnidad,
+                                    usuario: usuarioAutenticado,
                                   );
                                 }
                               }),

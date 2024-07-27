@@ -38,7 +38,10 @@ class ReporteProduccionMesLider extends StatelessWidget {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(
-                      child: Text('Error al cargar datos: ${snapshot.error}'));
+                      child: Text(
+                    'Error al cargar datos: ${snapshot.error}',
+                    textAlign: TextAlign.center,
+                  ));
                 } else {
                   // Construye el gráfico cuando los datos están disponibles
                   return SfCartesianChart(

@@ -58,7 +58,7 @@ class _PdfPageConstanciaPedidoScreenState
   /// Los datos del pedido para el cual se generará la constancia.
   final AuxPedidoModel pedido;
 
-  /// Constructor para inicializar las variables con los datos de la reserva.
+  /// Constructor para inicializar las variables con los datos del pedido.
   ///
   /// Parámetros requeridos para la construcción del widget:
   ///
@@ -214,8 +214,6 @@ class _PdfPageConstanciaPedidoScreenState
                           pw.Text(
                               "Documento: ${usuario.tipoDocumento} - ${usuario.numeroDocumento}",
                               style: const pw.TextStyle(fontSize: 13)),
-                          // pw.Text('Estado de la reserva: ${estado}',
-                          //     style: pw.TextStyle(fontSize: 13)),
                         ]),
                     pw.SizedBox(width: 20),
                     pw.Column(

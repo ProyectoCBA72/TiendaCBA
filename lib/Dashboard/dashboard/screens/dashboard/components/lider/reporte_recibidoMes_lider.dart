@@ -48,7 +48,10 @@ class ReporteRecibidoMesLider extends StatelessWidget {
                     // Mostrar mensaje de error si ocurre algún problema al cargar los datos
                   } else if (snapshot.hasError) {
                     return Center(
-                      child: Text('Error al cargar datos: ${snapshot.error}'),
+                      child: Text(
+                        'Error al cargar datos: ${snapshot.error}',
+                        textAlign: TextAlign.center,
+                      ),
                     );
                   } else {
                     // Cuando los datos están disponibles, procesarlos

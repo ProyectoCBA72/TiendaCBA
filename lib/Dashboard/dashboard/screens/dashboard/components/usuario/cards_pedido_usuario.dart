@@ -86,9 +86,15 @@ class FileInfoCardGridView extends StatelessWidget {
           if (snapshotPedido.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator(); // Muestra un indicador de carga
           } else if (snapshotPedido.hasError) {
-            return Text('Error al cargar pedidos: ${snapshotPedido.error}');
+            return Text(
+              'Error al cargar pedidos: ${snapshotPedido.error}',
+              textAlign: TextAlign.center,
+            );
           } else if (snapshotPedido.data == null) {
-            return const Text('No se encontraron pedidos');
+            return const Text(
+              'No se encontraron pedidos',
+              textAlign: TextAlign.center,
+            );
           } else {
             // Variables para contabilizar los pedidos
             int pedidos = 0;
@@ -118,28 +124,28 @@ class FileInfoCardGridView extends StatelessWidget {
               PedidoCardClase(
                 title: "Pedidos",
                 svgSrc: "assets/icons/pedido.svg",
-                totalReservas: pedidos.toString(),
+                totalPedidos: pedidos.toString(),
                 color: primaryColor,
                 percentage: pedidos,
               ),
               PedidoCardClase(
                 title: "Entregados",
                 svgSrc: "assets/icons/check.svg",
-                totalReservas: pedidosEntregados.toString(),
+                totalPedidos: pedidosEntregados.toString(),
                 color: Colors.green,
                 percentage: pedidosEntregados,
               ),
               PedidoCardClase(
                 title: "Cancelados",
                 svgSrc: "assets/icons/cancel.svg",
-                totalReservas: pedidosCancelados.toString(),
+                totalPedidos: pedidosCancelados.toString(),
                 color: Colors.red,
                 percentage: pedidosCancelados,
               ),
               PedidoCardClase(
                 title: "Pendientes",
                 svgSrc: "assets/icons/pendiente.svg",
-                totalReservas: pedidosPendientes.toString(),
+                totalPedidos: pedidosPendientes.toString(),
                 color: const Color(0xFF007EE5),
                 percentage: pedidosPendientes,
               ),

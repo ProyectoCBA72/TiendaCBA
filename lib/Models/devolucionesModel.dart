@@ -87,6 +87,7 @@ Future<List<DevolucionesModel>> getDevoluciones() async {
             id: devolucionData['factura']['id'] ?? 0,
             numero: devolucionData['factura']['numero'] ?? 0,
             fecha: devolucionData['factura']['fecha'] ?? "",
+            usuarioVendedor: devolucionData['factura']['usuarioVendedor'] ?? 0,
             medioPago: MedioPagoModel(
               id: devolucionData['factura']['medioPago']['id'] ?? 0,
               nombre: devolucionData['factura']['medioPago']['nombre'] ?? "",
@@ -95,7 +96,7 @@ Future<List<DevolucionesModel>> getDevoluciones() async {
             pedido: PedidoModel(
               id: devolucionData['factura']['pedido']['id'] ?? 0,
               numeroPedido:
-                  devolucionData['factura']['pedido']['cantidada'] ?? 0,
+                  devolucionData['factura']['pedido']['numeroPedido'] ?? 0,
               fechaEncargo:
                   devolucionData['factura']['pedido']['fechaEncargo'] ?? "",
               fechaEntrega:

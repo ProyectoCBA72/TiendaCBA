@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
+import 'package:tienda_app/Models/devolucionesModel.dart';
 import 'package:tienda_app/Models/facturaModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
@@ -43,6 +44,7 @@ class ReportePuntoVentasMesPunto extends StatelessWidget {
                 getAuxPedidos(),
                 getFacturas(),
                 getPuntosVenta(),
+                getDevoluciones(),
               ]),
               builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
                 // Si los datos están cargando, muestra un indicador de carga
@@ -53,15 +55,20 @@ class ReportePuntoVentasMesPunto extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   // Si ocurre un error al cargar los datos, muestra un mensaje de error
                   return Center(
-                    child: Text('Error al cargar datos: ${snapshot.error}'),
+                    child: Text(
+                      'Error al cargar datos: ${snapshot.error}',
+                      textAlign: TextAlign.center,
+                    ),
                   );
                 } else {
                   // Cuando los datos están disponibles
                   List<AuxPedidoModel> auxPedidos = snapshot.data![0];
                   List<FacturaModel> facturas = snapshot.data![1];
                   List<PuntoVentaModel> puntos = snapshot.data![2];
+                  List<DevolucionesModel> devoluciones = snapshot.data![3];
 
-                  List<PuntoVentaModel> puntosFiltrados = puntos.where((p) => p.id == usuario.puntoVenta).toList();
+                  List<PuntoVentaModel> puntosFiltrados =
+                      puntos.where((p) => p.id == usuario.puntoVenta).toList();
 
                   return SfCartesianChart(
                     // Configuración del gráfico
@@ -87,7 +94,7 @@ class ReportePuntoVentasMesPunto extends StatelessWidget {
                         name: punto.nombre,
                         // Datos de ventas por mes para el punto de venta actual
                         dataSource: _getBalanceVentasDataMes(
-                            punto, auxPedidos, facturas),
+                            punto, auxPedidos, facturas, devoluciones),
                         xValueMapper: (BalanceVentasDataMesPunto data, _) =>
                             data.mes,
                         yValueMapper: (BalanceVentasDataMesPunto data, _) =>
@@ -110,15 +117,18 @@ class ReportePuntoVentasMesPunto extends StatelessWidget {
   List<BalanceVentasDataMesPunto> _getBalanceVentasDataMes(
       PuntoVentaModel puntoVenta,
       List<AuxPedidoModel> auxPedidos,
-      List<FacturaModel> facturas) {
+      List<FacturaModel> facturas,
+      List<DevolucionesModel> devoluciones) {
     Map<String, double> ventasPorMes = {};
     DateTime now = DateTime.now();
 
     for (var factura in facturas) {
       var pedido = factura.pedido;
 
-      // Filtrar facturas por punto de venta 
-      if (puntoVenta.id == pedido.puntoVenta) {
+      // Filtrar facturas por punto de venta
+      if (puntoVenta.id == pedido.puntoVenta &&
+          devoluciones.any((devolucion) =>
+              devolucion.factura.pedido.id != factura.pedido.id)) {
         var fechaFactura = DateTime.parse(factura.fecha);
         // Considerar solo los últimos 4 meses (incluyendo el mes actual)
         if (fechaFactura.isAfter(now.subtract(const Duration(days: 120)))) {
@@ -195,4 +205,3 @@ class BalanceVentasDataMesPunto {
   final String mes;
   final double ventas;
 }
-

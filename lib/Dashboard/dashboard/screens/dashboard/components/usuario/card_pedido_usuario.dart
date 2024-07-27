@@ -78,7 +78,7 @@ class CardPedidoUsuario extends StatelessWidget {
                     .copyWith(color: primaryColor),
               ),
               Text(
-                info.totalReservas!,
+                info.totalPedidos!,
                 style: Theme.of(context)
                     .textTheme
                     .bodySmall!

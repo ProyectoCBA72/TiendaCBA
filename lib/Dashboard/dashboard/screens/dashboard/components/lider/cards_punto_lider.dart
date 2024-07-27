@@ -140,10 +140,16 @@ class _CardsPuntoLiderState extends State<CardsPuntoLider> {
                     );
                   } else if (snapshot.hasError) {
                     // Mensaje de error si ocurre un problema al cargar datos
-                    return Text('Error al cargar puntos: ${snapshot.error}');
+                    return Text(
+                      'Error al cargar puntos: ${snapshot.error}',
+                      textAlign: TextAlign.center,
+                    );
                   } else if (snapshot.data == null) {
                     // Mensaje si no se encontraron datos de puntos de venta
-                    return const Text('No se encontraron puntos');
+                    return const Text(
+                      'No se encontraron puntos',
+                      textAlign: TextAlign.center,
+                    );
                   } else {
                     // Procesamiento de datos y construcción de las tarjetas de puntos de venta
                     List<PuntoVentaModel> puntosVenta = snapshot.data!;
@@ -169,6 +175,7 @@ class _CardsPuntoLiderState extends State<CardsPuntoLider> {
                         child: Text(
                           'No hay puntos de venta en esta sede',
                           style: TextStyle(fontSize: 20),
+                          textAlign: TextAlign.center,
                         ),
                       );
                     }

@@ -6,7 +6,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/inventarioModel.dart';
 import 'package:tienda_app/Models/produccionModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+import 'package:tienda_app/pdf/Lider/pdfBodegaLider.dart';
+import 'package:tienda_app/pdf/modalsPdf.dart';
 
 /// Un widget de estado que representa la vista de la bodega de un punto de venta para el lider.
 ///
@@ -19,11 +22,14 @@ class BodegaLider extends StatefulWidget {
   /// Esta lista se utiliza para inicializar la vista de la bodega.
   final List<InventarioModel> inventarioLista;
 
+  final UsuarioModel usuario;
+
   /// Constructor del widget [BodegaLider].
   ///
   /// Toma como parámetro [inventarioLista], que es la lista de inventarios
   /// que representan la cantidad de productos en cada bodega.
-  const BodegaLider({super.key, required this.inventarioLista});
+  const BodegaLider(
+      {super.key, required this.inventarioLista, required this.usuario});
 
   /// Crea el estado asociado al widget [BodegaLider].
   @override
@@ -45,6 +51,8 @@ class _BodegaLiderState extends State<BodegaLider> {
   ///
   /// Se inicializa en el estado y se utiliza en la vista de la bodega.
   late BodegaLiderDataGridSource _dataGridSource;
+
+  List<DataGridRow> registros = [];
 
   @override
 
@@ -94,6 +102,7 @@ class _BodegaLiderState extends State<BodegaLider> {
   }
 
   @override
+
   /// Se llama automáticamente cuando se elimina el widget.
   /// Se debe llamar a [dispose] para liberar los recursos utilizados por el widget.
   /// Finalmente, se llama al método [dispose] del padre para liberar recursos adicionales.
@@ -145,6 +154,19 @@ class _BodegaLiderState extends State<BodegaLider> {
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Cambia la firma del callback
+                onSelectionChanged: (List<DataGridRow> addedRows,
+                    List<DataGridRow> removedRows) {
+                  setState(() {
+                    // Añadir filas a la lista de registros seleccionados
+                    registros.addAll(addedRows);
+
+                    // Eliminar filas de la lista de registros seleccionados
+                    for (var row in removedRows) {
+                      registros.remove(row);
+                    }
+                  });
+                },
                 // Columnas de la tabla
                 columns: <GridColumn>[
                   GridColumn(
@@ -222,7 +244,17 @@ class _BodegaLiderState extends State<BodegaLider> {
           Center(
             child: Column(
               children: [
-                _buildButton('Imprimir Reporte', () {}),
+                _buildButton('Imprimir Reporte', () {
+                  if (registros.isEmpty) {
+                    noHayPDFModal(context);
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PdfBodegaLiderScreen(
+                                usuario: widget.usuario, registro: registros)));
+                  }
+                }),
                 const SizedBox(
                   height: defaultPadding,
                 ),
@@ -460,7 +492,7 @@ class BodegaLiderDataGridSource extends DataGridSource {
     return DataGridRowAdapter(cells: [
       Container(
         padding: const EdgeInsets.all(8.0),
-        alignment: Alignment.center,
+        alignment: Alignment.centerLeft,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(

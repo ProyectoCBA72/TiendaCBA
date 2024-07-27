@@ -126,7 +126,7 @@ class _UploadUsersCSVState extends State<UploadUsersCSV> {
                 flex: 2,
                 child: Text('Eliminar',
                     style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 18), textAlign: TextAlign.center,)),
           ],
         ),
       ),
@@ -187,7 +187,7 @@ class _UploadUsersCSVState extends State<UploadUsersCSV> {
                 icon: const Icon(
                   Icons.delete,
                   size: 22,
-                  color: Colors.red,
+                  color: primaryColor,
                 ),
               )),
         ],
@@ -281,24 +281,15 @@ class _UploadUsersCSVState extends State<UploadUsersCSV> {
                   onTap: () {
                     Navigator.pop(context);
                   },
-                  child: Container(
-                    padding: const EdgeInsets.all(3),
-                    width: 50,
-                    height: 50,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: primaryColor,
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back_ios_new,
-                      color: Colors.white,
-                    ),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new,
+                    color: primaryColor,
                   ),
                 ),
                 const Expanded(
                   child: Center(
                     child: Text(
-                      'Registrar Usuarios',
+                      'Registro de usuarios',
                       style: TextStyle(
                         fontFamily: 'Calibri-Bold',
                         fontSize: 20,
@@ -340,7 +331,7 @@ class _UploadUsersCSVState extends State<UploadUsersCSV> {
               ? const Expanded(
                   child: Center(
                     child: Text(
-                      'Carga un archivo CSV',
+                      'Cargue un archivo CSV',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -408,12 +399,12 @@ class _UploadUsersCSVState extends State<UploadUsersCSV> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('¡Importante!'),
+          title: const Text('¡Advertencia!'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               const Text(
-                "Tenga en cuenta que los usuarios con algun dato faltante no se podran registrar. ",
+                "Tenga en cuenta que los usuarios con algún dato faltante no podrán registrarse.",
                 style: TextStyle(fontSize: 17),
               ),
               const SizedBox(
@@ -456,7 +447,7 @@ class _UploadUsersCSVState extends State<UploadUsersCSV> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                           content: Text(
-                              'Se cargaron ${_usuariosCargados.length} Usuarios')),
+                              'Se registraron ${_usuariosCargados.length} usuarios')),
                     );
                     // cerramos el modal y construimos la vista del dashboard de nuevo.
                     Navigator.pop(context);

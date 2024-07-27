@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
+import 'package:tienda_app/Models/devolucionesModel.dart';
 import 'package:tienda_app/Models/facturaModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
@@ -42,7 +43,8 @@ class ReporteProductosMasVendidosAgnoPunto extends StatelessWidget {
                 getFacturas(),
                 getProductos(),
                 getAuxPedidos(),
-                getPuntosVenta()
+                getPuntosVenta(),
+                getDevoluciones(),
               ]),
               builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
                 // Si los datos están cargando, mostrar un indicador de carga
@@ -53,7 +55,10 @@ class ReporteProductosMasVendidosAgnoPunto extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   // Si ocurre un error al cargar los datos, mostrar un mensaje de error
                   return Center(
-                    child: Text('Error al cargar datos: ${snapshot.error}'),
+                    child: Text(
+                      'Error al cargar datos: ${snapshot.error}',
+                      textAlign: TextAlign.center,
+                    ),
                   );
                 } else {
                   // Procesar los datos para obtener los productos más vendidos
@@ -61,6 +66,8 @@ class ReporteProductosMasVendidosAgnoPunto extends StatelessWidget {
                   final productos = snapshot.data![1] as List<ProductoModel>;
                   final auxPedidos = snapshot.data![2] as List<AuxPedidoModel>;
                   final puntos = snapshot.data![3] as List<PuntoVentaModel>;
+                  final devoluciones =
+                      snapshot.data![4] as List<DevolucionesModel>;
 
                   // Mapa para almacenar las ventas por producto por año
                   final Map<String, Map<String, double>>
@@ -68,14 +75,17 @@ class ReporteProductosMasVendidosAgnoPunto extends StatelessWidget {
 
                   // Iterar sobre las facturas para calcular las ventas por producto por año
                   for (var factura in facturas) {
-                    final agno = factura.fecha.split('-')[0];
+                    final agno = DateTime.parse(factura.fecha).year.toString();
                     // Considerar solo los datos de los últimos 3 años (incluyendo el actual)
                     if (int.parse(agno) >= DateTime.now().year - 2) {
                       for (var punto in puntos) {
                         for (var auxPedido in auxPedidos) {
                           if (auxPedido.pedido.id == factura.pedido.id &&
                               punto.id == factura.pedido.puntoVenta &&
-                              punto.id == usuario.puntoVenta) {
+                              punto.id == usuario.puntoVenta &&
+                              devoluciones.any((devolucion) =>
+                                  devolucion.factura.pedido.id !=
+                                  factura.pedido.id)) {
                             final producto = productos
                                 .firstWhere((p) => p.id == auxPedido.producto)
                                 .nombre;
@@ -83,6 +93,7 @@ class ReporteProductosMasVendidosAgnoPunto extends StatelessWidget {
                                 producto, () => {});
                             ventasPorProductoPorAgno[producto]!
                                 .putIfAbsent(agno, () => 0);
+
                             ventasPorProductoPorAgno[producto]![agno] =
                                 ventasPorProductoPorAgno[producto]![agno]! +
                                     auxPedido.cantidad.toDouble();
@@ -109,10 +120,10 @@ class ReporteProductosMasVendidosAgnoPunto extends StatelessWidget {
                     legend: const Legend(isVisible: true),
                     primaryXAxis: const CategoryAxis(
                       title: AxisTitle(text: 'Año'),
-                      interval: 1,
                     ),
                     primaryYAxis: const NumericAxis(
                       title: AxisTitle(text: 'Cantidad Vendida'),
+                      minimum: 0, // Asegúrate de que el mínimo sea 0 para mostrar correctamente las líneas
                     ),
                     series: <CartesianSeries>[
                       // Crear una serie por cada producto más vendido
@@ -127,8 +138,12 @@ class ReporteProductosMasVendidosAgnoPunto extends StatelessWidget {
                           yValueMapper:
                               (ProduccionVentaAgnoDataPunto data, _) =>
                                   data.cantidad,
-                          color:
-                              _getColor(), // Asignar color basado en la lista de colores
+                          color: _getColor(), // Asignar color basado en la lista de colores
+                          width: 2, // Asegúrate de que el grosor de la línea sea adecuado
+                          markerSettings: const MarkerSettings(
+                            isVisible: true, // Mostrar marcadores en las líneas
+                            shape: DataMarkerType.circle, // Forma del marcador
+                          ),
                         ),
                     ],
                   );

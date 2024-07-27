@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:tienda_app/Anuncio/Modals/modalsAnuncio.dart';
 import 'package:tienda_app/Anuncio/comentarioForm.dart';
-import 'package:tienda_app/Auth/authScreen.dart';
 import 'package:tienda_app/Models/anuncioModel.dart';
 import 'package:tienda_app/Models/comentarioModel.dart';
 import 'package:tienda_app/Models/imagenUsuarioModel.dart';
@@ -189,7 +188,7 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                   child: GestureDetector(
                                     onTap: () {
                                       // Llama a la función _modalAmpliacion para mostrar la imagen ampliada
-                                      _modalAmpliacion(context, mainImageUrl);
+                                      modalAmpliacion(context, mainImageUrl);
                                     },
                                     child: Image.network(
                                       mainImageUrl,
@@ -981,7 +980,7 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                 child: GestureDetector(
                                   onTap: () {
                                     // Abre la imagen ampliada
-                                    _modalAmpliacion(context, mainImageUrl);
+                                    modalAmpliacion(context, mainImageUrl);
                                   },
                                   child: Image.network(
                                     mainImageUrl,
@@ -2116,157 +2115,4 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
       },
     );
   }
-
-  /// Muestra un diálogo con un formulario para hacer un comentario.
-  ///
-  /// El diálogo contiene un formulario para agregar un comentario. El
-  /// [context] es el contexto de la aplicación donde se mostrará el
-  /// diálogo.
-  void inicioSesionComents(BuildContext context) {
-    // Muestra un diálogo
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          // Título del diálogo
-          title: const Text("¿Quiere agregar un comentario?"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              // Texto de descripción
-              const Text("¡Para agregar un comentario, debe iniciar sesión!"),
-              const SizedBox(
-                height: 10,
-              ),
-              // Muestra una imagen circular del logo de la aplicación
-              ClipOval(
-                child: Container(
-                  width: 100, // Ajusta el tamaño según sea necesario
-                  height: 100, // Ajusta el tamaño según sea necesario
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: primaryColor,
-                  ),
-                  child: Image.asset(
-                    "assets/img/logo.png",
-                    fit: BoxFit.cover, // Ajusta la imagen al contenedor
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            ButtonBar(
-              alignment: MainAxisAlignment.center,
-              children: [
-                // Botón para cancelar la operación
-                Padding(
-                  padding: const EdgeInsets.all(defaultPadding),
-                  child: _buildButton("Cancelar", () {
-                    Navigator.pop(context);
-                  }),
-                ),
-                // Botón para iniciar sesión
-                Padding(
-                  padding: const EdgeInsets.all(defaultPadding),
-                  child: _buildButton("Iniciar Sesión", () {
-                    // Ignora el compilador y navega a la pantalla de inicio de sesión
-                    Navigator.pop(context);
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginScreen()));
-                  }),
-                )
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  /// Construye un botón con los estilos de diseño especificados.
-  ///
-  /// El parámetro [text] es el texto que se mostrará en el botón.
-  /// El parámetro [onPressed] es la función que se ejecutará cuando se presione el botón.
-  ///
-  /// Devuelve un widget [Container] que contiene un widget [Material] con un estilo específico.
-  Widget _buildButton(String text, VoidCallback onPressed) {
-    // Contenedor con un ancho fijo de 200 píxeles y una apariencia personalizada
-    // con un borde redondeado, un gradiente de colores y una sombra.
-    return Container(
-      width: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10), // Borde redondeado.
-        gradient: const LinearGradient(
-          colors: [
-            botonClaro, // Color claro del gradiente.
-            botonOscuro, // Color oscuro del gradiente.
-          ],
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: botonSombra, // Color de la sombra.
-            blurRadius: 5, // Radio de desfoque de la sombra.
-            offset: Offset(0, 3), // Desplazamiento de la sombra.
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent, // Color transparente para el Material.
-        child: InkWell(
-          onTap: onPressed, // Función de presionar.
-          borderRadius:
-              BorderRadius.circular(10), // Radio del borde redondeado.
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 10), // Padding vertical.
-            child: Center(
-              child: Text(
-                text, // Texto del botón.
-                style: const TextStyle(
-                  color: background1, // Color del texto.
-                  fontSize: 13, // Tamaño de fuente.
-                  fontWeight: FontWeight.bold, // Peso de fuente.
-                  fontFamily: 'Calibri-Bold', // Fuente.
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Muestra un diálogo modal con una imagen ampliada.
-///
-/// El parámetro [src] es la URL de la imagen a mostrar.
-void _modalAmpliacion(BuildContext context, String src) {
-  // Muestra un diálogo modal con una imagen ampliada.
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        // El contenido del diálogo debe tener un tamaño cero para que el
-        // fondo transparente no afecte al diálogo completo.
-        contentPadding: EdgeInsets.zero,
-        // El color de fondo se establece a transparente para que la imagen
-        // pueda ser visible detrás de otras partes del diálogo.
-        backgroundColor: Colors.transparent,
-        // Crea un contenedor con un borde redondeado para la imagen.
-        content: InteractiveViewer(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            // Muestra la imagen en el diálogo.
-            child: Image.network(
-              src,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-      );
-    },
-  );
 }

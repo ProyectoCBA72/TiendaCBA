@@ -1,14 +1,26 @@
-// ignore_for_file: use_full_hex_values_for_flutter_colors
+// ignore_for_file: use_full_hex_values_for_flutter_colors, use_build_context_synchronously
+
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:tienda_app/Dashboard/controllers/MenuAppController.dart';
+import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/modalsDashboard.dart';
+import 'package:tienda_app/Dashboard/dashboard/screens/main/main_screen_usuario.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
+import 'package:tienda_app/Models/pedidoModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+import 'package:tienda_app/pdf/Usuario/pdfPendienteUsuario.dart';
+import 'package:tienda_app/pdf/modalsPdf.dart';
 import 'package:tienda_app/responsive.dart';
+import 'package:tienda_app/source.dart';
+import 'package:http/http.dart' as http;
 
 /// Esta clase representa un widget de estado que muestra una tabla de pedidos pendientes de un usuario.
 ///
@@ -22,10 +34,13 @@ class PendienteUsuario extends StatefulWidget {
   /// Lista de objetos [AuxPedidoModel] que representan los pedidos pendientes del usuario.
   final List<AuxPedidoModel> auxPedido;
 
+  final UsuarioModel usuario;
+
   /// Constructor para crear un widget de estado [PendienteUsuario].
   ///
   /// El parámetro [auxPedido] es requerido y representa los pedidos pendientes del usuario.
-  const PendienteUsuario({super.key, required this.auxPedido});
+  const PendienteUsuario(
+      {super.key, required this.auxPedido, required this.usuario});
 
   /// Sobrecarga del método [createState] para crear un estado [_PendienteUsuarioState].
   ///
@@ -53,6 +68,8 @@ class _PendienteUsuarioState extends State<PendienteUsuario> {
   /// Se utiliza para mostrar los datos de los pedidos pendientes en la tabla.
   late PendienteUsuarioDataGridSource _dataGridSource;
 
+  List<DataGridRow> registros = [];
+
   @override
 
   /// Se llama cuando se crea el estado para la primera vez.
@@ -71,7 +88,8 @@ class _PendienteUsuarioState extends State<PendienteUsuario> {
       pedidos: _pedidos,
       listaProductos: listaProductos,
       listaPuntosVenta: listaPuntosVenta,
-    );
+    )..eliminarProductoCallback =
+        (AuxPedidoModel producto) => _removeProducto(producto);
 
     // Actualiza los pedidos pendientes con los que se creó el widget
     _pedidos = widget.auxPedido;
@@ -106,9 +124,171 @@ class _PendienteUsuarioState extends State<PendienteUsuario> {
             pedidos: _pedidos,
             listaProductos: listaProductos,
             listaPuntosVenta: listaPuntosVenta,
-          );
+          )..eliminarProductoCallback =
+              (AuxPedidoModel producto) => _removeProducto(producto);
         });
       });
+    }
+  }
+
+  /// Cancela los pedidos seleccionados.
+  ///
+  /// Esta función toma una lista de filas de [DataGrid] y cancela cada pedido
+  /// correspondiente. Primero, verifica si alguna devolución ya ha sido
+  /// procesada y si no es así, continua con la operación. Luego, recorre la lista
+  /// de devoluciones a editar y realiza una solicitud PUT para cada una de ellas.
+  /// Si todas las solicitudes son exitosas, muestra un mensaje de éxito y navega
+  /// a la pantalla principal de usuario. Si alguna solicitud falla, muestra un
+  /// mensaje de error.
+  Future cancelarPedido(List<DataGridRow> pedidos) async {
+    // Lista para almacenar las devoluciones a editar
+    List<PedidoModel> pedidoCancelado = [];
+    String url;
+
+    // Obtiene las devoluciones cargadas desde la API
+    List<PedidoModel> pedidosCargados = await getPedidos();
+
+    // Utilizamos un Set para almacenar los números de factura ya procesados
+    Set<String> pedidosProcesados = {};
+
+    // Verificación inicial para determinar si alguna devolución ya ha sido procesada
+    for (var ped in pedidos) {
+      // Obtiene el número de factura de la fila actual
+      String numeroPedido = ped.getCells()[0].value;
+
+      // Si ninguna devolución ya ha sido procesada, continuar con la operación
+      for (var pedido in pedidosCargados) {
+        if (!pedidosProcesados.contains(numeroPedido) &&
+            numeroPedido == pedido.numeroPedido.toString()) {
+          // Agrega la devolución a la lista de devoluciones a editar
+          pedidoCancelado.add(pedido);
+          // Agregamos el número de factura al Set
+          pedidosProcesados.add(numeroPedido);
+        }
+      }
+    }
+
+    // Variable para controlar el estado de las solicitudes
+    bool allSuccessful = true;
+
+    // Recorre la lista de devoluciones a editar
+    for (var cancelado in pedidoCancelado) {
+      // Genera la URL de la solicitud PUT
+      url = "$sourceApi/api/pedidos/${cancelado.id}/";
+
+      // Define los encabezados de la solicitud
+      final headers = {
+        'Content-Type': 'application/json',
+      };
+
+      // Define el cuerpo de la solicitud
+      final body = {
+        "numeroPedido": cancelado.numeroPedido,
+        "fechaEncargo": cancelado.fechaEncargo,
+        "fechaEntrega": cancelado.fechaEntrega,
+        "grupal": cancelado.grupal,
+        "estado": "CANCELADO",
+        "entregado": cancelado.entregado,
+        "puntoVenta": cancelado.puntoVenta,
+        "pedidoConfirmado": cancelado.pedidoConfirmado,
+        "usuario": cancelado.usuario.id
+      };
+
+      // Realiza la solicitud PUT
+      final response = await http.put(Uri.parse(url),
+          headers: headers, body: jsonEncode(body));
+
+      // Si la solicitud falla, marcamos allSuccessful como false
+      if (response.statusCode != 200) {
+        allSuccessful = false;
+
+        // Muestra un mensaje de error si la respuesta indica un error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al editar registros: ${response.statusCode}.'),
+          ),
+        );
+      }
+    }
+
+    // Si todas las solicitudes fueron exitosas
+    if (allSuccessful) {
+      // Muestra un mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Pedidos actualizados correctamente.'),
+        ),
+      );
+
+      // Navega a la pantalla principal de usuario
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (context) => MenuAppController()),
+            ],
+            child: const MainScreenUsuario(),
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _removeProducto(AuxPedidoModel producto) async {
+    // Obtén los pedidos auxiliares cargados desde la API
+    List<AuxPedidoModel> auxPedidosCargados = await getAuxPedidos();
+
+    // Contar cuántos productos hay en el pedido especificado
+    int contadorProductos = auxPedidosCargados
+        .where((aux) => aux.pedido.numeroPedido == producto.pedido.numeroPedido)
+        .length;
+
+    if (contadorProductos > 1) {
+      // Construir la URL para eliminar el aux pedido especificado
+      final url = Uri.parse('$sourceApi/api/aux-pedidos/${producto.id}/');
+
+      // Realizar la solicitud DELETE al API
+      final response = await http.delete(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      // Verificar el estado de la respuesta de la solicitud
+      if (response.statusCode == 204) {
+        // Si la respuesta es exitosa (código 204), mostrar un mensaje de éxito
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Producto eliminado con éxito.'),
+          ),
+        );
+
+        // Navegar a la pantalla principal de usuario
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MultiProvider(
+              providers: [
+                ChangeNotifierProvider(
+                    create: (context) => MenuAppController()),
+              ],
+              child: const MainScreenUsuario(),
+            ),
+          ),
+        );
+      } else {
+        // Si la respuesta no es exitosa, mostrar un mensaje de error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al eliminar el producto: ${response.body}.'),
+          ),
+        );
+      }
+    } else {
+      // Si el contador de productos es 1 o menos, llamar a la función de modal para manejo de error
+      eliminacionFallidaModal(context);
     }
   }
 
@@ -165,6 +345,19 @@ class _PendienteUsuarioState extends State<PendienteUsuario> {
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Cambia la firma del callback
+                onSelectionChanged: (List<DataGridRow> addedRows,
+                    List<DataGridRow> removedRows) {
+                  setState(() {
+                    // Añadir filas a la lista de registros seleccionados
+                    registros.addAll(addedRows);
+
+                    // Eliminar filas de la lista de registros seleccionados
+                    for (var row in removedRows) {
+                      registros.remove(row);
+                    }
+                  });
+                },
                 // Define las columnas de la tabla
                 columns: <GridColumn>[
                   GridColumn(
@@ -263,27 +456,122 @@ class _PendienteUsuarioState extends State<PendienteUsuario> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildButton('Imprimir Reporte', () {}),
+                _buildButton('Imprimir Reporte', () {
+                  if (registros.isEmpty) {
+                    noHayPDFModal(context);
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PdfPendienteUsuarioScreen(
+                                usuario: widget.usuario, registro: registros)));
+                  }
+                }),
                 const SizedBox(
                   width: defaultPadding,
                 ),
-                _buildButton('Cancelar Pedido', () {}),
+                _buildButton('Cancelar Pedido', () {
+                  if (registros.isEmpty) {
+                    operacionFallidaModal(context);
+                  } else {
+                    cancelarPedido(registros);
+                  }
+                }),
               ],
             ),
           if (Responsive.isMobile(context))
             Center(
               child: Column(
                 children: [
-                  _buildButton('Imprimir Reporte', () {}),
+                  _buildButton('Imprimir Reporte', () {
+                    if (registros.isEmpty) {
+                      noHayPDFModal(context);
+                    } else {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PdfPendienteUsuarioScreen(
+                                  usuario: widget.usuario,
+                                  registro: registros)));
+                    }
+                  }),
                   const SizedBox(
                     height: defaultPadding,
                   ),
-                  _buildButton('Cancelar Pedido', () {}),
+                  _buildButton('Cancelar Pedido', () {
+                    if (registros.isEmpty) {
+                      operacionFallidaModal(context);
+                    } else {
+                      cancelarPedido(registros);
+                    }
+                  }),
                 ],
               ),
             ),
         ],
       ),
+    );
+  }
+
+  void eliminacionFallidaModal(BuildContext context) {
+    // Muestra el diálogo modal para confirmar la eliminación de la asistencia
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          // Título del diálogo
+          title: const Text(
+            "¡La eliminación del producto falló!",
+            textAlign: TextAlign.center,
+          ),
+          // Contenido del diálogo
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              // Mensaje informativo para el usuario
+              const Text(
+                "No se puede eliminar este producto ya que es el único en este pedido. Se recomienda cancelar el pedido.",
+                textAlign: TextAlign.center,
+              ),
+              // Espaciado entre el texto y la imagen
+              const SizedBox(
+                height: 10,
+              ),
+              // Muestra una imagen circular del logo de la aplicación
+              ClipOval(
+                child: Container(
+                  width: 100, // Ajusta el tamaño según sea necesario
+                  height: 100, // Ajusta el tamaño según sea necesario
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: primaryColor, // Color de fondo del contenedor
+                  ),
+                  child: Image.asset(
+                    "assets/img/logo.png",
+                    fit: BoxFit.cover, // Ajusta la imagen al contenedor
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // Botones de acción dentro del diálogo
+          actions: <Widget>[
+            ButtonBar(
+              alignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(defaultPadding),
+                  // Construye un botón con los estilos de diseño especificados
+                  child: _buildButton("Aceptar", () {
+                    // Cierra el diálogo cuando se hace clic en el botón de aceptar
+                    Navigator.pop(context);
+                  }),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -433,7 +721,9 @@ class PendienteUsuarioDataGridSource extends DataGridSource {
         DataGridCell<Widget>(
             columnName: 'Eliminar Producto',
             value: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                eliminarProductoCallback?.call(pedido);
+              },
               style: const ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll(primaryColor)),
               child: const Text("Eliminar Producto"),
@@ -445,6 +735,9 @@ class PendienteUsuarioDataGridSource extends DataGridSource {
   // DataGridRow para la tabla de pedidos pendientes
   List<DataGridRow> _pedidoData = [];
 
+  // Callback para eliminar boleta
+  void Function(AuxPedidoModel)? eliminarProductoCallback;
+
   /// Obtiene las filas de datos de la grilla.
   @override
   List<DataGridRow> get rows => _pedidoData;
@@ -455,7 +748,7 @@ class PendienteUsuarioDataGridSource extends DataGridSource {
     return DataGridRowAdapter(cells: [
       Container(
         padding: const EdgeInsets.all(8.0),
-        alignment: Alignment.center,
+        alignment: Alignment.centerLeft,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(

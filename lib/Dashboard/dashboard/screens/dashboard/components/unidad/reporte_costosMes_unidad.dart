@@ -47,7 +47,10 @@ class ReporteCostoProduccionMesUnidad extends StatelessWidget {
                   } else if (snapshot.hasError) {
                     // Mostrar un mensaje de error si la carga falla
                     return Center(
-                      child: Text('Error al cargar datos: ${snapshot.error}'),
+                      child: Text(
+                        'Error al cargar datos: ${snapshot.error}',
+                        textAlign: TextAlign.center,
+                      ),
                     );
                   } else {
                     // Obtener los datos de las producciones y productos

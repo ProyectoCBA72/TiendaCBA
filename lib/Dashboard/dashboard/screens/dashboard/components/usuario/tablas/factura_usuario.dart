@@ -7,7 +7,10 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
 import 'package:tienda_app/Models/facturaModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+import 'package:tienda_app/pdf/Usuario/pdfFacturaUsuario.dart';
+import 'package:tienda_app/pdf/modalsPdf.dart';
 
 /// Clase [FacturaUsuario] que representa una pantalla de la aplicación para
 /// mostrar las facturas de un usuario.
@@ -25,11 +28,14 @@ class FacturaUsuario extends StatefulWidget {
   /// Este atributo es requerido y debe ser una lista de objetos [AuxPedidoModel].
   final List<AuxPedidoModel> auxPedido;
 
+  final UsuarioModel usuario;
+
   /// Constructor de [FacturaUsuario].
   ///
   /// El constructor toma una lista de pedidos del usuario a mostrar y
   /// almacena en el atributo [auxPedido].
-  const FacturaUsuario({super.key, required this.auxPedido});
+  const FacturaUsuario(
+      {super.key, required this.auxPedido, required this.usuario});
 
   /// Crea el estado para [FacturaUsuario].
   ///
@@ -57,11 +63,16 @@ class _FacturaUsuarioState extends State<FacturaUsuario> {
   /// detalles de las facturas en la pantalla de facturas.
   List<FacturaModel> listaFacturas = [];
 
+  /// Lista de objetos [UsuarioModel] que representan los vendedores.
+  List<UsuarioModel> listaUsuarios = [];
+
   /// El origen de datos de la cuadrícula de facturas del usuario.
   ///
   /// Este objeto es utilizado para definir la estructura y los datos de la
   /// cuadrícula de facturas del usuario.
   late FacturaUsuarioDataGridSource _dataGridSource;
+
+  List<DataGridRow> registros = [];
 
   @override
 
@@ -77,9 +88,11 @@ class _FacturaUsuarioState extends State<FacturaUsuario> {
 
     // Inicializa la fuente de datos de la cuadrícula de facturas del usuario
     _dataGridSource = FacturaUsuarioDataGridSource(
-        facturas: _facturas,
-        listaProductos: listaProductos,
-        listaFacturas: listaFacturas);
+      facturas: _facturas,
+      listaProductos: listaProductos,
+      listaFacturas: listaFacturas,
+      listaUsuarios: listaUsuarios,
+    );
 
     // Establece la lista de facturas a la lista de pedidos del usuario
     _facturas = widget.auxPedido;
@@ -101,9 +114,13 @@ class _FacturaUsuarioState extends State<FacturaUsuario> {
     // Obtiene las facturas de la API
     List<FacturaModel> facturasCargadas = await getFacturas();
 
-    // Asigna los productos y las facturas a las variables correspondientes
+    // Obtiene los usuarios de la API
+    List<UsuarioModel> usuariosCargados = await getUsuarios();
+
+    // Asigna los productos, las facturas y los usuarios a las variables correspondientes
     listaProductos = productosCargados;
     listaFacturas = facturasCargadas;
+    listaUsuarios = usuariosCargados;
 
     if (mounted) {
       // Ahora inicializa _dataGridSource después de cargar los datos
@@ -111,9 +128,11 @@ class _FacturaUsuarioState extends State<FacturaUsuario> {
         setState(() {
           // Inicializa _dataGridSource con los datos de las facturas, productos y pedidos
           _dataGridSource = FacturaUsuarioDataGridSource(
-              facturas: _facturas,
-              listaProductos: listaProductos,
-              listaFacturas: listaFacturas);
+            facturas: _facturas,
+            listaProductos: listaProductos,
+            listaFacturas: listaFacturas,
+            listaUsuarios: listaUsuarios,
+          );
         });
       });
     }
@@ -170,6 +189,19 @@ class _FacturaUsuarioState extends State<FacturaUsuario> {
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Cambia la firma del callback
+                onSelectionChanged: (List<DataGridRow> addedRows,
+                    List<DataGridRow> removedRows) {
+                  setState(() {
+                    // Añadir filas a la lista de registros seleccionados
+                    registros.addAll(addedRows);
+
+                    // Eliminar filas de la lista de registros seleccionados
+                    for (var row in removedRows) {
+                      registros.remove(row);
+                    }
+                  });
+                },
                 // Define las columnas de la tabla
                 columns: <GridColumn>[
                   GridColumn(
@@ -228,6 +260,14 @@ class _FacturaUsuarioState extends State<FacturaUsuario> {
                       child: const Text('Medio Pago'),
                     ),
                   ),
+                  GridColumn(
+                    columnName: 'Vendedor',
+                    label: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      child: const Text('Vendedor'),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -239,7 +279,17 @@ class _FacturaUsuarioState extends State<FacturaUsuario> {
           Center(
             child: Column(
               children: [
-                _buildButton('Imprimir Reporte', () {}),
+                _buildButton('Imprimir Reporte', () {
+                  if (registros.isEmpty) {
+                    noHayPDFModal(context);
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PdfFacturaUsuarioScreen(
+                                usuario: widget.usuario, registro: registros)));
+                  }
+                }),
               ],
             ),
           ),
@@ -451,6 +501,48 @@ class FacturaUsuarioDataGridSource extends DataGridSource {
     return medioVenta;
   }
 
+  /// Obtiene el nombre del vendedor de una factura dada su número de pedido.
+  ///
+  /// El método recibe el número de pedido de la factura y una lista de facturas y
+  /// de usuarios. Recorre la lista de facturas buscando la factura que
+  /// corresponda al número de pedido especificado. Si encuentra una factura que
+  /// coincide con el número de pedido, obtiene el usuario vendedor de la factura
+  /// y devuelve su nombre como una cadena. Si no encuentra ninguna factura que
+  /// coincida, devuelve una cadena vacía.
+  ///
+  /// Parámetros:
+  /// - numeroPedido: El número de pedido de la factura a buscar.
+  /// - usuarios: La lista de usuarios en la que buscar el usuario vendedor.
+  /// - facturas: La lista de facturas en la que buscar la factura.
+  ///
+  /// Retorna:
+  /// - Una cadena con el nombre del vendedor de la factura encontrada, si se
+  ///   encuentra una factura que coincida con el número de pedido.
+  /// - Una cadena vacía si no se encuentra ninguna factura que coincida con el
+  ///   número de pedido.
+  String nombreVendedor(int numeroPedido, List<UsuarioModel> usuarios,
+      List<FacturaModel> facturas) {
+    // Inicializa una cadena vacía para almacenar el nombre del vendedor.
+    String vendedor = "";
+
+    // Recorre la lista de facturas buscando la factura correspondiente.
+    for (var factura in facturas) {
+      // Verifica si el número de pedido de la factura coincide con el buscado.
+      if (factura.pedido.numeroPedido == numeroPedido) {
+        // Busca el usuario vendedor en la lista de usuarios.
+        var usuario = usuarios
+            .firstWhere((usuario) => usuario.id == factura.usuarioVendedor);
+        // Obtiene el nombre del usuario vendedor.
+        vendedor = "${usuario.nombres} ${usuario.apellidos}";
+        // Salta el bucle para evitar buscar más facturas.
+        break;
+      }
+    }
+
+    // Devuelve el nombre del vendedor de la factura encontrada o una cadena vacía.
+    return vendedor;
+  }
+
   /// Crea un objeto [FacturaUsuarioDataGridSource] a partir de una lista de
   /// facturas y una lista de productos.
   ///
@@ -458,6 +550,7 @@ class FacturaUsuarioDataGridSource extends DataGridSource {
     required List<AuxPedidoModel> facturas,
     required List<ProductoModel> listaProductos,
     required List<FacturaModel> listaFacturas,
+    required List<UsuarioModel> listaUsuarios,
   }) {
     _facturaData = facturas.map<DataGridRow>((factura) {
       return DataGridRow(cells: [
@@ -483,6 +576,10 @@ class FacturaUsuarioDataGridSource extends DataGridSource {
             columnName: 'Medio Pago',
             value:
                 medioVentaFactura(factura.pedido.numeroPedido, listaFacturas)),
+        DataGridCell<String>(
+            columnName: 'Vendedor',
+            value: nombreVendedor(
+                factura.pedido.numeroPedido, listaUsuarios, listaFacturas)),
       ]);
     }).toList();
   }
@@ -500,7 +597,7 @@ class FacturaUsuarioDataGridSource extends DataGridSource {
     return DataGridRowAdapter(cells: [
       Container(
         padding: const EdgeInsets.all(8.0),
-        alignment: Alignment.center,
+        alignment: Alignment.centerLeft,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(

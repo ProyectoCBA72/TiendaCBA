@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 ///
 /// Esta clase se utiliza para almacenar información relevante sobre un card
 /// de pedidos. Incluye propiedades como la ruta de la imagen SVG, el título,
-/// el total de reservas y el porcentaje de avance.
+/// el total de pedidos y el porcentaje de avance.
 class PedidoCardClase {
   /// Ruta de la imagen SVG.
   ///
@@ -18,10 +18,10 @@ class PedidoCardClase {
   /// Es una [String] opcional.
   final String? title;
 
-  /// Total de reservas.
+  /// Total de pedidos.
   ///
   /// Es una [String] opcional.
-  final String? totalReservas;
+  final String? totalPedidos;
 
   /// Porcentaje de avance.
   ///
@@ -39,7 +39,7 @@ class PedidoCardClase {
   PedidoCardClase({
     this.svgSrc,
     this.title,
-    this.totalReservas,
+    this.totalPedidos,
     this.percentage,
     this.color,
   });

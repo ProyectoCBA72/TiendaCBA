@@ -819,12 +819,18 @@ class _ProductoCardState extends State<ProductoCard> {
       builder: (context) {
         return AlertDialog(
           // Título del diálogo
-          title: const Text("¿Quiere agregar a favoritos?"),
+          title: const Text(
+            "¿Quiere agregar a favoritos?",
+            textAlign: TextAlign.center,
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               // Texto de descripción
-              const Text("¡Para agregar a favoritos debe iniciar sesión!"),
+              const Text(
+                "¡Para agregar a favoritos debe iniciar sesión!",
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(
                 height: 10,
               ),

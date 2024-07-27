@@ -46,15 +46,16 @@ class ReporteProduccionAgnoLider extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   return Center(
                     child: Text(
-                        'Error al cargar datos: ${snapshot.error}'), // Muestra mensaje de error si falla la carga
+                      'Error al cargar datos: ${snapshot.error}',
+                      textAlign: TextAlign.center,
+                    ), // Muestra mensaje de error si falla la carga
                   );
                 } else {
                   List<ProduccionModel> producciones = snapshot.data ??
                       []; // Obtiene la lista de producciones del snapshot
 
                   List<ProduccionModel> produccionesFiltradas = producciones
-                      .where((p) =>
-                          p.unidadProduccion.sede.id == usuario.sede)
+                      .where((p) => p.unidadProduccion.sede.id == usuario.sede)
                       .toList();
 
                   // Construye y retorna el gráfico de Syncfusion con los datos de producción

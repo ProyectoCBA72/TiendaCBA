@@ -131,7 +131,7 @@ class CardsMetodoLider extends StatelessWidget {
               } else if (snapshot.hasError) {
                 // Mensaje de error si ocurre un problema al cargar datos
                 return Center(
-                  child: Text('Error al cargar métodos de pago: ${snapshot.error}'),
+                  child: Text('Error al cargar métodos de pago: ${snapshot.error}', textAlign: TextAlign.center,),
                 );
               } else {
                 // Construcción de las tarjetas de métodos de pago

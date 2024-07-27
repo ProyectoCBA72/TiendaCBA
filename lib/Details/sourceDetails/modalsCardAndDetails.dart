@@ -36,7 +36,9 @@ void modalCompartirWhatsappProducto(BuildContext context, String text) {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               const Text(
-                  "Por favor, ingrese el número de teléfono celular de la persona con la cual desea compartir este producto."),
+                "Por favor, ingrese el número de teléfono celular de la persona con la cual desea compartir este producto.",
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(
                 height: 10,
               ),
@@ -143,11 +145,17 @@ void isProductAddedModal(BuildContext context) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text("¡Este producto ya está agregado!"),
+        title: const Text(
+          "¡Este producto ya está agregado!",
+          textAlign: TextAlign.center,
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Text("El producto seleccionado ya está en su pedido."),
+            const Text(
+              "El producto seleccionado ya está en su pedido.",
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(
               height: 10,
             ),
@@ -200,14 +208,19 @@ void productoExclusivo(BuildContext context) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text("¿Quiere agregar un producto exclusivo?"),
+        title: const Text(
+          "¿Quiere agregar un producto exclusivo?",
+          textAlign: TextAlign.center,
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             // Se muestra un mensaje explicando que para agregar productos exclusivos
             // se debe agregar previamente otro producto.
             const Text(
-                "¡Tenga en cuenta que, para agregar un producto exclusivo como los huevos, tiene que agregar previamente otro producto!"),
+              "¡Tenga en cuenta que, para agregar un producto exclusivo como los huevos, tiene que agregar previamente otro producto!",
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(
               height: 10,
             ),
@@ -260,12 +273,18 @@ void inicioSesion(BuildContext context) {
     builder: (context) {
       return AlertDialog(
         // Título del diálogo
-        title: const Text("¿Quiere agregar a favoritos?"),
+        title: const Text(
+          "¿Quiere agregar a favoritos?",
+          textAlign: TextAlign.center,
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             // Texto de descripción
-            const Text("¡Para agregar a favoritos, debe iniciar sesión!"),
+            const Text(
+              "¡Para agregar a favoritos, debe iniciar sesión!",
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(
               height: 10,
             ),
@@ -326,11 +345,17 @@ void loginPedidoScreen(BuildContext context) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text("¿Quiere agregar un producto a su pedido?"),
+        title: const Text(
+          "¿Quiere agregar un producto a su pedido?",
+          textAlign: TextAlign.center,
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Text("¡Para agregar un pedido, debe iniciar sesión!"),
+            const Text(
+              "¡Para agregar un pedido, debe iniciar sesión!",
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(
               height: 10,
             ),

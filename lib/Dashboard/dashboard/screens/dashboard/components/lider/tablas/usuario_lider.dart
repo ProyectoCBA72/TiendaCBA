@@ -6,7 +6,10 @@ import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lide
 import 'package:tienda_app/EditarUsuario/editarUsuario.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+import 'package:tienda_app/pdf/Lider/pdfUsuarioLider.dart';
+import 'package:tienda_app/pdf/modalsPdf.dart';
 import 'package:tienda_app/responsive.dart';
+import 'package:universal_platform/universal_platform.dart';
 
 /// Esta clase representa un widget de estado que muestra una tabla de usuarios.
 ///
@@ -23,11 +26,14 @@ class UsuarioLider extends StatefulWidget {
   /// usuarios a mostrar en la tabla.
   final List<UsuarioModel> usuarioLista;
 
+  final UsuarioModel usuario;
+
   /// Constructor de la clase [UsuarioLider].
   ///
   /// El parámetro [usuarioLista] es requerido y debe contener una lista de
   /// objetos [UsuarioModel] que representan los usuarios a mostrar en la tabla.
-  const UsuarioLider({super.key, required this.usuarioLista});
+  const UsuarioLider(
+      {super.key, required this.usuarioLista, required this.usuario});
 
   /// Crea el estado de la clase [UsuarioLider].
   ///
@@ -48,6 +54,8 @@ class _UsuarioLiderState extends State<UsuarioLider> {
   /// Esta instancia se utiliza para manejar los datos de la tabla y proporcionar
   /// los datos necesarios para mostrar la tabla en la pantalla.
   late UsuarioDataGridSource _dataGridSource;
+
+  List<DataGridRow> registros = [];
 
   /// Lista de objetos [UsuarioModel] que representan los usuarios a mostrar en la tabla.
   ///
@@ -77,6 +85,7 @@ class _UsuarioLiderState extends State<UsuarioLider> {
     _dataGridSource = UsuarioDataGridSource(
       usuarios: _usuarios,
       context: context,
+      usuarioAutenticado: widget.usuario,
     );
   }
 
@@ -121,6 +130,19 @@ class _UsuarioLiderState extends State<UsuarioLider> {
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Cambia la firma del callback
+                onSelectionChanged: (List<DataGridRow> addedRows,
+                    List<DataGridRow> removedRows) {
+                  setState(() {
+                    // Añadir filas a la lista de registros seleccionados
+                    registros.addAll(addedRows);
+
+                    // Eliminar filas de la lista de registros seleccionados
+                    for (var row in removedRows) {
+                      registros.remove(row);
+                    }
+                  });
+                },
                 // Columnas de la tabla
                 columns: <GridColumn>[
                   GridColumn(
@@ -196,6 +218,14 @@ class _UsuarioLiderState extends State<UsuarioLider> {
                     ),
                   ),
                   GridColumn(
+                    columnName: 'Fecha Registro',
+                    label: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      child: const Text('Fecha Registro'),
+                    ),
+                  ),
+                  GridColumn(
                     columnName: 'Estado',
                     label: Container(
                       padding: const EdgeInsets.all(8.0),
@@ -225,7 +255,17 @@ class _UsuarioLiderState extends State<UsuarioLider> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildButton('Imprimir Reporte', () {}),
+                _buildButton('Imprimir Reporte', () {
+                  if (registros.isEmpty) {
+                    noHayPDFModal(context);
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PdfUsuarioLiderScreen(
+                                usuario: widget.usuario, registro: registros)));
+                  }
+                }),
                 const SizedBox(
                   width: defaultPadding,
                 ),
@@ -237,20 +277,26 @@ class _UsuarioLiderState extends State<UsuarioLider> {
                 }),
               ],
             ),
-          if (Responsive.isMobile(context))
+          if (Responsive.isMobile(context) ||
+              (UniversalPlatform.isIOS || UniversalPlatform.isAndroid))
             Center(
               child: Column(
                 children: [
-                  _buildButton('Imprimir Reporte', () {}),
+                  _buildButton('Imprimir Reporte', () {
+                    if (registros.isEmpty) {
+                      noHayPDFModal(context);
+                    } else {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PdfUsuarioLiderScreen(
+                                  usuario: widget.usuario,
+                                  registro: registros)));
+                    }
+                  }),
                   const SizedBox(
                     height: defaultPadding,
                   ),
-                  _buildButton('Añadir Usuarios', () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const UploadUsersCSV()));
-                  }),
                 ],
               ),
             ),
@@ -316,7 +362,9 @@ class _UsuarioLiderState extends State<UsuarioLider> {
 class UsuarioDataGridSource extends DataGridSource {
   // Crea un objeto de tipo DataGridRow para cada usuario
   UsuarioDataGridSource(
-      {required List<UsuarioModel> usuarios, required BuildContext context}) {
+      {required List<UsuarioModel> usuarios,
+      required BuildContext context,
+      required UsuarioModel usuarioAutenticado}) {
     _usuarioData = usuarios.map<DataGridRow>((usuario) {
       return DataGridRow(cells: [
         DataGridCell<String>(
@@ -336,6 +384,8 @@ class UsuarioDataGridSource extends DataGridSource {
         DataGridCell<String>(columnName: 'Rol 2', value: usuario.rol2),
         DataGridCell<String>(columnName: 'Rol 3', value: usuario.rol3),
         DataGridCell<String>(
+            columnName: 'Fecha Registro', value: usuario.fechaRegistro),
+        DataGridCell<String>(
             columnName: 'Estado',
             value: usuario.estado ? "Activo" : "Inactivo"),
         DataGridCell<Widget>(
@@ -347,6 +397,7 @@ class UsuarioDataGridSource extends DataGridSource {
                     MaterialPageRoute(
                         builder: (context) => FormActualizarUsuario(
                               usuario: usuario,
+                              usuarioAutenticado: usuarioAutenticado,
                             )));
               },
               style: const ButtonStyle(
@@ -370,7 +421,7 @@ class UsuarioDataGridSource extends DataGridSource {
     return DataGridRowAdapter(cells: [
       Container(
         padding: const EdgeInsets.all(8.0),
-        alignment: Alignment.center,
+        alignment: Alignment.centerLeft,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -403,10 +454,13 @@ class UsuarioDataGridSource extends DataGridSource {
           padding: const EdgeInsets.all(8.0),
           child: (row.getCells()[i].value is Widget)
               ? row.getCells()[i].value // Texto normal
-              : Text(row
-                  .getCells()[i]
-                  .value
-                  .toString()), // Texto modificado para valores enteros
+              : Text(i == 9
+                  ? formatFechaHora(
+                      row.getCells()[i].value.toString()) // Formato de fecha
+                  : row
+                      .getCells()[i]
+                      .value
+                      .toString()), // Texto modificado para valores enteros
         ),
     ]);
   }

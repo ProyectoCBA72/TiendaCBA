@@ -7,7 +7,10 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
 import 'package:tienda_app/Models/facturaModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+import 'package:tienda_app/pdf/Lider/pdfFacturaLider.dart';
+import 'package:tienda_app/pdf/modalsPdf.dart';
 
 /// Esta clase representa un widget de estado que muestra una tabla de facturas de un líder.
 ///
@@ -21,11 +24,14 @@ class FacturaLider extends StatefulWidget {
   /// Lista de objetos [AuxPedidoModel] que representan las facturas del líder.
   final List<AuxPedidoModel> auxPedido;
 
+  final UsuarioModel usuario;
+
   /// Constructor que recibe la lista de facturas del líder.
   ///
   /// Parámetros:
   /// - [auxPedido] es una lista de objetos [AuxPedidoModel] que representan las facturas del líder.
-  const FacturaLider({super.key, required this.auxPedido});
+  const FacturaLider(
+      {super.key, required this.auxPedido, required this.usuario});
 
   /// Crea un estado [_FacturaLiderState] para manejar los datos de la pantalla.
   @override
@@ -50,6 +56,8 @@ class _FacturaLiderState extends State<FacturaLider> {
   ///
   /// Este origen de datos se utiliza para obtener los datos para mostrar en la tabla de facturas.
   late FacturaLiderDataGridSource _dataGridSource;
+
+  List<DataGridRow> registros = [];
 
   @override
 
@@ -161,6 +169,19 @@ class _FacturaLiderState extends State<FacturaLider> {
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Cambia la firma del callback
+                onSelectionChanged: (List<DataGridRow> addedRows,
+                    List<DataGridRow> removedRows) {
+                  setState(() {
+                    // Añadir filas a la lista de registros seleccionados
+                    registros.addAll(addedRows);
+
+                    // Eliminar filas de la lista de registros seleccionados
+                    for (var row in removedRows) {
+                      registros.remove(row);
+                    }
+                  });
+                },
                 // Columnas de la tabla
                 columns: <GridColumn>[
                   GridColumn(
@@ -230,7 +251,17 @@ class _FacturaLiderState extends State<FacturaLider> {
           Center(
             child: Column(
               children: [
-                _buildButton('Imprimir Reporte', () {}),
+                _buildButton('Imprimir Reporte', () {
+                  if (registros.isEmpty) {
+                    noHayPDFModal(context);
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PdfFacturaLiderScreen(
+                                usuario: widget.usuario, registro: registros)));
+                  }
+                }),
               ],
             ),
           ),
@@ -473,7 +504,7 @@ class FacturaLiderDataGridSource extends DataGridSource {
     return DataGridRowAdapter(cells: [
       Container(
         padding: const EdgeInsets.all(8.0),
-        alignment: Alignment.center,
+        alignment: Alignment.centerLeft,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(

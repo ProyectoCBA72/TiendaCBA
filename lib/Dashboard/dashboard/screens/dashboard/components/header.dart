@@ -85,6 +85,7 @@ class _HeaderState extends State<Header> {
                       MaterialPageRoute(
                           builder: (context) => FormActualizarUsuario(
                                 usuario: usuarioAutenticado!,
+                                usuarioAutenticado: usuarioAutenticado,
                               )));
                 },
                 icon: const Icon(

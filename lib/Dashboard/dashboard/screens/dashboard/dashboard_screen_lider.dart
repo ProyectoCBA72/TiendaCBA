@@ -179,8 +179,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                             const SizedBox(height: defaultPadding),
                           if (!Responsive.isMobile(context))
                             Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
                                   child: Text(
@@ -188,8 +187,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleLarge
-                                        ?.copyWith(
-                                            fontFamily: 'Calibri-Bold'),
+                                        ?.copyWith(fontFamily: 'Calibri-Bold'),
                                   ),
                                 ),
                               ],
@@ -215,13 +213,11 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                 color: primaryColor,
                                               ),
                                               onPressed: () =>
-                                                  _scrollToPreviousTab(
-                                                      context),
+                                                  _scrollToPreviousTab(context),
                                             ),
                                             Expanded(
                                               child: TabBar(
-                                                indicatorColor:
-                                                    primaryColor,
+                                                indicatorColor: primaryColor,
                                                 isScrollable: true,
                                                 tabAlignment:
                                                     TabAlignment.center,
@@ -237,8 +233,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                         "Costo de producción por año",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -250,17 +245,17 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                             "assets/icons/costoProduccion.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFCD5C5C),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFCD5C5C),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Año",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -278,8 +273,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                         "Costo de producción por mes",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -291,17 +285,17 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                             "assets/icons/costoProduccion.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFCD5C5C),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFCD5C5C),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Mes",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -319,8 +313,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                         "Productos más vendidos por año",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -332,17 +325,17 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                             "assets/icons/productosVendidos.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFF4682B4),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFF4682B4),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Año",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -360,8 +353,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                         "Productos más vendidos por mes",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -373,17 +365,17 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                             "assets/icons/productosVendidos.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFF4682B4),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFF4682B4),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Mes",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -401,8 +393,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                         "Balance de ventas por año",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -414,17 +405,17 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                             "assets/icons/ventas.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFF50C878),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFF50C878),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Año",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -442,8 +433,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                         "Balance de ventas por mes",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -455,17 +445,17 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                             "assets/icons/ventas.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFF50C878),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFF50C878),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Mes",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -483,8 +473,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                         "Devoluciones por año",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -496,17 +485,17 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                             "assets/icons/devoluciones.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFFF7F50),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFFF7F50),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Año",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -524,8 +513,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                         "Devoluciones por mes",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -537,17 +525,17 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                             "assets/icons/devoluciones.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFFF7F50),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFFF7F50),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Mes",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -565,8 +553,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                         "Producciones despachadas por año",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -578,17 +565,17 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                             "assets/icons/produccion.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFB8860B),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFB8860B),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Año",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -606,8 +593,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                         "Producciones despachadas por mes",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -619,17 +605,17 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                             "assets/icons/produccion.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFB8860B),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFB8860B),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Mes",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -647,8 +633,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                         "Producciones recibidas por año",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -660,17 +645,17 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                             "assets/icons/recibidas.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFBA55D3),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFBA55D3),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Año",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -688,8 +673,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                         "Producciones recibidas por mes",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -701,17 +685,17 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                             "assets/icons/recibidas.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFBA55D3),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFBA55D3),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Mes",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -764,8 +748,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                               )
                                             : _selectedItem == 4
                                                 ? ReportePuntoVentasAgnoLider(
-                                                    usuario:
-                                                        usuarioAutenticado,
+                                                    usuario: usuarioAutenticado,
                                                   )
                                                 : _selectedItem == 5
                                                     ? ReportePuntoVentasMesLider(
@@ -782,8 +765,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                                 usuario:
                                                                     usuarioAutenticado,
                                                               )
-                                                            : _selectedItem ==
-                                                                    8
+                                                            : _selectedItem == 8
                                                                 ? ReporteProduccionAgnoLider(
                                                                     usuario:
                                                                         usuarioAutenticado,
@@ -797,9 +779,11 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                                     : _selectedItem ==
                                                                             10
                                                                         ? ReporteRecibidoAgnoLider(
-                                                                            usuario: usuarioAutenticado,
+                                                                            usuario:
+                                                                                usuarioAutenticado,
                                                                           )
-                                                                        : _selectedItem == 11
+                                                                        : _selectedItem ==
+                                                                                11
                                                                             ? ReporteRecibidoMesLider(
                                                                                 usuario: usuarioAutenticado,
                                                                               )
@@ -847,24 +831,29 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                   // Validar si hay un error
                                 } else if (snapshotBoleta.hasError) {
                                   return Text(
-                                      'Error al cargar inscripciones: ${snapshotBoleta.error}');
+                                    'Error al cargar inscripciones: ${snapshotBoleta.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Validar si no hay inscripciones
                                 } else if (snapshotBoleta.data == null) {
                                   return const Text(
-                                      'No se encontraron inscripciones');
+                                    'No se encontraron inscripciones',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Mostrar las inscripciones
                                 } else {
                                   List<BoletaModel> boletaSede =
                                       []; // Lista para las boletas de la sede
-                                            
-                                  boletaSede = snapshotBoleta.data!
-                                      .where((boleta) =>
+
+                                  boletaSede.addAll(snapshotBoleta.data!.where(
+                                      (boleta) =>
                                           boleta.anuncio.usuario.sede ==
-                                          usuarioAutenticado.sede)
-                                      .toList(); // Filtra las boletas por la sede
-                                            
+                                          usuarioAutenticado
+                                              .sede)); // Filtra las boletas por la sede
+
                                   return EventosLider(
                                     boletas: boletaSede,
+                                    usuario: usuarioAutenticado,
                                   );
                                 }
                               }),
@@ -882,70 +871,70 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                   // Validar si hay un error
                                 } else if (snapshotPunto.hasError) {
                                   return Text(
-                                      'Error al cargar puntos: ${snapshotPunto.error}');
+                                    'Error al cargar puntos: ${snapshotPunto.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Validar si no hay puntos
                                 } else if (snapshotPunto.data == null) {
                                   return const Text(
-                                      'No se encontraron puntos');
+                                    'No se encontraron puntos',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Mostrar los puntos
                                 } else {
                                   return FutureBuilder(
-                                      future:
-                                          getAuxPedidos(), // Cargar pedidos
+                                      future: getAuxPedidos(), // Cargar pedidos
                                       builder: (context,
-                                          AsyncSnapshot<
-                                                  List<AuxPedidoModel>>
+                                          AsyncSnapshot<List<AuxPedidoModel>>
                                               snapshotAuxiliar) {
                                         // Cargar pedidos
-                                        if (snapshotAuxiliar
-                                                .connectionState ==
+                                        if (snapshotAuxiliar.connectionState ==
                                             ConnectionState.waiting) {
                                           return const CircularProgressIndicator();
                                           // Validar si hay un error
-                                        } else if (snapshotAuxiliar
-                                            .hasError) {
+                                        } else if (snapshotAuxiliar.hasError) {
                                           return Text(
-                                              'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                            'Error al cargar pedidos: ${snapshotAuxiliar.error}',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Validar si no hay pedidos
                                         } else if (snapshotAuxiliar.data ==
                                             null) {
                                           return const Text(
-                                              'No se encontraron pedidos');
+                                            'No se encontraron pedidos',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Mostrar los pedidos
                                         } else {
                                           List<AuxPedidoModel>
                                               pedidosEntregados =
                                               []; // Lista para los pedidos
-                                            
+
                                           // Obtener los pedidos entregados de los puntos de venta correspondientes a la sede
                                           for (var p = 0;
-                                              p <
-                                                  snapshotPunto
-                                                      .data!.length;
+                                              p < snapshotPunto.data!.length;
                                               p++) {
-                                            pedidosEntregados =
-                                                snapshotAuxiliar
-                                                    .data!
-                                                    .where((auxiliar) =>
+                                            pedidosEntregados.addAll(
+                                                snapshotAuxiliar.data!.where(
+                                                    (auxiliar) =>
                                                         auxiliar.pedido
                                                                 .estado ==
                                                             "COMPLETADO" &&
-                                                        auxiliar.pedido
-                                                            .entregado &&
+                                                        auxiliar
+                                                            .pedido.entregado &&
                                                         auxiliar.pedido
                                                                 .puntoVenta ==
                                                             snapshotPunto
-                                                                .data![p]
-                                                                .id &&
+                                                                .data![p].id &&
                                                         usuarioAutenticado
                                                                 .sede ==
                                                             snapshotPunto
                                                                 .data![p]
-                                                                .sede)
-                                                    .toList();
+                                                                .sede));
                                           }
-                                            
+
                                           return EntregadoLider(
+                                            usuario: usuarioAutenticado,
                                             auxPedido: pedidosEntregados,
                                           );
                                         }
@@ -966,68 +955,68 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                   // Validar si hay un error
                                 } else if (snapshotPunto.hasError) {
                                   return Text(
-                                      'Error al cargar puntos: ${snapshotPunto.error}');
+                                    'Error al cargar puntos: ${snapshotPunto.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Validar si no hay puntos
                                 } else if (snapshotPunto.data == null) {
                                   return const Text(
-                                      'No se encontraron puntos');
+                                    'No se encontraron puntos',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Mostrar los puntos
                                 } else {
                                   return FutureBuilder(
-                                      future:
-                                          getAuxPedidos(), // Cargar pedidos
+                                      future: getAuxPedidos(), // Cargar pedidos
                                       builder: (context,
-                                          AsyncSnapshot<
-                                                  List<AuxPedidoModel>>
+                                          AsyncSnapshot<List<AuxPedidoModel>>
                                               snapshotAuxiliar) {
                                         // Cargar pedidos
-                                        if (snapshotAuxiliar
-                                                .connectionState ==
+                                        if (snapshotAuxiliar.connectionState ==
                                             ConnectionState.waiting) {
                                           return const CircularProgressIndicator();
                                           // Validar si hay un error
-                                        } else if (snapshotAuxiliar
-                                            .hasError) {
+                                        } else if (snapshotAuxiliar.hasError) {
                                           return Text(
-                                              'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                            'Error al cargar pedidos: ${snapshotAuxiliar.error}',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Validar si no hay pedidos
                                         } else if (snapshotAuxiliar.data ==
                                             null) {
                                           return const Text(
-                                              'No se encontraron pedidos');
+                                            'No se encontraron pedidos',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Mostrar los pedidos
                                         } else {
                                           List<AuxPedidoModel>
                                               pedidosCancelados =
                                               []; // Lista para los pedidos
-                                            
+
                                           // Obtener los pedidos cancelados de los puntos de venta correspondientes a la sede
                                           for (var p = 0;
-                                              p <
-                                                  snapshotPunto
-                                                      .data!.length;
+                                              p < snapshotPunto.data!.length;
                                               p++) {
-                                            pedidosCancelados =
-                                                snapshotAuxiliar
-                                                    .data!
-                                                    .where((auxiliar) =>
+                                            pedidosCancelados.addAll(
+                                                snapshotAuxiliar.data!.where(
+                                                    (auxiliar) =>
                                                         auxiliar.pedido
                                                                 .estado ==
                                                             "CANCELADO" &&
                                                         auxiliar.pedido
                                                                 .puntoVenta ==
                                                             snapshotPunto
-                                                                .data![p]
-                                                                .id &&
+                                                                .data![p].id &&
                                                         usuarioAutenticado
                                                                 .sede ==
                                                             snapshotPunto
                                                                 .data![p]
-                                                                .sede)
-                                                    .toList();
+                                                                .sede));
                                           }
                                           return CanceladoLider(
                                             auxPedido: pedidosCancelados,
+                                            usuario: usuarioAutenticado,
                                           );
                                         }
                                       });
@@ -1039,8 +1028,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                           const SizedBox(height: defaultPadding),
                           // Tabla de facturas
                           FutureBuilder(
-                              future:
-                                  getPuntosVenta(), // Obtener los puntos
+                              future: getPuntosVenta(), // Obtener los puntos
                               builder: (context,
                                   AsyncSnapshot<List<PuntoVentaModel>>
                                       snapshotPunto) {
@@ -1051,34 +1039,39 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                   // Validar si hay un error
                                 } else if (snapshotPunto.hasError) {
                                   return Text(
-                                      'Error al cargar puntos: ${snapshotPunto.error}');
+                                    'Error al cargar puntos: ${snapshotPunto.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Validar si no hay puntos
                                 } else if (snapshotPunto.data == null) {
                                   return const Text(
-                                      'No se encontraron puntos');
+                                    'No se encontraron puntos',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Mostrar los puntos
                                 } else {
                                   return FutureBuilder(
-                                      future:
-                                          getFacturas(), // Obtener facturas
+                                      future: getFacturas(), // Obtener facturas
                                       builder: (context,
                                           AsyncSnapshot<List<FacturaModel>>
                                               snapshotFactura) {
                                         // Cargar facturas
-                                        if (snapshotFactura
-                                                .connectionState ==
+                                        if (snapshotFactura.connectionState ==
                                             ConnectionState.waiting) {
                                           return const CircularProgressIndicator();
                                           // Validar si hay un error
-                                        } else if (snapshotFactura
-                                            .hasError) {
+                                        } else if (snapshotFactura.hasError) {
                                           return Text(
-                                              'Error al cargar ventas: ${snapshotFactura.error}');
+                                            'Error al cargar ventas: ${snapshotFactura.error}',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Validar si no hay facturas
                                         } else if (snapshotFactura.data ==
                                             null) {
                                           return const Text(
-                                              'No se encontraron ventas');
+                                            'No se encontraron ventas',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Mostrar las facturas
                                         } else {
                                           return FutureBuilder(
@@ -1086,32 +1079,34 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                   getAuxPedidos(), // Obtener pedidos
                                               builder: (context,
                                                   AsyncSnapshot<
-                                                          List<
-                                                              AuxPedidoModel>>
+                                                          List<AuxPedidoModel>>
                                                       snapshotAuxiliar) {
                                                 // Cargar pedidos
                                                 if (snapshotAuxiliar
                                                         .connectionState ==
-                                                    ConnectionState
-                                                        .waiting) {
+                                                    ConnectionState.waiting) {
                                                   return const CircularProgressIndicator();
                                                   // Validar si hay un error
                                                 } else if (snapshotAuxiliar
                                                     .hasError) {
                                                   return Text(
-                                                      'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                                    'Error al cargar pedidos: ${snapshotAuxiliar.error}',
+                                                    textAlign: TextAlign.center,
+                                                  );
                                                   // Validar si no hay pedidos
                                                 } else if (snapshotAuxiliar
                                                         .data ==
                                                     null) {
                                                   return const Text(
-                                                      'No se encontraron pedidos');
+                                                    'No se encontraron pedidos',
+                                                    textAlign: TextAlign.center,
+                                                  );
                                                   // Mostrar los pedidos
                                                 } else {
                                                   List<AuxPedidoModel>
                                                       pedidosFacturas =
                                                       []; // Lista para los pedidos
-                                            
+
                                                   // Obtener las facturas de los puntos de venta correspondientes a la sede
                                                   for (var p = 0;
                                                       p <
@@ -1121,39 +1116,33 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                     for (var f = 0;
                                                         f <
                                                             snapshotFactura
-                                                                .data!
-                                                                .length;
+                                                                .data!.length;
                                                         f++) {
-                                                      pedidosFacturas = snapshotAuxiliar
+                                                      pedidosFacturas.addAll(snapshotAuxiliar
                                                           .data!
                                                           .where((pedido) =>
                                                               snapshotFactura
-                                                                      .data![
-                                                                          f]
+                                                                      .data![f]
                                                                       .pedido
                                                                       .id ==
-                                                                  pedido
-                                                                      .pedido
+                                                                  pedido.pedido
                                                                       .id &&
                                                               snapshotPunto
-                                                                      .data![
-                                                                          p]
+                                                                      .data![p]
                                                                       .sede ==
                                                                   usuarioAutenticado
                                                                       .sede &&
                                                               pedido.pedido
                                                                       .puntoVenta ==
                                                                   snapshotPunto
-                                                                      .data![
-                                                                          p]
-                                                                      .id)
-                                                          .toList();
+                                                                      .data![p]
+                                                                      .id));
                                                     }
                                                   }
-                                            
+
                                                   return FacturaLider(
-                                                    auxPedido:
-                                                        pedidosFacturas,
+                                                    auxPedido: pedidosFacturas,
+                                                    usuario: usuarioAutenticado,
                                                   );
                                                 }
                                               });
@@ -1176,20 +1165,22 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                   // Muestra un mensaje de error si ocurre un problema al cargar las devoluciones
                                 } else if (snapshotDevolucion.hasError) {
                                   return Text(
-                                      'Error al cargar devoluciones: ${snapshotDevolucion.error}');
+                                    'Error al cargar devoluciones: ${snapshotDevolucion.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra un mensaje de que no se encontraron devoluciones
-                                } else if (snapshotDevolucion.data ==
-                                    null) {
+                                } else if (snapshotDevolucion.data == null) {
                                   return const Text(
-                                      'No se encontraron devoluciones');
+                                    'No se encontraron devoluciones',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra el contenido de las devoluciones
                                 } else {
                                   return FutureBuilder(
                                       future:
                                           getPuntosVenta(), // Obtiene los puntos de venta
                                       builder: (context,
-                                          AsyncSnapshot<
-                                                  List<PuntoVentaModel>>
+                                          AsyncSnapshot<List<PuntoVentaModel>>
                                               snapshotPunto) {
                                         // Muestra un CircularProgressIndicator mientras se obtienen los puntos de venta
                                         if (snapshotPunto.connectionState ==
@@ -1198,12 +1189,15 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                           // Muestra un mensaje de error si ocurre un problema al cargar los puntos de venta
                                         } else if (snapshotPunto.hasError) {
                                           return Text(
-                                              'Error al cargar puntos: ${snapshotPunto.error}');
+                                            'Error al cargar puntos: ${snapshotPunto.error}',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Muestra un mensaje de que no se encontraron puntos de venta
-                                        } else if (snapshotPunto.data ==
-                                            null) {
+                                        } else if (snapshotPunto.data == null) {
                                           return const Text(
-                                              'No se encontraron puntos');
+                                            'No se encontraron puntos',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Muestra el contenido de los puntos de venta
                                         } else {
                                           return FutureBuilder(
@@ -1211,32 +1205,34 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                   getAuxPedidos(), // Obtiene los pedidos
                                               builder: (context,
                                                   AsyncSnapshot<
-                                                          List<
-                                                              AuxPedidoModel>>
+                                                          List<AuxPedidoModel>>
                                                       snapshotAuxiliar) {
                                                 // Muestra un CircularProgressIndicator mientras se obtienen los pedidos
                                                 if (snapshotAuxiliar
                                                         .connectionState ==
-                                                    ConnectionState
-                                                        .waiting) {
+                                                    ConnectionState.waiting) {
                                                   return const CircularProgressIndicator();
                                                   // Muestra un mensaje de error si ocurre un problema al cargar los pedidos
                                                 } else if (snapshotAuxiliar
                                                     .hasError) {
                                                   return Text(
-                                                      'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                                    'Error al cargar pedidos: ${snapshotAuxiliar.error}',
+                                                    textAlign: TextAlign.center,
+                                                  );
                                                   // Muestra un mensaje de que no se encontraron pedidos
                                                 } else if (snapshotAuxiliar
                                                         .data ==
                                                     null) {
                                                   return const Text(
-                                                      'No se encontraron pedidos');
+                                                    'No se encontraron pedidos',
+                                                    textAlign: TextAlign.center,
+                                                  );
                                                   // Muestra el contenido de los pedidos
                                                 } else {
                                                   List<AuxPedidoModel>
                                                       pedidosDevueltos =
                                                       []; // Lista para los pedidos
-                                            
+
                                                   // Obtener las devoluciones de los puntos de venta correspondientes a la sede
                                                   for (var p = 0;
                                                       p <
@@ -1246,40 +1242,34 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                     for (var d = 0;
                                                         d <
                                                             snapshotDevolucion
-                                                                .data!
-                                                                .length;
+                                                                .data!.length;
                                                         d++) {
-                                                      pedidosDevueltos = snapshotAuxiliar
+                                                      pedidosDevueltos.addAll(snapshotAuxiliar
                                                           .data!
                                                           .where((pedido) =>
                                                               snapshotDevolucion
-                                                                      .data![
-                                                                          d]
+                                                                      .data![d]
                                                                       .factura
                                                                       .pedido
                                                                       .id ==
-                                                                  pedido
-                                                                      .pedido
+                                                                  pedido.pedido
                                                                       .id &&
                                                               snapshotPunto
-                                                                      .data![
-                                                                          p]
+                                                                      .data![p]
                                                                       .sede ==
                                                                   usuarioAutenticado
                                                                       .sede &&
                                                               pedido.pedido
                                                                       .puntoVenta ==
                                                                   snapshotPunto
-                                                                      .data![
-                                                                          p]
-                                                                      .id)
-                                                          .toList();
+                                                                      .data![p]
+                                                                      .id));
                                                     }
                                                   }
-                                            
+
                                                   return DevolucionLider(
-                                                    auxPedido:
-                                                        pedidosDevueltos,
+                                                    auxPedido: pedidosDevueltos,
+                                                    usuario: usuarioAutenticado,
                                                   );
                                                 }
                                               });
@@ -1305,24 +1295,28 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                   // Muestra un mensaje de error si ocurre un problema al cargar las producciones
                                 } else if (snapshotProduccion.hasError) {
                                   return Text(
-                                      'Error al cargar producciones: ${snapshotProduccion.error}');
+                                    'Error al cargar producciones: ${snapshotProduccion.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra un mensaje de que no se encontraron producciones
-                                } else if (snapshotProduccion.data ==
-                                    null) {
+                                } else if (snapshotProduccion.data == null) {
                                   return const Text(
-                                      'No se encontraron producciones');
+                                    'No se encontraron producciones',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra el contenido de las producciones
                                 } else {
-                                  final produccionSede = snapshotProduccion
-                                      .data!
+                                  List<ProduccionModel> produccionSede = [];
+
+                                  produccionSede.addAll(snapshotProduccion.data!
                                       .where((produccion) =>
-                                          produccion
-                                              .unidadProduccion.sede.id ==
-                                          usuarioAutenticado.sede)
-                                      .toList(); // Filtra las producciones por la sede de usuario
-                                            
+                                          produccion.unidadProduccion.sede.id ==
+                                          usuarioAutenticado
+                                              .sede)); // Filtra las producciones por la sede de usuario
+
                                   return ProduccionLider(
                                     producciones: produccionSede,
+                                    usuario: usuarioAutenticado,
                                   );
                                 }
                               }),
@@ -1344,23 +1338,27 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                   // Muestra un mensaje de error si ocurre un problema al cargar los inventarios
                                 } else if (snapshotInventario.hasError) {
                                   return Text(
-                                      'Error al cargar inventarios: ${snapshotInventario.error}');
+                                    'Error al cargar inventarios: ${snapshotInventario.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra un mensaje de que no se encontraron inventarios
-                                } else if (snapshotInventario.data ==
-                                    null) {
+                                } else if (snapshotInventario.data == null) {
                                   return const Text(
-                                      'No se encontraron inventarios');
+                                    'No se encontraron inventarios',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra el contenido de los inventarios
                                 } else {
-                                  final inventarioSede = snapshotInventario
-                                      .data!
+                                  List<InventarioModel> inventarioSede = [];
+
+                                  inventarioSede.addAll(snapshotInventario.data!
                                       .where((inventario) =>
-                                          inventario
-                                              .bodega.puntoVenta.sede ==
-                                          usuarioAutenticado.sede)
-                                      .toList(); // Filtra los inventarios por la sede de usuario
-                                            
+                                          inventario.bodega.puntoVenta.sede ==
+                                          usuarioAutenticado
+                                              .sede)); // Filtra los inventarios por la sede de usuario
+
                                   return BodegaLider(
+                                    usuario: usuarioAutenticado,
                                     inventarioLista: inventarioSede,
                                   );
                                 }
@@ -1379,15 +1377,20 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                 // Muestra un mensaje de error si ocurre un problema al cargar los usuarios
                               } else if (snapshotUsuario.hasError) {
                                 return Text(
-                                    'Error al cargar usuarios: ${snapshotUsuario.error}');
+                                  'Error al cargar usuarios: ${snapshotUsuario.error}',
+                                  textAlign: TextAlign.center,
+                                );
                                 // Muestra un mensaje de que no se encontraron usuarios
                               } else if (snapshotUsuario.data == null) {
                                 return const Text(
-                                    'No se encontraron usuarios');
+                                  'No se encontraron usuarios',
+                                  textAlign: TextAlign.center,
+                                );
                                 // Muestra el contenido de los usuarios
                               } else {
                                 return UsuarioLider(
                                   usuarioLista: snapshotUsuario.data!,
+                                  usuario: usuarioAutenticado,
                                 );
                               }
                             },

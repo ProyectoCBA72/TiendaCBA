@@ -7,6 +7,7 @@ import 'package:tienda_app/Carrito/carritoScreen.dart';
 import 'package:tienda_app/Carrito/source/carritoTabla.dart';
 import 'package:tienda_app/Models/imagenProductoModel.dart';
 import 'package:tienda_app/Tienda/tiendaScreen.dart';
+import 'package:tienda_app/responsive.dart';
 import 'package:tienda_app/source.dart';
 import '../../Models/productoModel.dart';
 import '../../provider.dart';
@@ -692,7 +693,7 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
     // Ajustar el ancho de la imagen relativo al tamaño de la pantalla
     final double imageWidth = MediaQuery.of(context).size.width * 0.4;
     // Altura fija para la tarjeta
-    const double cardHeight = 150.0;
+    double cardHeight = !Responsive.isMobile(context) ? 160.0 : 180.0;
 
     return Dismissible(
       // Clave única para el widget Dismissible
@@ -864,6 +865,68 @@ class _CarritoBodyScreenState extends State<CarritoBodyScreen> {
                         },
                       ),
                     ),
+                    const SizedBox(height: 10),
+                    if (!Responsive.isMobile(context))
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Flexible(
+                              child: Text(
+                                'Total: ',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium!
+                                    .copyWith(
+                                      fontFamily: 'Calibri-Bold',
+                                      color: Colors.white,
+                                    ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Flexible(
+                              child: Text(
+                                "\$${formatter.format(auxPedido.cantidad * producto.precio)}",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .copyWith(
+                                      fontFamily: 'Calibri-Bold',
+                                      color: Colors.white,
+                                    ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    if (Responsive.isMobile(context))
+                      Flexible(
+                        child: Text(
+                          'Total: ',
+                          style:
+                              Theme.of(context).textTheme.titleMedium!.copyWith(
+                                    fontFamily: 'Calibri-Bold',
+                                    color: Colors.white,
+                                  ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    if (Responsive.isMobile(context)) const SizedBox(width: 10),
+                    if (Responsive.isMobile(context))
+                      Flexible(
+                        child: Text(
+                          "\$${formatter.format(auxPedido.cantidad * producto.precio)}",
+                          style:
+                              Theme.of(context).textTheme.titleLarge!.copyWith(
+                                    fontFamily: 'Calibri-Bold',
+                                    color: Colors.white,
+                                  ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                   ],
                 ),
               ),
