@@ -1,4 +1,4 @@
-// ignore_for_file: use_full_hex_values_for_flutter_colors, use_build_context_synchronously
+// ignore_for_file: use_full_hex_values_for_flutter_colors, use_build_context_synchronously, avoid_print
 
 import 'dart:convert';
 
@@ -365,6 +365,9 @@ class _PendientePuntoState extends State<PendientePunto> {
   }
 
   Future<void> _removeProducto(AuxPedidoModel producto) async {
+    // Obtiene la lista de productos desde la API o base de datos
+    final productos = await getProductos();
+
     // Obtén los pedidos auxiliares cargados desde la API
     List<AuxPedidoModel> auxPedidosCargados = await getAuxPedidos();
 
@@ -373,11 +376,102 @@ class _PendientePuntoState extends State<PendientePunto> {
         .where((aux) => aux.pedido.numeroPedido == producto.pedido.numeroPedido)
         .length;
 
-    if (contadorProductos > 1) {
-      // Construir la URL para eliminar el aux pedido especificado
-      final url = Uri.parse('$sourceApi/api/aux-pedidos/${producto.id}/');
+    // Verifica si hay exactamente dos pedidos auxiliares
+    if (auxPedidos.length == 2) {
+      // Obtiene el pedido auxiliar restante que no es el producto especificado
+      final auxPedidoRestante = auxPedidos
+          .where((item) => item.producto != producto.producto)
+          .firstOrNull;
 
-      // Realizar la solicitud DELETE al API
+      // Obtiene el producto correspondiente al pedido auxiliar restante
+      final productoRestante = productos
+          .where((item) => item.id == auxPedidoRestante!.producto)
+          .firstOrNull;
+
+      // Verifica si el producto restante es exclusivo
+      if (productoRestante!.exclusivo) {
+        // Muestra un modal indicando que no se puede eliminar un producto exclusivo
+        modalEliminarExclusivo();
+      } else {
+        // Elimina el producto ya que no es exclusivo
+        _eliminarProducto(producto.id);
+      }
+    } else {
+      // Si hay más de un producto en el pedido especificado
+      if (contadorProductos > 1) {
+        // Elimina el producto
+        _eliminarProducto(producto.id);
+      } else {
+        // Muestra un modal indicando que la eliminación falló
+        eliminacionFallidaModal(context);
+      }
+    }
+  }
+
+  // modal de que no se puede eliminar un producto si solo queda un exclusivo.
+  void modalEliminarExclusivo() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("¡No se puede eliminar este producto!"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const Text(
+                "¡No puede llevar un producto exclusivo sin compañia de otro producto!",
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              // Muestra una imagen circular del logo de la aplicación
+              ClipOval(
+                child: Container(
+                  width: 100, // Ajusta el tamaño según sea necesario
+                  height: 100, // Ajusta el tamaño según sea necesario
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: primaryColor,
+                  ),
+                  child: Image.asset(
+                    "assets/img/logo.png",
+                    fit: BoxFit.cover, // Ajusta la imagen al contenedor
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            ButtonBar(
+              alignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(defaultPadding),
+                  child: _buildButton(
+                    "Aceptar",
+                    () {
+                      // Cierra el diálogo cuando se hace clic en el botón de aceptar
+                      Navigator.pop(context);
+                      // Navega a la pantalla de la tienda
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Elimina un producto del carrito.
+  ///
+  /// @param id El ID del producto a eliminar.
+
+  Future<void> _eliminarProducto(int id) async {
+    try {
+      final url = Uri.parse('$sourceApi/api/aux-pedidos/$id/');
       final response = await http.delete(
         url,
         headers: {
@@ -385,39 +479,14 @@ class _PendientePuntoState extends State<PendientePunto> {
         },
       );
 
-      // Verificar el estado de la respuesta de la solicitud
       if (response.statusCode == 204) {
-        // Si la respuesta es exitosa (código 204), mostrar un mensaje de éxito
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Producto eliminado con éxito.'),
-          ),
-        );
-
-        // Navegar a la pantalla principal de usuario
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MultiProvider(
-              providers: [
-                ChangeNotifierProvider(
-                    create: (context) => MenuAppController()),
-              ],
-              child: const MainScreenUsuario(),
-            ),
-          ),
-        );
+        print('Producto eliminado con éxito.');
+        setState(() {});
       } else {
-        // Si la respuesta no es exitosa, mostrar un mensaje de error
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al eliminar el producto: ${response.body}.'),
-          ),
-        );
+        print('Error al eliminar el producto: ${response.body}');
       }
-    } else {
-      // Si el contador de productos es 1 o menos, llamar a la función de modal para manejo de error
-      eliminacionFallidaModal(context);
+    } catch (e) {
+      print(e);
     }
   }
 

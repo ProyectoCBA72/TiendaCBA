@@ -1,10 +1,14 @@
 // ignore_for_file: file_names, avoid_print, unnecessary_null_comparison
 
+import 'dart:convert';
+
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:tienda_app/Anuncio/Modals/modalsAnuncio.dart';
 import 'package:tienda_app/Anuncio/comentarioForm.dart';
+import 'package:tienda_app/Auth/authScreen.dart';
 import 'package:tienda_app/Models/anuncioModel.dart';
+import 'package:tienda_app/Models/boletaModel.dart';
 import 'package:tienda_app/Models/comentarioModel.dart';
 import 'package:tienda_app/Models/imagenUsuarioModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
@@ -45,6 +49,8 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
   /// URL de la imagen principal.
   String mainImageUrl = '';
 
+  bool _isInscrito = false;
+
   /// Lista de URL de miniaturas de imágenes.
   ///
   /// Cada URL representa una imagen en miniatura del anuncio.
@@ -73,7 +79,15 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
   @override
   void initState() {
     super.initState();
-    _loadImages();
+    _loadData();
+  }
+
+  // cambia el estado del widget una vez que este este en el arbol de los mismo
+  // con el fin de no perder el contexto
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    setData();
   }
 
   /// Carga las imágenes del anuncio.
@@ -82,12 +96,36 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
   /// y la URL de la imagen principal.
   ///
   /// No devuelve nada.
-  void _loadImages() {
+  void _loadData() {
     // Establece la lista de URL de miniaturas de imágenes del anuncio.
     thumbnailUrls = widget.images;
-
     // Establece la URL de la imagen principal como la primera URL de miniatura.
     mainImageUrl = thumbnailUrls.first;
+  }
+
+  Future setData() async {
+    final usuarioAutenticado =
+        Provider.of<AppState>(context).usuarioAutenticado;
+    if (usuarioAutenticado != null) {
+      final isInscrito = await isUserAddedBoleta(usuarioAutenticado);
+      setState(() {
+        _isInscrito = isInscrito;
+      });
+    }
+  }
+
+  // futuro que retorna un bool para verificar si el usuario ya tiene boleta.
+  Future<bool> isUserAddedBoleta(UsuarioModel user) async {
+    final boletas = await getBoletas();
+    // verificamos si el usuario ya ha reservado una boleta en este anuncio.
+
+    if (boletas == null || boletas.isEmpty) {
+      return false;
+    }
+
+    // si nunguna coincide se retorna el false automaticamente
+    return boletas.any((boleta) =>
+        boleta.usuario == user.id && boleta.anuncio.id == widget.anuncio.id);
   }
 
   /// Función asincrónica para obtener los datos necesarios para mostrar los comentarios, las imágenes de los usuarios y los usuarios.
@@ -110,6 +148,49 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
       // Obtener los usuarios
       getUsuarios(),
     ]);
+  }
+
+  /// Funación asincrónica para separar la boleta si aun esta disponible.
+  ///
+  Future reservarBoleta(AnuncioModel anuncio, int userID) async {
+    final boletas = await getBoletas();
+    String url;
+    url = "$sourceApi/api/boletas/";
+    final headers = {
+      'Content-Type': 'application/json',
+    };
+
+    final body = {
+      'usuario': userID,
+      'anuncio': anuncio.id,
+    };
+    // contamos las boletas relacionadas al anuncio.
+    final boletasAnuncio =
+        boletas.where((boleta) => boleta.anuncio.id == anuncio.id).toList();
+    // verificamos si el usuario ya ha reservado una boleta en este anuncio.
+    final siAdded = boletas.any((boleta) => boleta.usuario == userID);
+
+    if (!siAdded) {
+      if (boletasAnuncio.length < anuncio.maxCupos) {
+        // si la lista de las boletas relacionadas a este anuncio no es vacia y es menor a la cantidad maxima se hace el post
+        final http.Response responde = await http.post(Uri.parse(url),
+            headers: headers, body: jsonEncode(body));
+        if (responde.statusCode == 201) {
+          // Si la sulicitud fue correcta se muestra
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Se guardo su inscripción a este evento')));
+
+          setState(() {
+            _isInscrito = true;
+          });
+        } else {
+          print('Error al enviar datos ${responde.body}');
+        }
+      }
+    } else {
+      // si el usuario ya reservó la boleta no podra hacerlo otra vez.
+      idAddedBoleta(context);
+    }
   }
 
   /// Función asincrónica para eliminar un comentario específico.
@@ -188,7 +269,7 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                   child: GestureDetector(
                                     onTap: () {
                                       // Llama a la función _modalAmpliacion para mostrar la imagen ampliada
-                                      modalAmpliacion(context, mainImageUrl);
+                                      _modalAmpliacion(context, mainImageUrl);
                                     },
                                     child: Image.network(
                                       mainImageUrl,
@@ -696,6 +777,12 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                                                                   icon: const Icon(Icons.edit, size: 25, color: primaryColor),
                                                                                   onPressed: () {
                                                                                     // Acción al presionar el botón de editar
+                                                                                    fomularioComentario(
+                                                                                      context,
+                                                                                      usuarioAutenticado.id,
+                                                                                      anuncio.id,
+                                                                                      comentarioID: comentario.id,
+                                                                                    );
                                                                                   },
                                                                                 ),
                                                                               ),
@@ -794,6 +881,7 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                                           // Acción al presionar el botón de ver todos los comentarios
                                                           modalComentarios(
                                                               context,
+                                                              anuncio,
                                                               comentarios,
                                                               usuarios,
                                                               allImagesUsuario);
@@ -890,7 +978,15 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                   Expanded(
                                     flex: 3, // Este botón ocupará más espacio
                                     child: GestureDetector(
-                                      onTap: () {},
+                                      onTap: () {
+                                        if (usuarioAutenticado != null) {
+                                          reservarBoleta(
+                                              anuncio, usuarioAutenticado.id);
+                                        } else {
+                                          // mostrar modal de falta iniciar sesión
+                                          inicioSesionBoleta(context);
+                                        }
+                                      },
                                       child: Container(
                                         height: 55,
                                         decoration: BoxDecoration(
@@ -899,9 +995,11 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                               BorderRadius.circular(50),
                                         ),
                                         alignment: Alignment.center,
-                                        child: const Text(
-                                          "Inscribirme",
-                                          style: TextStyle(
+                                        child: Text(
+                                          _isInscrito
+                                              ? "Inscrito"
+                                              : "Inscribirse",
+                                          style: const TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
                                             fontFamily: 'Calibri-Bold',
@@ -980,7 +1078,7 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                 child: GestureDetector(
                                   onTap: () {
                                     // Abre la imagen ampliada
-                                    modalAmpliacion(context, mainImageUrl);
+                                    _modalAmpliacion(context, mainImageUrl);
                                   },
                                   child: Image.network(
                                     mainImageUrl,
@@ -1485,6 +1583,12 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                                                                   icon: const Icon(Icons.edit, size: 25, color: primaryColor),
                                                                                   onPressed: () {
                                                                                     // Acción al presionar el botón de editar
+                                                                                    fomularioComentario(
+                                                                                      context,
+                                                                                      usuarioAutenticado.id,
+                                                                                      anuncio.id,
+                                                                                      comentarioID: comentario.id,
+                                                                                    );
                                                                                   },
                                                                                 ),
                                                                               ),
@@ -1582,6 +1686,7 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                                           // Acción al presionar el botón de ver todos los comentarios
                                                           modalComentarios(
                                                               context,
+                                                              anuncio,
                                                               comentarios,
                                                               usuarios,
                                                               allImagesUsuario);
@@ -1680,7 +1785,16 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                           flex:
                                               3, // Este botón ocupará más espacio
                                           child: GestureDetector(
-                                            onTap: () {},
+                                            onTap: () {
+                                              // funcion para realizar la inscripcion de los anuncios con evento.
+                                              if (usuarioAutenticado != null) {
+                                                reservarBoleta(anuncio,
+                                                    usuarioAutenticado.id);
+                                              } else {
+                                                // modal de inicio de sesión
+                                                inicioSesionBoleta(context);
+                                              }
+                                            },
                                             child: Container(
                                               height: 55,
                                               decoration: BoxDecoration(
@@ -1689,9 +1803,11 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                                     BorderRadius.circular(50),
                                               ),
                                               alignment: Alignment.center,
-                                              child: const Text(
-                                                "Inscribirme",
-                                                style: TextStyle(
+                                              child: Text(
+                                                _isInscrito
+                                                    ? "Inscrito"
+                                                    : "Inscribirse",
+                                                style: const TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
                                                   fontFamily: 'Calibri-Bold',
@@ -1771,8 +1887,12 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
   /// [anuncios]: Lista de modelos de comentarios a mostrar.
   /// [usuarios]: Lista de modelos de usuarios correspondientes a los comentarios.
   /// [usersImages]: Lista de imágenes de usuarios para mostrar avatares.
-  void modalComentarios(BuildContext context, List<ComentarioModel> anuncios,
-      List<UsuarioModel> usuarios, List<ImagenUsuarioModel> usersImages) {
+  void modalComentarios(
+      BuildContext context,
+      AnuncioModel anuncio,
+      List<ComentarioModel> comentariosAnuncio,
+      List<UsuarioModel> usuarios,
+      List<ImagenUsuarioModel> usersImages) {
     showDialog(
         context: context,
         builder: (context) {
@@ -1807,9 +1927,10 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                   SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount:
                                           Responsive.isMobile(context) ? 1 : 2),
-                              itemCount: comentarios.length,
+                              itemCount: comentariosAnuncio.length,
                               itemBuilder: (context, index) {
-                                ComentarioModel comentario = comentarios[index];
+                                ComentarioModel comentario =
+                                    comentariosAnuncio[index];
 
                                 // Obtener el usuario del comentario actual
                                 UsuarioModel usuario = usuarios
@@ -1991,6 +2112,14 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                                                 primaryColor),
                                                         onPressed: () {
                                                           // Acción al presionar el botón de editar
+                                                          fomularioComentario(
+                                                              context,
+                                                              usuarioAutenticado
+                                                                  .id,
+                                                              anuncio.id,
+                                                              comentarioID:
+                                                                  comentario
+                                                                      .id);
                                                         },
                                                       ),
                                                     ),
@@ -2038,6 +2167,8 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                                                 primaryColor),
                                                         onPressed: () {
                                                           // Acción al presionar el botón de eliminar
+                                                          Navigator.pop(
+                                                              context);
                                                           deleteComent(
                                                               comentario.id);
                                                         },
@@ -2088,7 +2219,9 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
   /// diálogo. El [userId] es el ID del usuario que está haciendo el
   /// comentario y el [anuncioID] es el ID del anuncio al que se está
   /// haciendo el comentario.
-  fomularioComentario(BuildContext context, int userId, int anuncioID) {
+  // Usamos el comentario ID para poder usar el mismo formulario para la creacion de comentario como la edición del mismo.
+  fomularioComentario(BuildContext context, int userId, int anuncioID,
+      {int? comentarioID}) {
     return showDialog(
       context: context,
       builder: (context) {
@@ -2107,6 +2240,7 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                 child: Comentario(
                   userID: userId,
                   anuncioID: anuncioID,
+                  comentarioID: comentarioID,
                 ),
               ),
             ),
@@ -2115,4 +2249,277 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
       },
     );
   }
+
+  /// Muestra un diálogo si no se ha logueado  para hacer el registro en el evento (Boleta).
+  void inicioSesionBoleta(BuildContext context) {
+    // Muestra un diálogo
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          // Título del diálogo
+          title: const Text("¿Quiere reservar su entrada?"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              // Texto de descripción
+              const Text(
+                  "¡Para reservar su entrada al evento, debe iniciar sesión!"),
+              const SizedBox(
+                height: 10,
+              ),
+              // Muestra una imagen circular del logo de la aplicación
+              ClipOval(
+                child: Container(
+                  width: 100, // Ajusta el tamaño según sea necesario
+                  height: 100, // Ajusta el tamaño según sea necesario
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: primaryColor,
+                  ),
+                  child: Image.asset(
+                    "assets/img/logo.png",
+                    fit: BoxFit.cover, // Ajusta la imagen al contenedor
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            ButtonBar(
+              alignment: MainAxisAlignment.center,
+              children: [
+                // Botón para cancelar la operación
+                Padding(
+                  padding: const EdgeInsets.all(defaultPadding),
+                  child: _buildButton("Cancelar", () {
+                    Navigator.pop(context);
+                  }),
+                ),
+                // Botón para iniciar sesión
+                Padding(
+                  padding: const EdgeInsets.all(defaultPadding),
+                  child: _buildButton("Iniciar Sesión", () {
+                    // Ignora el compilador y navega a la pantalla de inicio de sesión
+                    Navigator.pop(context);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginScreen()));
+                  }),
+                )
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Muestra un diálogo si ya tiene un registro en el evento (Boleta).
+  void idAddedBoleta(BuildContext context) {
+    // Muestra un diálogo
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          // Título del diálogo
+          title: const Text("¡Ya está inscrito!"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              // Texto de descripción
+              const Text(
+                  "Usted ya cuenta con una inscripción en este evento. No puede inscribirse de nuevo"),
+              const SizedBox(
+                height: 10,
+              ),
+              // Muestra una imagen circular del logo de la aplicación
+              ClipOval(
+                child: Container(
+                  width: 100, // Ajusta el tamaño según sea necesario
+                  height: 100, // Ajusta el tamaño según sea necesario
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: primaryColor,
+                  ),
+                  child: Image.asset(
+                    "assets/img/logo.png",
+                    fit: BoxFit.cover, // Ajusta la imagen al contenedor
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            ButtonBar(
+              alignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(defaultPadding),
+                  child: _buildButton("Aceptar", () {
+                    // Ignora el compilador y navega a la pantalla de inicio de sesión
+                    Navigator.pop(context);
+                  }),
+                )
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Muestra un diálogo con un formulario para hacer un comentario.
+  ///
+  /// El diálogo contiene un formulario para agregar un comentario. El
+  /// [context] es el contexto de la aplicación donde se mostrará el
+  /// diálogo.
+  void inicioSesionComents(BuildContext context) {
+    // Muestra un diálogo
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          // Título del diálogo
+          title: const Text("¿Quiere agregar un comentario?"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              // Texto de descripción
+              const Text("¡Para agregar un comentario, debe iniciar sesión!"),
+              const SizedBox(
+                height: 10,
+              ),
+              // Muestra una imagen circular del logo de la aplicación
+              ClipOval(
+                child: Container(
+                  width: 100, // Ajusta el tamaño según sea necesario
+                  height: 100, // Ajusta el tamaño según sea necesario
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: primaryColor,
+                  ),
+                  child: Image.asset(
+                    "assets/img/logo.png",
+                    fit: BoxFit.cover, // Ajusta la imagen al contenedor
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            ButtonBar(
+              alignment: MainAxisAlignment.center,
+              children: [
+                // Botón para cancelar la operación
+                Padding(
+                  padding: const EdgeInsets.all(defaultPadding),
+                  child: _buildButton("Cancelar", () {
+                    Navigator.pop(context);
+                  }),
+                ),
+                // Botón para iniciar sesión
+                Padding(
+                  padding: const EdgeInsets.all(defaultPadding),
+                  child: _buildButton("Iniciar Sesión", () {
+                    // Ignora el compilador y navega a la pantalla de inicio de sesión
+                    Navigator.pop(context);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginScreen()));
+                  }),
+                )
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Construye un botón con los estilos de diseño especificados.
+  ///
+  /// El parámetro [text] es el texto que se mostrará en el botón.
+  /// El parámetro [onPressed] es la función que se ejecutará cuando se presione el botón.
+  ///
+  /// Devuelve un widget [Container] que contiene un widget [Material] con un estilo específico.
+  Widget _buildButton(String text, VoidCallback onPressed) {
+    // Contenedor con un ancho fijo de 200 píxeles y una apariencia personalizada
+    // con un borde redondeado, un gradiente de colores y una sombra.
+    return Container(
+      width: 200,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10), // Borde redondeado.
+        gradient: const LinearGradient(
+          colors: [
+            botonClaro, // Color claro del gradiente.
+            botonOscuro, // Color oscuro del gradiente.
+          ],
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: botonSombra, // Color de la sombra.
+            blurRadius: 5, // Radio de desfoque de la sombra.
+            offset: Offset(0, 3), // Desplazamiento de la sombra.
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent, // Color transparente para el Material.
+        child: InkWell(
+          onTap: onPressed, // Función de presionar.
+          borderRadius:
+              BorderRadius.circular(10), // Radio del borde redondeado.
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: 10), // Padding vertical.
+            child: Center(
+              child: Text(
+                text, // Texto del botón.
+                style: const TextStyle(
+                  color: background1, // Color del texto.
+                  fontSize: 13, // Tamaño de fuente.
+                  fontWeight: FontWeight.bold, // Peso de fuente.
+                  fontFamily: 'Calibri-Bold', // Fuente.
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Muestra un diálogo modal con una imagen ampliada.
+///
+/// El parámetro [src] es la URL de la imagen a mostrar.
+void _modalAmpliacion(BuildContext context, String src) {
+  // Muestra un diálogo modal con una imagen ampliada.
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        // El contenido del diálogo debe tener un tamaño cero para que el
+        // fondo transparente no afecte al diálogo completo.
+        contentPadding: EdgeInsets.zero,
+        // El color de fondo se establece a transparente para que la imagen
+        // pueda ser visible detrás de otras partes del diálogo.
+        backgroundColor: Colors.transparent,
+        // Crea un contenedor con un borde redondeado para la imagen.
+        content: InteractiveViewer(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            // Muestra la imagen en el diálogo.
+            child: Image.network(
+              src,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      );
+    },
+  );
 }

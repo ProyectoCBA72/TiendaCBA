@@ -22,6 +22,9 @@ class Comentario extends StatefulWidget {
   /// Identificador único del anuncio al que se está realizando el comentario.
   final int anuncioID;
 
+  // Variable que puede ser nula, segun la funcion del caso.  con el fin de editar el comentario.
+  final int? comentarioID;
+
   /// Crea una instancia de [Comentario] con los parámetros [userID] y [anuncioID].
   ///
   /// El parámetro [userID] es obligatorio y se utiliza para identificar al usuario
@@ -33,6 +36,7 @@ class Comentario extends StatefulWidget {
     super.key,
     required this.userID,
     required this.anuncioID,
+    this.comentarioID,
   });
 
   @override
@@ -44,6 +48,15 @@ class _ComentarioState extends State<Comentario> {
 
   // Anula el método dispose para liberar recursos cuando el widget se desecha
   @override
+
+  // Al inicar el widget verificamos si se va a crear o actualizar un comentario.
+  // así mismo se ejecuta el metodo que iguala los controladores al texto ya traido.
+  void initState() {
+    super.initState();
+    if (widget.comentarioID != null) {
+      cargarComentario(widget.comentarioID!);
+    }
+  }
 
   /// Se llama automáticamente cuando se elimina el widget.
   ///
@@ -59,6 +72,23 @@ class _ComentarioState extends State<Comentario> {
     super.dispose();
   }
 
+  // Función para cargar los datos del comentario existente
+  Future<void> cargarComentario(int comentarioID) async {
+    // creamos la url para hacer el get a ese comentario especifico.
+    String url = '$sourceApi/api/comentarios/$comentarioID/';
+    // hacemos la solucitud al backend.
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      // si fue correcta decodificamos la respuesta en json y tomamos la descripción para igualarla al controlador.
+      final data = jsonDecode(response.body);
+      setState(() {
+        descripcion.text = data['descripcion'];
+      });
+    } else {
+      print('Error al cargar el comentario: ${response.statusCode}');
+    }
+  }
+
   /// Agrega un nuevo comentario a la base de datos.
   ///
   /// Esta función envía una solicitud POST a la API para agregar un nuevo comentario
@@ -71,19 +101,27 @@ class _ComentarioState extends State<Comentario> {
   /// mensaje de éxito y actualiza el estado del widget. Si hay un error en la
   /// operación de inserción, imprime un mensaje de error con el código de estado
   /// HTTP de la respuesta.
-  Future addComent() async {
-    // Construir la URL de la API
-    String url = '$sourceApi/api/comentarios/';
+  // Función para agregar o actualizar un comentario
+  Future addOrUpdateComent() async {
+    // variables para el metodo y la url del bakend,
+    // con el fin de separar si es editar o crear un comentario
+    String url;
+    String method;
+    if (widget.comentarioID == null) {
+      // si no se va a editar se hace el post con la url predeterminada
+      url = '$sourceApi/api/comentarios/';
+      method = 'POST';
+    } else {
+      // si se va a editar se hace el put con la url modificada.
+      url = '$sourceApi/api/comentarios/${widget.comentarioID}/';
+      method = 'PUT';
+    }
 
-    // Obtener la fecha actual
     final DateTime now = DateTime.now();
-
-    // Definir los encabezados de la solicitud
     final headers = {
       'Content-Type': 'application/json',
     };
 
-    // Definir el cuerpo de la solicitud (JSON)
     final body = {
       'descripcion': descripcion.text,
       'fecha': now.toIso8601String(),
@@ -91,24 +129,22 @@ class _ComentarioState extends State<Comentario> {
       'anuncio': widget.anuncioID,
     };
 
-    // Enviar una solicitud POST a la API con los datos del comentario
-    final response = await http.post(
-      Uri.parse(url),
-      headers: headers,
-      body: jsonEncode(body),
-    );
+    final response = http.Request(method, Uri.parse(url))
+      // mediante los [..] configuramos las propiedades sin necesidad de hacer un llamado nuevo,
+      ..headers.addAll(headers)
+      ..body = jsonEncode(body);
 
-    // Verificar el estado de la respuesta HTTP
-    if (response.statusCode == 201) {
-      // Ir a la pantalla de inicio
+    // procede a hacer el envio de la solicitud y espera de la respuesta
+    final streamedResponse = await response.send();
+
+    if (streamedResponse.statusCode == 201 ||
+        streamedResponse.statusCode == 200) {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => const HomePage()));
-      // Imprimir un mensaje de éxito si la operación de inserción es exitosa
-      print('Datos enviados correctamente(Comentario)');
+      print('Datos enviados correctamente (Comentario)');
       setState(() {});
     } else {
-      // Imprimir un mensaje de error si hay un error en la operación de inserción
-      print('Error al enviar datos: ${response.statusCode}');
+      print('Error al enviar datos: ${streamedResponse.statusCode}');
     }
   }
 
@@ -121,11 +157,13 @@ class _ComentarioState extends State<Comentario> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Título "Crear Comentario"
-          const Padding(
-            padding: EdgeInsets.only(left: 10),
+          Padding(
+            padding: const EdgeInsets.only(left: 10),
             child: Text(
-              "Crear Comentario",
-              style: TextStyle(
+              widget.comentarioID == null
+                  ? "Crear Comentario"
+                  : "Editar Comentario",
+              style: const TextStyle(
                   color: primaryColor,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -177,7 +215,7 @@ class _ComentarioState extends State<Comentario> {
           Center(
             child: InkWell(
               onTap: () {
-                addComent();
+                addOrUpdateComent();
               },
               child: Container(
                 padding: const EdgeInsets.only(
@@ -193,9 +231,9 @@ class _ComentarioState extends State<Comentario> {
                         offset: const Offset(0, 3),
                       ),
                     ]),
-                child: const Text(
-                  "Enviar",
-                  style: TextStyle(color: primaryColor),
+                child: Text(
+                  widget.comentarioID == null ? "Enviar" : "Guardar",
+                  style: const TextStyle(color: primaryColor),
                 ),
               ),
             ),

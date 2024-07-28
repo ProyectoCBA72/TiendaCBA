@@ -61,6 +61,9 @@ class _ProductoCardState extends State<ProductoCard> {
   /// El valor por defecto es `false`.
   bool _isFavorite = false;
 
+  // variable para almacenar si el producto ya fue añadido. por defecto es false
+  bool _isAdded = false;
+
   /// Contador de veces que se ha visitado el producto.
   int _count = 0;
 
@@ -101,20 +104,20 @@ class _ProductoCardState extends State<ProductoCard> {
     _usuario = Provider.of<AppState>(context, listen: false).usuarioAutenticado;
 
     // Carga las imágenes del producto
-    await _loadImages();
+    _loadImages();
 
     // Obtiene el número de pedidos del producto
     _countPedidos();
 
     // Obtiene el estado de favorito del producto
-    _initializeFavoriteState();
+    _initializeFavoriteAndAddedState();
   }
 
   /// Inicializa el estado del widget relacionado con el estado de favorito.
   ///
   /// Este método obtiene el usuario autenticado, verifica si el producto es favorito
   /// y actualiza el estado correspondiente.
-  Future<void> _initializeFavoriteState() async {
+  Future<void> _initializeFavoriteAndAddedState() async {
     // Obtiene el usuario autenticado
     final usuarioAutenticado =
         Provider.of<AppState>(context, listen: false).usuarioAutenticado;
@@ -127,9 +130,13 @@ class _ProductoCardState extends State<ProductoCard> {
         usuarioAutenticado.id,
       );
 
+      bool isAdded =
+          await isProductAdded(widget.producto.id, usuarioAutenticado.id);
+
       // Actualiza el estado correspondiente
       setState(() {
         _isFavorite = isFavorite;
+        _isAdded = isAdded;
       });
     }
   }
@@ -151,6 +158,23 @@ class _ProductoCardState extends State<ProductoCard> {
 
     // Llama al método [_countPedidos] para obtener el número de pedidos del producto
     _countPedidos();
+  }
+
+  Future isProductAdded(
+    int productoID,
+    int userID,
+  ) async {
+    final auxPedidos = await getAuxPedidos();
+
+    if (auxPedidos.isNotEmpty) {
+      return auxPedidos.any((auxPedido) =>
+          auxPedido.pedido.estado == "PENDIENTE" &&
+          !auxPedido.pedido.pedidoConfirmado &&
+          auxPedido.pedido.usuario.id == userID &&
+          auxPedido.producto == productoID);
+    } else {
+      return false;
+    }
   }
 
 // Verificar si el producto es favorito.
@@ -350,7 +374,7 @@ class _ProductoCardState extends State<ProductoCard> {
   /// a la variable [_images].
   ///
   /// No devuelve nada.
-  Future<void> _loadImages() async {
+  void _loadImages() {
     // Asigna la lista de imágenes proporcionadas por el widget a la variable _images
     _images = widget.imagenes;
   }
@@ -394,11 +418,11 @@ class _ProductoCardState extends State<ProductoCard> {
             if (producto.exclusivo == false) {
               // Agregar el producto si no es exclusivo
               print('Producto no exclusivo');
-              addAuxPedido(producto, pedidoPendiente.id);
+              addAuxPedido(producto, pedidoPendiente.id, usuario);
             } else if (producto.exclusivo && auxPedidosUsuario.isNotEmpty) {
               // Añadir el producto exclusivo si ya hay uno o más productos añadidos
               print('Producto exclusivo, agregado si ya hay más productos');
-              addAuxPedido(producto, pedidoPendiente.id);
+              addAuxPedido(producto, pedidoPendiente.id, usuario);
             } else {
               // Producto exclusivo, debe añadir otro producto antes. Mostrar modal
               productoExclusivo(context);
@@ -413,10 +437,10 @@ class _ProductoCardState extends State<ProductoCard> {
           if (producto.exclusivo == false) {
             // Agregar el producto si no es exclusivo
             print('Producto no exclusivo');
-            addAuxPedido(producto, pedidoPendiente.id);
+            addAuxPedido(producto, pedidoPendiente.id, usuario);
           } else if (producto.exclusivo && auxPedidosUsuario.isNotEmpty) {
             // Añadir el producto exclusivo si ya hay uno o más productos añadidos
-            addAuxPedido(producto, pedidoPendiente.id);
+            addAuxPedido(producto, pedidoPendiente.id, usuario);
             print('Producto exclusivo, agregado si ya hay más productos');
           } else {
             productoExclusivo(context);
@@ -436,7 +460,7 @@ class _ProductoCardState extends State<ProductoCard> {
         if (producto.exclusivo == false) {
           // Agregar el producto si no es exclusivo
           print('Producto no exclusivo');
-          addAuxPedido(producto, pedidoPendiente!.id);
+          addAuxPedido(producto, pedidoPendiente!.id, usuario);
         } else {
           productoExclusivo(context);
         }
@@ -458,7 +482,7 @@ class _ProductoCardState extends State<ProductoCard> {
       if (producto.exclusivo == false) {
         // Agregar el producto si no es exclusivo
         print('Producto no exclusivo');
-        addAuxPedido(producto, pedidoPendiente!.id);
+        addAuxPedido(producto, pedidoPendiente!.id, usuario);
       } else {
         productoExclusivo(context);
       }
@@ -474,6 +498,8 @@ class _ProductoCardState extends State<ProductoCard> {
   /// @param userID El ID del usuario.
   /// @return Un Future que completa cuando el pedido ha sido añadido.
   Future addPedido(int anteriorPedido, int userID) async {
+    final puntoVenta =
+        Provider.of<PuntoVentaProvider>(context, listen: false).puntoVenta;
     final String url = "$sourceApi/api/pedidos/";
     final headers = {
       'Content-Type': 'application/json',
@@ -486,7 +512,8 @@ class _ProductoCardState extends State<ProductoCard> {
       'estado': 'PENDIENTE',
       'entregado': false,
       'pedidoConfirmado': false,
-      'usuario': userID
+      'usuario': userID,
+      'puntoVenta': puntoVenta!.id
     };
 
     // Enviar la solicitud POST para agregar el nuevo pedido
@@ -511,17 +538,35 @@ class _ProductoCardState extends State<ProductoCard> {
   /// @param producto El modelo del producto que se va a añadir.
   /// @param pedidoPendienteID El ID del pedido pendiente.
   /// @return Un Future que completa cuando el pedido auxiliar ha sido añadido.
-  Future addAuxPedido(ProductoModel producto, int pedidoPendienteID) async {
+  Future addAuxPedido(ProductoModel producto, int pedidoPendienteID,
+      UsuarioModel usuario) async {
     // URL del API para agregar el pedido auxiliar
     final String url = "$sourceApi/api/aux-pedidos/";
     final headers = {
       'Content-Type': 'application/json',
     };
 
+    // vafirbale para colocar le precio dependiendo del rol del usuario.
+    int precio;
+
+    // condicional para verificar que rol tiene el usuario
+
+    if (usuario.rol2 == "APRENDIZ") {
+      precio = producto.precioAprendiz;
+    } else if (usuario.rol2 == "FUNCIONARIO") {
+      precio = producto.precioFuncionario;
+    } else if (usuario.rol2 == "INSTRUCTOR") {
+      precio = producto.precioInstructor;
+
+      // EN CASO DE NO TENER ROL 2 ES EL PRECIO POR DEFECTO, EXTERNO...
+    } else {
+      precio = producto.precio;
+    }
+
     // Datos del pedido auxiliar: cantidad, precio, producto y pedido pendiente
     final body = {
       'cantidad': 1,
-      'precio': producto.precio,
+      'precio': precio,
       'producto': producto.id,
       'pedido': pedidoPendienteID
     };
@@ -537,6 +582,9 @@ class _ProductoCardState extends State<ProductoCard> {
     if (response.statusCode == 201) {
       print('Datos enviados correctamente (auxPedido nuevo)');
       _countPedidos();
+      setState(() {
+        _isAdded = true;
+      });
     } else {
       print('Error al enviar datos: ${response.statusCode}');
     }
@@ -726,8 +774,11 @@ class _ProductoCardState extends State<ProductoCard> {
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: IconButton(
-                                        icon: const Icon(Icons.shopping_cart,
-                                            color: Colors.white),
+                                        icon: _isAdded
+                                            ? const Icon(Icons.check,
+                                                color: Colors.white)
+                                            : const Icon(Icons.shopping_cart,
+                                                color: Colors.white),
                                         onPressed: () {
                                           // Acción al presionar el carrito de compra
                                           if (usuarioAutenticado != null) {

@@ -21,7 +21,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = AppState(); // Crea una instancia de AppState, que maneja el estado de la aplicación
+    final appState =
+        AppState(); // Crea una instancia de AppState, que maneja el estado de la aplicación
 
     // Proporciona `AppState` como ChangeNotifierProvider a los widgets hijos
     return ChangeNotifierProvider<AppState>(

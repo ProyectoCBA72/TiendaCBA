@@ -1,13 +1,15 @@
-// ignore_for_file: non_constant_identifier_names, use_full_hex_values_for_flutter_colors, use_build_context_synchronously, file_names, avoid_print
+// ignore_for_file: non_constant_identifier_names, use_full_hex_values_for_flutter_colors, use_build_context_synchronously, file_names, avoid_print, unnecessary_null_comparison
 
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:tienda_app/Home/homePage.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
+import 'package:tienda_app/Models/bodegaModel.dart';
 import 'package:tienda_app/Models/imagenProductoModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
+import 'package:tienda_app/Tienda/tiendaScreen.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/pdf/pdf_constancia_pedido_screen.dart';
 import 'package:tienda_app/source.dart';
@@ -23,6 +25,10 @@ class CarritoTabla extends StatefulWidget {
   /// en el carrito.
   final List<AuxPedidoModel> auxPedido;
 
+  // punto de venta que seleccionamos al agregar productos al carrito.
+
+  final PuntoVentaModel puntoVenta;
+
   /// Constructor del componente [CarritoTabla].
   ///
   /// Toma una lista de objetos [AuxPedidoModel] como parámetro y la asigna al campo
@@ -30,6 +36,7 @@ class CarritoTabla extends StatefulWidget {
   const CarritoTabla({
     super.key,
     required this.auxPedido,
+    required this.puntoVenta,
   });
 
   /// Sobrecarga del método [createState] para crear el estado asociado al componente.
@@ -46,15 +53,10 @@ class _CarritoTablaState extends State<CarritoTabla> {
 
   /// Variable para almacenar el índice del elemento seleccionado en un desplegable.
   /// El valor predeterminado es nulo.
-  int? _selectedItem;
 
   /// Variable para almacenar la fecha y hora seleccionadas para la entrega.
   /// El valor predeterminado es la fecha y hora actual.
-  DateTime _selectedDateTimeEntrega = DateTime.now();
-
-  List<PuntoDesplegable> metodo = [
-    PuntoDesplegable("Portería CBA", 1),
-  ];
+  DateTime? _selectedDateTimeEntrega;
 
   /// Esta función permite al usuario seleccionar una fecha y hora para la entrega de los productos.
   /// La fecha y hora seleccionadas se almacenan en la variable _selectedDateTimeEntrega.
@@ -65,6 +67,8 @@ class _CarritoTablaState extends State<CarritoTabla> {
   ///
   /// [BuildContext context] es el contexto del widget tree donde se va a mostrar el
   /// diálogo de selección de fecha y hora.
+  ///
+
   Future<void> _selectDateEntrega(BuildContext context) async {
     // Se muestra un diálogo para seleccionar la fecha
     final DateTime? pickedDate = await showDatePicker(
@@ -201,45 +205,177 @@ class _CarritoTablaState extends State<CarritoTabla> {
   /// @param puntoVenta El punto de venta al que pertenece el pedido.
   /// @param pedido El aux pedido que se va a finalizar.
   /// @param grupal Si el pedido es grupal o no.
-  Future<void> finalizarPedido(DateTime fechaEntrega, int? puntoVenta,
-      AuxPedidoModel pedido, bool grupal) async {
-    // Construir la URL para el pedido
-    String url = "$sourceApi/api/pedidos/${pedido.pedido.id}/";
+  Future<void> finalizarPedido(
+    BuildContext context,
+    DateTime fechaEntrega,
+    List<AuxPedidoModel> auxPedidos,
+    bool grupal,
+  ) async {
+    try {
+      final auxPedido = auxPedidos.first;
+
+      String url = "$sourceApi/api/pedidos/${auxPedido.pedido.id}/";
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        "numeroPedido": auxPedido.pedido.numeroPedido,
+        "fechaEncargo": DateTime.now().toIso8601String(),
+        "fechaEntrega": fechaEntrega.toIso8601String(),
+        "grupal": grupal,
+        "estado": auxPedido.pedido.estado,
+        "entregado": auxPedido.pedido.entregado,
+        "puntoVenta": widget.puntoVenta.id,
+        "pedidoConfirmado": true,
+        "usuario": auxPedido.pedido.usuario.id
+      });
+
+      final response = await http.put(
+        Uri.parse(url),
+        headers: headers,
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        updateBodegas();
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+        pedidoConfirmadoModal(context, auxPedido, auxPedido.pedido.usuario);
+      } else {
+        print('Error al actualizar el pedido: ${response.body}');
+      }
+    } catch (e) {
+      print('Error inesperado: $e');
+    }
+  }
+
+  Future<void> _eliminarProducto(AuxPedidoModel auxPedido) async {
+    try {
+      final url = Uri.parse('$sourceApi/api/aux-pedidos/${auxPedido.id}/');
+      final response = await http.delete(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 204) {
+        print('Producto eliminado con éxito.');
+      } else {
+        print('Error al eliminar el producto: ${response.body}');
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+  // Futuro para recorrer la lista de bodegas y actualizar el valor de la cantidad en las mismas.
+
+  Future updateBodegas() async {
+    final bodegas = await getBodegas();
 
     // Construir los encabezados de la solicitud
     final headers = {'Content-Type': 'application/json'};
 
-    // Construir el cuerpo de la solicitud
-    final body = jsonEncode({
-      "numeroPedido": pedido.pedido.numeroPedido,
-      "fechaEncargo": DateTime.now().toString(),
-      "fechaEntrega": fechaEntrega.toString(),
-      "grupal": grupal,
-      "estado": pedido.pedido.estado,
-      "entregado": pedido.pedido.entregado,
-      "puntoVenta": puntoVenta,
-      "pedidoConfirmado": true,
-      "usuario": pedido.pedido.usuario.id
-    });
+    // por cada uno de los item en la lista auxPedidos creamos una solicitud para actualizar las bodegas.
 
-    // Enviar la solicitud PUT a la API
-    final response = await http.put(
-      Uri.parse(url),
-      headers: headers,
-      body: body,
-    );
+    for (var item in widget.auxPedido) {
+      // VAriable de la bodega, (nunca va a ser nula, que la cantidad sea 0 si...)
+      final BodegaModel? bodega = bodegas
+          .where((bodega) => bodega.producto.id == item.producto)
+          .firstOrNull;
 
-    // Verificar el estado de la respuesta
-    if (response.statusCode == 200) {
-      // Navegar a la página de inicio
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const HomePage()));
-      // Mostrar un diálogo con la información del pedido confirmado
-      pedidoConfirmadoModal(context, pedido, pedido.pedido.usuario);
-    } else {
-      // Imprimir un mensaje de error en caso de que la solicitud no sea exitosa
-      print('Error al actualizar el pedido: ${response.body}');
+      // Construir el cuerpo de la solicitud
+
+      String url = "$sourceApi/api/bodegas/${bodega!.id}/";
+
+      // restamos la cantidad comprada a la que ya estaba anteriormente.
+      final body = jsonEncode({
+        'cantidad': bodega.cantidad - item.cantidad,
+        'producto': item.producto,
+        'puntoVenta': widget.puntoVenta.id
+      });
+
+      // Enviar la solicitud PUT a la API
+
+      // Si la respuesat fue erronea imprimir.
+      final response = await http.put(
+        Uri.parse(url),
+        headers: headers,
+        body: body,
+      );
+
+      if (response.statusCode != 200) {
+        print('error al actualizar bodega');
+      }
     }
+  }
+
+  // Funcion para elimnar los productos que no estan disponibles.
+  Future<void> _eliminarProductosYActualizar(
+    BuildContext context,
+    List<AuxPedidoModel> auxPedidosNoDisponibles,
+    List<AuxPedidoModel> auxPedidosDisponibles,
+  ) async {
+    // Elimina los productos que no están disponibles.
+    for (var item in auxPedidosNoDisponibles) {
+      await _eliminarProducto(item);
+    }
+    // traemos los productos de la api.
+
+    final productos = await getProductos();
+
+    // seleccionamos el primero porque si la lista de Disponibles solo tiene un valor.
+    final producto = productos
+        .where(
+          (item) => item.id == auxPedidosDisponibles.first.producto,
+        )
+        .first;
+
+    // en caso de que la lista no es vacia se prosigue,
+    // Si la lista tiene solo un valor miramos si es exclusivo ese producto.
+    if (auxPedidosDisponibles.isNotEmpty) {
+      if (auxPedidosDisponibles.length == 1 &&
+          producto != null &&
+          producto.exclusivo) {
+        // SI el producto es exclusivo llevamos a la tienda y mostramos la modal.
+        if (!context.mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => const TiendaScreen(),
+          ),
+        );
+        modalExclusivo(context);
+      } else {
+        // si no es exclusivo, se finaliza el pedido con un unico producto.
+        finalizarPedido(
+          context,
+          _selectedDateTimeEntrega!,
+          widget.auxPedido,
+          isChecked,
+        );
+      }
+    } else {
+      // si la lsita es vacia se muestra el mensaje en el scaffold. y se lleva a la tienda.
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No puede confirmar un pedido vacío'),
+        ),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => const TiendaScreen(),
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -470,93 +606,42 @@ class _CarritoTablaState extends State<CarritoTabla> {
           const SizedBox(
             height: defaultPadding,
           ),
-          // Título de selección de punto de venta
-          Center(
-            child: Text(
-              "Seleccione punto de venta *",
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium!
-                  .copyWith(fontWeight: FontWeight.bold),
-            ),
-          ),
-          const SizedBox(
-            height: defaultPadding,
-          ),
-          // DropdownButton de selección de punto de venta
-          Center(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                gradient: const LinearGradient(
-                  colors: [
-                    botonClaro,
-                    botonOscuro,
-                  ],
-                ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: botonSombra,
-                    blurRadius: 5,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<dynamic>(
-                  alignment: Alignment.center,
-                  value: _selectedItem,
-                  iconEnabledColor: background1,
-                  hint: const Text(
-                    'Seleccionar',
-                    style: TextStyle(
-                      color: background1,
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Calibri-Bold',
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  items: metodo.map((dynamic value) {
-                    return DropdownMenuItem<dynamic>(
-                      value: value.valor,
-                      child: Center(
-                        child: Text(
-                          value.nombre,
-                          style: const TextStyle(
-                            color: background1,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Calibri-Bold',
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    setState(() {
-                      _selectedItem = newValue;
-                    });
-                  },
-                  dropdownColor: primaryColor,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: defaultPadding,
-          ),
           // Botón de finalizar pedido
           Center(
-            child: _buildButton("Finalizar Pedido", () {
-              if (_selectedItem == null ||
-                  _selectedDateTimeEntrega == DateTime.now()) {
+            child: _buildButton("Finalizar Pedido", () async {
+              if (_selectedDateTimeEntrega == null) {
                 camposrequeridosModal(context);
               } else {
-                Navigator.pop(context);
-                finalizarPedido(_selectedDateTimeEntrega, _selectedItem,
-                    widget.auxPedido[0], isChecked);
+                // al hacerlo directo en la funcion se pierde el contexto de la función
+                final bodegas = await getBodegas();
+                final productos = await getProductos();
+
+                List<AuxPedidoModel> auxPedidosNoDisponibles = [];
+                List<AuxPedidoModel> auxPedidosDisponibles = [];
+
+                // Verificamos si la bodega cuenta con los productos
+                for (var item in widget.auxPedido) {
+                  final bodega = bodegas
+                      .where((bodegaList) =>
+                          bodegaList.producto.id == item.producto)
+                      .first;
+
+                  if (bodega.cantidad >= item.cantidad) {
+                    auxPedidosDisponibles.add(item);
+                  } else {
+                    auxPedidosNoDisponibles.add(item);
+                  }
+                }
+
+                if (auxPedidosDisponibles.length == widget.auxPedido.length) {
+                  Navigator.pop(context);
+                  finalizarPedido(context, _selectedDateTimeEntrega!,
+                      widget.auxPedido, isChecked);
+                } else {
+                  Navigator.pop(context);
+                  modalBodegaFaltante(context, productos,
+                      auxPedidosNoDisponibles, auxPedidosDisponibles, bodegas);
+                }
               }
             }),
           ),
@@ -924,6 +1009,108 @@ class _CarritoTablaState extends State<CarritoTabla> {
     );
   }
 
+  void modalBodegaFaltante(
+      BuildContext context,
+      List<ProductoModel> productos,
+      List<AuxPedidoModel> auxPedidosNoDisponibles,
+      List<AuxPedidoModel> auxPedidosDisponibles,
+      List<BodegaModel> bodegas) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('No hay disponibilidad del producto'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                // Contenedor con la imagen del logo, recortado en forma circular
+                ClipOval(
+                  child: Container(
+                    width: 100, // Ajusta el tamaño según sea necesario
+                    height: 100, // Ajusta el tamaño según sea necesario
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: primaryColor,
+                    ),
+                    child: Image.asset(
+                      "assets/img/logo.png",
+                      fit: BoxFit.cover, // Ajusta la imagen al contenedor
+                    ),
+                  ),
+                ),
+                const Text(
+                  'Este(os) producto(s) no estan dispinibles o su cantidad es demaciada.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Column(
+                  children: auxPedidosNoDisponibles.map((item) {
+                    final producto = productos
+                        .where((prod) => prod.id == item.producto)
+                        .first;
+                    return Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: ListTile(
+                        tileColor: Colors.green[200],
+                        title: Text(
+                          producto.nombre,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                            'Cantidad solicitada: ${item.cantidad} - Cantidad disponible: ${bodegas.where((bodega) => bodega.producto.id == item.producto).first.cantidad}'),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const Text(
+                  'Si desea continuar con el pedido eliminando los productos que no estan disponibles seleccione "Eliminar", ó si desea esperar a que  tengamos disponibilidad  de producto seleccione "Mas Tarde"',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            ButtonBar(
+              alignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(defaultPadding),
+                  // Botón para aceptar el mensaje
+                  child: _buildButton("Eliminar", () async {
+                    // Función que hace la logica de mostrar las modales de exclusivo vacio y demas en el pedido,
+                    // En caso de que no tenga disponibilidad de eliminan los productos
+                    await _eliminarProductosYActualizar(context,
+                        auxPedidosNoDisponibles, auxPedidosDisponibles);
+                  }),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(defaultPadding),
+                  // Botón para aceptar el mensaje
+                  // Mast tarde se deja el pedido en standby sin modificaciones
+                  child: _buildButton("Mas tarde", () {
+                    // Cierra el diálogo
+                    // y construye la otra clase.
+                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                const TiendaScreen()));
+                  }),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   /// Muestra un modal de confirmación de pedido.
   ///
   /// Este método muestra un diálogo de alerta con información y opciones para el usuario
@@ -1007,6 +1194,64 @@ class _CarritoTablaState extends State<CarritoTabla> {
     );
   }
 
+  // MOdal del exclusivo, en caso de que en las bodegas no tenga suficiente cantidad, y se elimine un producto
+  // SI el producto restante es exclusivo, se muestra Esta modal y se lleva directo a la tienda.
+  void modalExclusivo(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("No se puede Llevar"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const Text(
+                "¡No puede llevar un producto exclusivo sin compañia de otro producto! Seleccione un otro producto. ",
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              // Muestra una imagen circular del logo de la aplicación
+              ClipOval(
+                child: Container(
+                  width: 100, // Ajusta el tamaño según sea necesario
+                  height: 100, // Ajusta el tamaño según sea necesario
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: primaryColor,
+                  ),
+                  child: Image.asset(
+                    "assets/img/logo.png",
+                    fit: BoxFit.cover, // Ajusta la imagen al contenedor
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            ButtonBar(
+              alignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(defaultPadding),
+                  child: _buildButton(
+                    "Aceptar",
+                    () {
+                      // Cierra el diálogo cuando se hace clic en el botón de aceptar
+                      Navigator.pop(context);
+                      // Navega a la pantalla de la tienda
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   /// Muestra un diálogo de alerta para informar al usuario sobre la necesidad de completar
   /// los campos requeridos.
   ///
@@ -1027,7 +1272,7 @@ class _CarritoTablaState extends State<CarritoTabla> {
             children: <Widget>[
               // Mensaje informativo para el usuario
               const Text(
-                "¡Es importante completar los campos de hora y fecha de entrega, así como el punto de venta, ya que son requeridos para finalizar el pedido!",
+                "¡Es importante completar los campos de hora y fecha de entrega, ya que son requeridos para finalizar el pedido!",
                 textAlign: TextAlign.center,
               ),
               const SizedBox(
@@ -1070,11 +1315,4 @@ class _CarritoTablaState extends State<CarritoTabla> {
       },
     );
   }
-}
-
-class PuntoDesplegable {
-  final String? nombre;
-  final int? valor;
-
-  PuntoDesplegable(this.nombre, this.valor);
 }

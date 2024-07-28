@@ -1,20 +1,21 @@
 // ignore_for_file: file_names, non_constant_identifier_names, use_build_context_synchronously, unnecessary_null_comparison
 
+import 'dart:async';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:tienda_app/Auth/authScreen.dart';
 import 'package:tienda_app/Buscador/searchDelegate.dart';
 import 'package:tienda_app/Carrito/carritoScreen.dart';
 import 'package:tienda_app/Home/homePage.dart';
 import 'package:tienda_app/Home/profileCard.dart';
-import 'package:tienda_app/Models/categoriaModel.dart';
+import 'package:tienda_app/Models/bodegaModel.dart';
 import 'package:tienda_app/Models/imagenProductoModel.dart';
 import 'package:tienda_app/Models/pedidoModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
+import 'package:tienda_app/Tienda/bodyTienda.dart';
 import 'package:tienda_app/Tienda/tiendaController.dart';
-import 'package:tienda_app/cardProducts.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/provider.dart';
 import 'package:tienda_app/responsive.dart';
@@ -47,6 +48,13 @@ class _TiendaScreenState extends State<TiendaScreen> {
   /// Almacena la cantidad de pedidos pendientes que tiene el usuario.
   int _count = 0;
 
+  late Future<void> initData;
+
+// lista para llenar con productos e imagenes
+  late Future<List<dynamic>> futureDataSearch;
+
+  int? puntoVentaID;
+
   /// Inicializa el estado de la pantalla.
   ///
   /// Se llama a esta función cuando se crea una nueva instancia de esta clase.
@@ -57,7 +65,8 @@ class _TiendaScreenState extends State<TiendaScreen> {
     // Llama al método initState de la superclase
     super.initState();
     // Obtiene la cantidad de pedidos pendientes del usuario
-    _countPedidos();
+    futureDataSearch = loadData();
+    initData = _initializeData();
   }
 
   /// Actualiza la cantidad de pedidos pendientes.
@@ -101,6 +110,38 @@ class _TiendaScreenState extends State<TiendaScreen> {
     Provider.of<Tiendacontroller>(context, listen: false).updateCount(_count);
   }
 
+  Future<void> _initializeData() async {
+    await _countPedidos();
+    await loadPuntoVenta();
+  }
+
+  Future loadPuntoVenta() async {
+    final usuario =
+        Provider.of<AppState>(context, listen: false).usuarioAutenticado;
+    if (usuario != null) {
+      final pedidos = await getPedidos();
+      final puntosVenta = await getPuntosVenta();
+
+      final pedidoPendiente = pedidos
+          .where((pedido) =>
+              pedido.usuario.id == usuario.id &&
+              pedido.estado == "PENDIENTE" &&
+              pedido.pedidoConfirmado == false)
+          .firstOrNull;
+
+      if (pedidoPendiente != null) {
+        final puntoVenta = puntosVenta
+            .where((item) => item.id == pedidoPendiente.puntoVenta)
+            .first;
+
+        setState(() {
+          Provider.of<PuntoVentaProvider>(context, listen: false)
+              .setPuntoVenta(puntoVenta);
+        });
+      }
+    }
+  }
+
   /// Abre la pantalla de carrito si el usuario tiene al menos un pedido pendiente.
   ///
   /// Recupera los pedidos y verifica si el usuario tiene al menos un pedido pendiente.
@@ -125,8 +166,25 @@ class _TiendaScreenState extends State<TiendaScreen> {
 
       // Si hay un pedido pendiente, navega a la pantalla de carrito
       if (pedidoPendiente != null) {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const CarritoScreen()));
+        setState(() {
+          puntoVentaID = pedidoPendiente.puntoVenta;
+        });
+        final puntoVenta =
+            Provider.of<PuntoVentaProvider>(context, listen: false).puntoVenta;
+        // Navegar a la pantalla de carrito y esperar el resultado
+        // de tal manera que al regresar tengamos el estado del contador recargado.
+        final result = await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => CarritoScreen(
+                    puntoVenta: puntoVenta!,
+                  )),
+        );
+
+        // Si el resultado es 'refresh', actualizar el contador de pedidos
+        if (result == 'refresh') {
+          _countPedidos();
+        }
       } else {
         // Si no hay pedidos pendientes, muestra un mensaje de alerta
         modalPedidosIsEmpy(context);
@@ -135,6 +193,15 @@ class _TiendaScreenState extends State<TiendaScreen> {
       // Si no hay pedidos, muestra un mensaje de alerta
       modalPedidosIsEmpy(context);
     }
+  }
+
+  // carga de los datos para pasar añ buscador.
+  Future<List<dynamic>> loadData() async {
+    return Future.wait([
+      getProductos(),
+      getImagenProductos(),
+      getBodegas(),
+    ]);
   }
 
   @override
@@ -195,7 +262,8 @@ class _TiendaScreenState extends State<TiendaScreen> {
                                   onPressed: () {
                                     showSearch(
                                       context: context,
-                                      delegate: SearchProductoDelegate(),
+                                      delegate: SearchProductoDelegate(
+                                          futureDataSearch),
                                     );
                                   },
                                   icon: const Icon(
@@ -255,7 +323,7 @@ class _TiendaScreenState extends State<TiendaScreen> {
                         borderRadius:
                             const BorderRadius.all(Radius.circular(50)),
                         child: Container(
-                          // Contenedor que envuelve un botón de búsqueda.
+                          // Contenedor que envuelve un botón del chat.
                           color: primaryColor,
                           child: IconButton(
                             onPressed: () {},
@@ -284,7 +352,8 @@ class _TiendaScreenState extends State<TiendaScreen> {
                                   onPressed: () {
                                     showSearch(
                                       context: context,
-                                      delegate: SearchProductoDelegate(),
+                                      delegate: SearchProductoDelegate(
+                                          futureDataSearch),
                                     );
                                   },
                                   icon: const Icon(
@@ -364,12 +433,24 @@ class _TiendaScreenState extends State<TiendaScreen> {
                   ],
                 ),
               ),
-              const Positioned(
+              Positioned(
                 top: 130,
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: BodyTienda(),
+                child: FutureBuilder(
+                  future: initData,
+                  builder:
+                      (BuildContext context, AsyncSnapshot<void> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else {
+                      return const BodyTienda();
+                    }
+                  },
+                ),
               ),
             ],
           ),
@@ -555,212 +636,6 @@ class _TiendaScreenState extends State<TiendaScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-/// Representa el cuerpo principal de la pantalla de la tienda.
-///
-/// Esta clase extiende [StatefulWidget] y se utiliza para mostrar el cuerpo
-/// principal de la pantalla de la tienda. Implementa el método [createState]
-/// para crear una instancia de [_BodyTiendaState].
-class BodyTienda extends StatefulWidget {
-  /// Construye un [BodyTienda].
-  ///
-  /// No requiere argumentos.
-  const BodyTienda({
-    super.key,
-  });
-
-  @override
-  // ignore: library_private_types_in_public_api
-  /// Crea un objeto [State] para este widget.
-  ///
-  /// Devuelve una instancia de [_BodyTiendaState].
-  State<BodyTienda> createState() => _BodyTiendaState();
-}
-
-class _BodyTiendaState extends State<BodyTienda> {
-  @override
-  Widget build(BuildContext context) {
-    /// Constructor del estado que construye la interfaz de la tienda
-    /// basada en las categorías obtenidas mediante [FutureBuilder].
-    return FutureBuilder(
-      future: getCategorias(),
-      builder: (BuildContext context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          // Mientras se carga la información, muestra un indicador de progreso.
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          // Si ocurre un error durante la carga, muestra un mensaje de error.
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          // Si no hay datos o los datos están vacíos, muestra un mensaje indicando la ausencia de categorías.
-          return const Center(child: Text('Sin categorías'));
-        } else {
-          // Si hay datos disponibles, construye la interfaz con las pestañas de categorías.
-          final categorias = snapshot.data!;
-          return DefaultTabController(
-            // Configura el controlador de pestañas con la longitud basada en la cantidad de categorías.
-            length: categorias.length,
-            child: Column(
-              children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  // Contenedor que alberga la barra de pestañas.
-                  child: TabBar(
-                    indicatorColor: primaryColor,
-                    isScrollable: true,
-                    tabAlignment: TabAlignment.center,
-                    tabs: categorias
-                        .map(
-                          (categoria) => Container(
-                            padding: const EdgeInsets.only(
-                                left: 12, right: 12, bottom: 4, top: 4),
-                            // Contenedor que alberga el ícono y el nombre de la categoría.
-                            child: Column(
-                              children: [
-                                SvgPicture.network(
-                                  categoria.icono,
-                                  height: 24.0,
-                                  width: 24.0,
-                                  colorFilter: const ColorFilter.mode(
-                                      primaryColor, BlendMode.srcIn),
-                                  placeholderBuilder: (BuildContext context) =>
-                                      const CircularProgressIndicator(),
-                                ),
-                                Text(
-                                  categoria.nombre,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: primaryColor,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ),
-                Expanded(
-                  child: TabBarView(
-                    // Contenido de las pestañas basado en cada categoría.
-                    children: categorias.map((categoria) {
-                      return Container(
-                          padding: const EdgeInsets.all(15),
-                          child: BodyTabBar(categoria: categoria));
-                    }).toList(),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-      },
-    );
-  }
-}
-
-/// Esta clase representa el cuerpo de la barra de pestañas para cada categoría.
-///
-/// [categoria] es la categoría seleccionada.
-class BodyTabBar extends StatefulWidget {
-  /// Categoría seleccionada.
-  final CategoriaModel categoria;
-
-  /// Constructor del widget [BodyTabBar].
-  ///
-  /// [categoria] es la categoría seleccionada.
-  const BodyTabBar({
-    super.key,
-    required this.categoria,
-  });
-
-  @override
-
-  /// Crea un objeto [State] para este widget.
-  State<BodyTabBar> createState() => _BodyTabBarState();
-}
-
-class _BodyTabBarState extends State<BodyTabBar> {
-  @override
-  Widget build(BuildContext context) {
-    /// Constructor del estado que construye la interfaz de pestañas de productos
-    /// basada en la categoría seleccionada y las imágenes de los productos obtenidas.
-    return FutureBuilder(
-      future: getImagenProductos(),
-      builder: (BuildContext context,
-          AsyncSnapshot<List<ImagenProductoModel>> snapshotImagenes) {
-        if (snapshotImagenes.connectionState == ConnectionState.waiting) {
-          // Mientras se cargan las imágenes de productos, muestra un indicador de progreso.
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        } else {
-          final allImages = snapshotImagenes.data!;
-          return FutureBuilder(
-            future: getProductos(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                // Mientras se cargan los productos, muestra un indicador de progreso.
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                // Si no hay datos de productos o están vacíos, muestra un mensaje indicando la ausencia de productos.
-                return const Center(
-                  child: Text(
-                    'No hay productos',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                  ),
-                );
-              } else {
-                // Filtra los productos según la categoría seleccionada.
-                List<ProductoModel> productosFiltrados;
-                if (widget.categoria.nombre == "Destacados") {
-                  productosFiltrados = productos
-                      .where(
-                          (producto) => producto.destacado && producto.estado)
-                      .toList();
-                } else {
-                  productosFiltrados = productos
-                      .where((producto) =>
-                          producto.categoria.id == widget.categoria.id &&
-                          producto.estado)
-                      .toList();
-                }
-                return GridView.builder(
-                  itemCount: productosFiltrados.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      // Número de columnas basado en el tipo de dispositivo.
-                      crossAxisCount: Responsive.isMobile(context)
-                          ? 1
-                          : Responsive.isTablet(context)
-                              ? 3
-                              : 4,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 20),
-                  itemBuilder: (context, index) {
-                    final producto = productosFiltrados[index];
-                    // Obtiene las imágenes correspondientes al producto actual.
-                    List<String> imagenesProducto = allImages
-                        .where((imagen) => imagen.producto.id == producto.id)
-                        .map((imagen) => imagen.imagen)
-                        .toList();
-                    return CardProducts(
-                      producto: producto,
-                      imagenes: imagenesProducto,
-                    );
-                  },
-                );
-              }
-            },
-          );
-        }
-      },
     );
   }
 }
