@@ -25,6 +25,8 @@ class FormActualizarUsuario extends StatefulWidget {
   /// El objeto [UsuarioModel] que representa el usuario a actualizar.
   final UsuarioModel usuario;
 
+  final UsuarioModel usuarioAutenticado;
+
   /// Construye un widget [FormActualizarUsuario].
   ///
   /// El parámetro [usuario] es obligatorio y debe ser un objeto
@@ -32,6 +34,7 @@ class FormActualizarUsuario extends StatefulWidget {
   const FormActualizarUsuario({
     super.key,
     required this.usuario,
+    required this.usuarioAutenticado,
   });
 
   @override
@@ -688,7 +691,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5),
                         child: Text(
-                          "Imagen de perfil",
+                          "Imagen Usuario",
                           style: TextStyle(
                             fontSize: 19,
                             color: Colors.white,
@@ -992,7 +995,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                           height: 20,
                         ),
                       // ver si es lider
-                      if (widget.usuario.rol3 == "LIDER")
+                      if (widget.usuarioAutenticado.rol3 == "LIDER")
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 5),
                           child: Text(
@@ -1016,11 +1019,11 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                           ),
                         ),
                       // ver si es lider
-                      if (widget.usuario.rol3 == "LIDER")
+                      if (widget.usuarioAutenticado.rol3 == "LIDER")
                         const SizedBox(height: 15),
                       // ver si es lider
                       // Desplegables para elegir los roles
-                      if (widget.usuario.rol3 == "LIDER")
+                      if (widget.usuarioAutenticado.rol3 == "LIDER")
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -1036,7 +1039,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          'Seleccione rol secundario',
+                                          'Seleccione perfil secundario',
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
@@ -1126,7 +1129,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          'Seleccione rol terciario',
+                                          'Seleccione perfil terciario',
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
@@ -1205,13 +1208,13 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                           ],
                         ),
                       // ver si es lider
-                      if (widget.usuario.rol3 == "LIDER")
+                      if (widget.usuarioAutenticado.rol3 == "LIDER")
                         const SizedBox(
                           height: 20,
                         ),
                       // ver si es lider
                       // Checkbox para habilitar o deshabilitar el usuario
-                      if (widget.usuario.rol3 == "LIDER")
+                      if (widget.usuarioAutenticado.rol3 == "LIDER")
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -1254,13 +1257,13 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                           ],
                         ),
                       // ver si es lider
-                      if (widget.usuario.rol3 == "LIDER")
+                      if (widget.usuarioAutenticado.rol3 == "LIDER")
                         const SizedBox(
                           height: 20,
                         ),
                       // ver si es lider
                       // Desplegables para seleccionar la unidad de producción y el punto de venta
-                      if (widget.usuario.rol3 == "LIDER")
+                      if (widget.usuarioAutenticado.rol3 == "LIDER")
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -1535,13 +1538,13 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                           ],
                         ),
                       // ver si es lider
-                      if (widget.usuario.rol3 == "LIDER")
+                      if (widget.usuarioAutenticado.rol3 == "LIDER")
                         const SizedBox(
                           height: 20,
                         ),
                       // ver si es lider
                       // Desplegable de sedes
-                      if (widget.usuario.rol3 == "LIDER")
+                      if (widget.usuarioAutenticado.rol3 == "LIDER")
                         FutureBuilder(
                             future:
                                 getSedes(), // Llamada al método para obtener los datos
@@ -2418,7 +2421,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                   height: 20,
                                 ),
                               // Ver si es lider
-                              if (widget.usuario.rol3 == "LIDER")
+                              if (widget.usuarioAutenticado.rol3 == "LIDER")
                                 Padding(
                                   padding:
                                       const EdgeInsets.symmetric(horizontal: 5),
@@ -2443,11 +2446,11 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                   ),
                                 ),
                               // Ver si es lider
-                              if (widget.usuario.rol3 == "LIDER")
+                              if (widget.usuarioAutenticado.rol3 == "LIDER")
                                 const SizedBox(height: 15),
                               // Ver si es lider
                               // Desplegables para los roles
-                              if (widget.usuario.rol3 == "LIDER")
+                              if (widget.usuarioAutenticado.rol3 == "LIDER")
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
@@ -2465,7 +2468,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                               children: [
                                                 Expanded(
                                                   child: Text(
-                                                    'Seleccione rol secundario',
+                                                    'Seleccione perfil secundario',
                                                     style: TextStyle(
                                                       fontSize: 14,
                                                       fontWeight:
@@ -2567,7 +2570,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                               children: [
                                                 Expanded(
                                                   child: Text(
-                                                    'Seleccione rol terciario',
+                                                    'Seleccione perfil terciario',
                                                     style: TextStyle(
                                                       fontSize: 14,
                                                       fontWeight:
@@ -2660,13 +2663,13 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                   ],
                                 ),
                               // Ver si es lider
-                              if (widget.usuario.rol3 == "LIDER")
+                              if (widget.usuarioAutenticado.rol3 == "LIDER")
                                 const SizedBox(
                                   height: 20,
                                 ),
                               // Ver si es lider
                               // Campo para activar o desactivar el usuario
-                              if (widget.usuario.rol3 == "LIDER")
+                              if (widget.usuarioAutenticado.rol3 == "LIDER")
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -2710,13 +2713,13 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                   ],
                                 ),
                               // Ver si es lider
-                              if (widget.usuario.rol3 == "LIDER")
+                              if (widget.usuarioAutenticado.rol3 == "LIDER")
                                 const SizedBox(
                                   height: 20,
                                 ),
                               // Ver si es lider
                               // Desplegables para el punto de venta y la unidad de producción
-                              if (widget.usuario.rol3 == "LIDER")
+                              if (widget.usuarioAutenticado.rol3 == "LIDER")
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
@@ -3058,13 +3061,13 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                                   ],
                                 ),
                               // Ver si es lider
-                              if (widget.usuario.rol3 == "LIDER")
+                              if (widget.usuarioAutenticado.rol3 == "LIDER")
                                 const SizedBox(
                                   height: 20,
                                 ),
                               // Ver si es lider
                               // Desplegable para la sede
-                              if (widget.usuario.rol3 == "LIDER")
+                              if (widget.usuarioAutenticado.rol3 == "LIDER")
                                 FutureBuilder(
                                     future: getSedes(), // Carga las sedes
                                     builder: (context,
@@ -3233,7 +3236,7 @@ class _FormActualizarUsuarioState extends State<FormActualizarUsuario> {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 5),
                               child: Text(
-                                "Imagen de perfil",
+                                "Imagen Usuario",
                                 style: TextStyle(
                                   fontSize:
                                       24, // Incremento de tamaño de fuente

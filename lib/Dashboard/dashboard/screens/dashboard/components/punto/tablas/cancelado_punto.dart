@@ -7,7 +7,10 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+import 'package:tienda_app/pdf/Punto/pdfCanceladoPunto.dart';
+import 'package:tienda_app/pdf/modalsPdf.dart';
 
 /// Esta clase representa un widget de estado que muestra una tabla de pedidos cancelados de un punto de venta.
 ///
@@ -25,11 +28,14 @@ class CanceladoPunto extends StatefulWidget {
   /// Los elementos de esta lista son de tipo [AuxPedidoModel].
   final List<AuxPedidoModel> auxPedido;
 
+  final UsuarioModel usuario;
+
   /// Constructor que recibe la lista de pedidos cancelados del punto de venta.
   ///
   /// El parámetro [auxPedido] es una lista de objetos [AuxPedidoModel]
   /// que representan los pedidos cancelados del punto de venta.
-  const CanceladoPunto({super.key, required this.auxPedido});
+  const CanceladoPunto(
+      {super.key, required this.auxPedido, required this.usuario});
 
   @override
 
@@ -64,6 +70,8 @@ class _CanceladoPuntoState extends State<CanceladoPunto> {
   /// Este objeto se utiliza para proporcionar los datos a la tabla
   /// de pedidos cancelados.
   late CanceladoPuntoDataGridSource _dataGridSource;
+
+  List<DataGridRow> registros = [];
 
   @override
 
@@ -170,6 +178,19 @@ class _CanceladoPuntoState extends State<CanceladoPunto> {
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Cambia la firma del callback
+                onSelectionChanged: (List<DataGridRow> addedRows,
+                    List<DataGridRow> removedRows) {
+                  setState(() {
+                    // Añadir filas a la lista de registros seleccionados
+                    registros.addAll(addedRows);
+
+                    // Eliminar filas de la lista de registros seleccionados
+                    for (var row in removedRows) {
+                      registros.remove(row);
+                    }
+                  });
+                },
                 // Crea una grilla de columnas
                 columns: <GridColumn>[
                   GridColumn(
@@ -257,7 +278,17 @@ class _CanceladoPuntoState extends State<CanceladoPunto> {
           Center(
             child: Column(
               children: [
-                _buildButton('Imprimir Reporte', () {}),
+                _buildButton('Imprimir Reporte', () {
+                  if (registros.isEmpty) {
+                    noHayPDFModal(context);
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PdfCanceladoPuntoScreen(
+                                usuario: widget.usuario, registro: registros)));
+                  }
+                }),
               ],
             ),
           ),
@@ -429,7 +460,7 @@ class CanceladoPuntoDataGridSource extends DataGridSource {
     return DataGridRowAdapter(cells: [
       Container(
         padding: const EdgeInsets.all(8.0),
-        alignment: Alignment.center,
+        alignment: Alignment.centerLeft,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -456,8 +487,13 @@ class CanceladoPuntoDataGridSource extends DataGridSource {
           child: (row.getCells()[i].value is Widget)
               ? row.getCells()[i].value
               : Text(i == 4
-                  ? "\$${row.getCells()[i].value}" // Convierte el valor a moneda
-                  : row.getCells()[i].value.toString()), // Muestra el valor
+                  ? "\$${formatter.format(row.getCells()[i].value)}" // Formato de moneda
+                  : i == 5 || i == 6
+                      ? formatFechaHora(row
+                          .getCells()[i]
+                          .value
+                          .toString()) // Formato de fecha
+                      : row.getCells()[i].value.toString()), // Valores normales
         ),
     ]);
   }

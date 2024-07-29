@@ -1,12 +1,19 @@
-// ignore_for_file: use_full_hex_values_for_flutter_colors
+// ignore_for_file: use_full_hex_values_for_flutter_colors, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:tienda_app/Dashboard/controllers/MenuAppController.dart';
+import 'package:tienda_app/Dashboard/dashboard/screens/main/main_screen_usuario.dart';
 import 'package:tienda_app/Models/boletaModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+import 'package:tienda_app/pdf/Unidad/pdfEventosUnidad.dart';
+import 'package:tienda_app/pdf/modalsPdf.dart';
+import 'package:tienda_app/source.dart';
+import 'package:http/http.dart' as http;
 
 /// Esta clase representa un widget de estado que muestra una tabla de eventos de una unidad.
 ///
@@ -20,10 +27,13 @@ class EventosUnidad extends StatefulWidget {
   /// Los eventos deben ser proporcionados al crear una instancia de [EventosUnidad].
   final List<BoletaModel> boletas;
 
+  final UsuarioModel usuario;
+
   /// Crea una instancia de [EventosUnidad] con los [boletas] proporcionados.
   ///
   /// El parámetro [boletas] es obligatorio y debe ser una lista de objetos [BoletaModel].
-  const EventosUnidad({super.key, required this.boletas});
+  const EventosUnidad(
+      {super.key, required this.boletas, required this.usuario});
 
   /// Crea un estado [_EventosUnidadState] para manejar los datos de la pantalla.
   ///
@@ -48,6 +58,8 @@ class _EventosUnidadState extends State<EventosUnidad> {
   /// Esta variable se inicializa en el método [initState].
   late EventosUnidadDataGridSource _dataGridSource;
 
+  List<DataGridRow> registros = [];
+
   @override
 
   /// Método llamado cuando se crea el widget.
@@ -64,7 +76,9 @@ class _EventosUnidadState extends State<EventosUnidad> {
 
     // Inicializa la fuente de datos para la tabla de eventos de la unidad
     _dataGridSource = EventosUnidadDataGridSource(
-        eventos: _eventos, listaUsuarios: listaUsuarios);
+        eventos: _eventos, listaUsuarios: listaUsuarios)
+      ..eliminarBoletaCallback =
+          (int boletaID) => eliminarBoletaModal(context, boletaID);
 
     // Actualiza la lista de eventos con los eventos proporcionados en el widget
     _eventos = widget.boletas;
@@ -90,9 +104,62 @@ class _EventosUnidadState extends State<EventosUnidad> {
         setState(() {
           // Actualiza _dataGridSource con los datos cargados de usuarios y eventos
           _dataGridSource = EventosUnidadDataGridSource(
-              eventos: _eventos, listaUsuarios: listaUsuarios);
+              eventos: _eventos, listaUsuarios: listaUsuarios)
+            ..eliminarBoletaCallback =
+                (int boletaID) => eliminarBoletaModal(context, boletaID);
         });
       });
+    }
+  }
+
+  /// Elimina una boleta específica de la API.
+  ///
+  /// Se envía una solicitud DELETE a la API con el ID de la boleta especificada.
+  /// Si la solicitud es exitosa (código de estado 204), se navega hacia la pantalla
+  /// principal de usuario. En caso de error, se muestra un mensaje de error.
+  Future deleteBoleta(int boletaID) async {
+    // Construye la URL de la API
+    String url;
+    url = "$sourceApi/api/boletas/$boletaID/";
+
+    // Define los encabezados de la solicitud
+    final headers = {
+      'Content-Type': 'application/json',
+    };
+
+    // Envía una solicitud DELETE a la API con el ID del comentario específico
+    final response = await http.delete(
+      Uri.parse(url),
+      headers: headers,
+    );
+
+    // Verifica el estado de la respuesta HTTP
+    if (response.statusCode == 204) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Asistencia eliminada correctamente.'),
+        ),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (context) => MenuAppController()),
+            ],
+            child: const MainScreenUsuario(),
+          ),
+        ),
+      );
+    } else {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text('Error al eliminar la asistencia: ${response.statusCode}'),
+        ),
+      );
     }
   }
 
@@ -146,6 +213,19 @@ class _EventosUnidadState extends State<EventosUnidad> {
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Cambia la firma del callback
+                onSelectionChanged: (List<DataGridRow> addedRows,
+                    List<DataGridRow> removedRows) {
+                  setState(() {
+                    // Añadir filas a la lista de registros seleccionados
+                    registros.addAll(addedRows);
+
+                    // Eliminar filas de la lista de registros seleccionados
+                    for (var row in removedRows) {
+                      registros.remove(row);
+                    }
+                  });
+                },
                 // Define las columnas de la tabla
                 columns: <GridColumn>[
                   GridColumn(
@@ -234,12 +314,101 @@ class _EventosUnidadState extends State<EventosUnidad> {
           Center(
             child: Column(
               children: [
-                _buildButton('Imprimir Reporte', () {}),
+                _buildButton('Imprimir Reporte', () {
+                  if (registros.isEmpty) {
+                    noHayPDFModal(context);
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PdfEventosUnidadScreen(
+                                usuario: widget.usuario, registro: registros)));
+                  }
+                }),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  /// Muestra un diálogo modal para confirmar la eliminación de una asistencia.
+  ///
+  /// El diálogo solicita al usuario que confirme la eliminación de la asistencia.
+  /// Si el usuario hace clic en "Cancelar", se cierra el diálogo.
+  /// Si el usuario hace clic en "Eliminar", se elimina la asistencia.
+  ///
+  /// Parámetros:
+  ///
+  ///   - `context` (BuildContext): El contexto de la aplicación.
+  ///   - `boletaID` (int): El ID de la asistencia a eliminar.
+  void eliminarBoletaModal(BuildContext context, int boletaID) {
+    // Muestra el diálogo modal para confirmar la eliminación de la asistencia
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          // Título del diálogo
+          title: const Text(
+            "¿Desea eliminar esta asistencia?",
+            textAlign: TextAlign.center,
+          ),
+          // Contenido del diálogo
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              // Mensaje informativo para el usuario
+              const Text(
+                "Si elimina la asistencia, no podrá participar en este evento.",
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              // Muestra una imagen circular del logo de la aplicación
+              ClipOval(
+                child: Container(
+                  width: 100, // Ajusta el tamaño según sea necesario
+                  height: 100, // Ajusta el tamaño según sea necesario
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: primaryColor,
+                  ),
+                  child: Image.asset(
+                    "assets/img/logo.png",
+                    fit: BoxFit.cover, // Ajusta la imagen al contenedor
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // Botones de acción dentro del diálogo
+          actions: <Widget>[
+            ButtonBar(
+              alignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(defaultPadding),
+                  // Construye un botón con los estilos de diseño especificados
+                  child: _buildButton("Cancelar", () {
+                    // Cierra el diálogo cuando se hace clic en el botón de aceptar
+                    Navigator.pop(context);
+                  }),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(defaultPadding),
+                  // Construye un botón con los estilos de diseño especificados
+                  child: _buildButton("Eliminar", () {
+                    // Elimina la asistencia cuando se hace clic en el botón de aceptar
+                    deleteBoleta(boletaID);
+                  }),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -495,7 +664,10 @@ class EventosUnidadDataGridSource extends DataGridSource {
         DataGridCell<Widget>(
             columnName: 'Eliminar',
             value: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                // Notificar al estado que se ha seleccionado una fila para eliminar
+                eliminarBoletaCallback?.call(evento.id);
+              },
               style: const ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll(primaryColor)),
               child: const Text("Eliminar"),
@@ -507,6 +679,9 @@ class EventosUnidadDataGridSource extends DataGridSource {
   // Lista de eventos
   List<DataGridRow> _eventoData = [];
 
+  // Callback para eliminar boleta
+  void Function(int)? eliminarBoletaCallback;
+
   // Getter para obtener la lista de eventos
   @override
   List<DataGridRow> get rows => _eventoData;
@@ -517,7 +692,7 @@ class EventosUnidadDataGridSource extends DataGridSource {
     return DataGridRowAdapter(cells: [
       Container(
         padding: const EdgeInsets.all(8.0),
-        alignment: Alignment.center,
+        alignment: Alignment.centerLeft,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(

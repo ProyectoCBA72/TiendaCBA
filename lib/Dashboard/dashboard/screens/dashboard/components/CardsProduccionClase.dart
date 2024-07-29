@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 /// Esta clase tiene los siguientes atributos:
 /// - [svgSrc]: La ruta de la imagen SVG a mostrar en la tarjeta.
 /// - [title]: El título a mostrar en la tarjeta.
-/// - [totalReservas]: La cantidad total de reservas en la tarjeta.
-/// - [percentage]: El porcentaje que representa la cantidad de reservas.
+/// - [totalProducciones]: La cantidad total de producciones en la tarjeta.
+/// - [percentage]: El porcentaje que representa la cantidad de producciones.
 /// - [color]: El color de la tarjeta.
 class ProduccionCardClase {
   /// Ruta de la imagen SVG a mostrar en la tarjeta.
@@ -17,10 +17,10 @@ class ProduccionCardClase {
   /// Título a mostrar en la tarjeta.
   final String? title;
 
-  /// Cantidad total de reservas en la tarjeta.
-  final String? totalReservas;
+  /// Cantidad total de producciones en la tarjeta.
+  final String? totalProducciones;
 
-  /// Porcentaje que representa la cantidad de reservas.
+  /// Porcentaje que representa la cantidad de producciones.
   final int? percentage;
 
   /// Color de la tarjeta.
@@ -32,7 +32,7 @@ class ProduccionCardClase {
   ProduccionCardClase({
     this.svgSrc,
     this.title,
-    this.totalReservas,
+    this.totalProducciones,
     this.percentage,
     this.color,
   });

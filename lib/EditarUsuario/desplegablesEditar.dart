@@ -135,9 +135,13 @@ final List rolN2 = [
   /// Este rol representa a un tutor de una unidad.
   RolSegundoNivelEditar("TUTOR UNIDAD", 'TUTOR'),
 
-  /// Opción de rol secundario "PUNTO VENTA".
-  /// Este rol representa a un punto de venta.
-  RolSegundoNivelEditar("PUNTO VENTA", "PUNTO"),
+  /// Opción de rol secundario "ADMINISTRADOR PUNTO VENTA".
+  /// Este rol representa a un administrador de un punto de venta.
+  RolSegundoNivelEditar("ADMINISTRADOR PUNTO VENTA", "PUNTO"),
+
+  /// Opción de rol secundario "VENDEDOR PUNTO VENTA".
+  /// Este rol representa a un vendedor de un punto de venta.
+  RolSegundoNivelEditar("VENDEDOR PUNTO VENTA", "VENDEDOR"),
 
   /// Opción de rol secundario "LIDER SENA".
   /// Este rol representa a un líder de una sede.

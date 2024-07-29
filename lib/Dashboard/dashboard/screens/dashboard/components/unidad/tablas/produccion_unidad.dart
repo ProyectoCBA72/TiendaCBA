@@ -6,7 +6,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/produccionModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+import 'package:tienda_app/pdf/Unidad/pdfProduccionUnidad.dart';
+import 'package:tienda_app/pdf/modalsPdf.dart';
 import 'package:tienda_app/responsive.dart';
 
 /// Esta clase representa un widget de estado [ProduccionUnidad], que es un
@@ -21,11 +24,14 @@ class ProduccionUnidad extends StatefulWidget {
   /// Esta lista debe ser proporcionada al crear una instancia de [ProduccionUnidad].
   final List<ProduccionModel> producciones;
 
+  final UsuarioModel usuario;
+
   /// Construye un nuevo widget [ProduccionUnidad].
   ///
   /// El parámetro [producciones] es la lista de [ProduccionModel] que se
   /// va a mostrar en la tabla de datos.
-  const ProduccionUnidad({super.key, required this.producciones});
+  const ProduccionUnidad(
+      {super.key, required this.producciones, required this.usuario});
 
   /// Crea un nuevo estado para este widget.
   ///
@@ -49,6 +55,8 @@ class _ProduccionUnidadState extends State<ProduccionUnidad> {
   ///
   /// Se utiliza para inicializar el estado de la pantalla.
   late ProduccionUnidadDataGridSource _dataGridSource;
+
+  List<DataGridRow> registros = [];
 
   @override
 
@@ -149,6 +157,19 @@ class _ProduccionUnidadState extends State<ProduccionUnidad> {
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Cambia la firma del callback
+                onSelectionChanged: (List<DataGridRow> addedRows,
+                    List<DataGridRow> removedRows) {
+                  setState(() {
+                    // Añadir filas a la lista de registros seleccionados
+                    registros.addAll(addedRows);
+
+                    // Eliminar filas de la lista de registros seleccionados
+                    for (var row in removedRows) {
+                      registros.remove(row);
+                    }
+                  });
+                },
                 // Columnas de la tabla
                 columns: <GridColumn>[
                   GridColumn(
@@ -227,27 +248,7 @@ class _ProduccionUnidadState extends State<ProduccionUnidad> {
                   GridColumn(
                     allowSorting: false,
                     allowFiltering: false,
-                    columnName: 'Ver',
-                    label: Container(
-                      padding: const EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      child: const Text(''),
-                    ),
-                  ),
-                  GridColumn(
-                    allowSorting: false,
-                    allowFiltering: false,
                     columnName: 'Editar',
-                    label: Container(
-                      padding: const EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      child: const Text(''),
-                    ),
-                  ),
-                  GridColumn(
-                    allowSorting: false,
-                    allowFiltering: false,
-                    columnName: 'Eliminar',
                     label: Container(
                       padding: const EdgeInsets.all(8.0),
                       alignment: Alignment.center,
@@ -266,7 +267,17 @@ class _ProduccionUnidadState extends State<ProduccionUnidad> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildButton('Imprimir Reporte', () {}),
+                _buildButton('Imprimir Reporte', () {
+                  if (registros.isEmpty) {
+                    noHayPDFModal(context);
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PdfProduccionUnidadScreen(
+                                usuario: widget.usuario, registro: registros)));
+                  }
+                }),
                 const SizedBox(
                   width: defaultPadding,
                 ),
@@ -277,7 +288,18 @@ class _ProduccionUnidadState extends State<ProduccionUnidad> {
             Center(
               child: Column(
                 children: [
-                  _buildButton('Imprimir Reporte', () {}),
+                  _buildButton('Imprimir Reporte', () {
+                    if (registros.isEmpty) {
+                      noHayPDFModal(context);
+                    } else {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PdfProduccionUnidadScreen(
+                                  usuario: widget.usuario,
+                                  registro: registros)));
+                    }
+                  }),
                   const SizedBox(
                     height: defaultPadding,
                   ),
@@ -421,28 +443,12 @@ class ProduccionUnidadDataGridSource extends DataGridSource {
         DataGridCell<String>(
             columnName: 'Estado Producción', value: produccion.estado),
         DataGridCell<Widget>(
-            columnName: 'Ver',
-            value: ElevatedButton(
-              onPressed: () {},
-              style: const ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(primaryColor)),
-              child: const Text("Ver"),
-            )),
-        DataGridCell<Widget>(
             columnName: 'Editar',
             value: ElevatedButton(
               onPressed: () {},
               style: const ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll(primaryColor)),
               child: const Text("Editar"),
-            )),
-        DataGridCell<Widget>(
-            columnName: 'Eliminar',
-            value: ElevatedButton(
-              onPressed: () {},
-              style: const ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(primaryColor)),
-              child: const Text("Eliminar"),
             )),
       ]);
     }).toList();
@@ -461,7 +467,7 @@ class ProduccionUnidadDataGridSource extends DataGridSource {
     return DataGridRowAdapter(cells: [
       Container(
         padding: const EdgeInsets.all(8.0),
-        alignment: Alignment.center,
+        alignment: Alignment.centerLeft,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(

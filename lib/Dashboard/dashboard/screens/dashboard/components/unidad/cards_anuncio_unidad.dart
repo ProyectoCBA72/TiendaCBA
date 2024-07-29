@@ -159,7 +159,10 @@ class _CardsAnuncioUnidadState extends State<CardsAnuncioUnidad> {
               } else if (snapshot.hasError) {
                 // Muestra un mensaje si hay un error al cargar los datos
                 return Center(
-                  child: Text('Ocurrió un error: ${snapshot.error}'),
+                  child: Text(
+                    'Ocurrió un error: ${snapshot.error}',
+                    textAlign: TextAlign.center,
+                  ),
                 );
               } else {
                 // Obtener listas de todos los anuncios y todas las imágenes de anuncios
@@ -175,6 +178,7 @@ class _CardsAnuncioUnidadState extends State<CardsAnuncioUnidad> {
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   );
                 } else {
@@ -215,6 +219,7 @@ class _CardsAnuncioUnidadState extends State<CardsAnuncioUnidad> {
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     );
                   }

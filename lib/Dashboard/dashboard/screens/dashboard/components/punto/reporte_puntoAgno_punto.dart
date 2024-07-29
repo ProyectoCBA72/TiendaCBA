@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
+import 'package:tienda_app/Models/devolucionesModel.dart';
 import 'package:tienda_app/Models/facturaModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
@@ -41,6 +42,7 @@ class ReportePuntoVentasAgnoPunto extends StatelessWidget {
                 getAuxPedidos(),
                 getFacturas(),
                 getPuntosVenta(),
+                getDevoluciones(),
               ]),
               builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
                 // Si los datos están cargando, muestra un indicador de carga
@@ -51,13 +53,17 @@ class ReportePuntoVentasAgnoPunto extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   // Si ocurre un error al cargar los datos, muestra un mensaje de error
                   return Center(
-                    child: Text('Error al cargar datos: ${snapshot.error}'),
+                    child: Text(
+                      'Error al cargar datos: ${snapshot.error}',
+                      textAlign: TextAlign.center,
+                    ),
                   );
                 } else {
                   // Cuando los datos están disponibles
                   List<AuxPedidoModel> auxPedidos = snapshot.data![0];
                   List<FacturaModel> facturas = snapshot.data![1];
                   List<PuntoVentaModel> puntos = snapshot.data![2];
+                  List<DevolucionesModel> devoluciones = snapshot.data![3];
 
                   return SfCartesianChart(
                     // Configuración del gráfico
@@ -84,6 +90,7 @@ class ReportePuntoVentasAgnoPunto extends StatelessWidget {
                               puntos[i],
                               auxPedidos,
                               facturas,
+                              devoluciones,
                             ),
                             xValueMapper:
                                 (BalanceVentasAgnoDataPunto data, _) =>
@@ -113,6 +120,7 @@ class ReportePuntoVentasAgnoPunto extends StatelessWidget {
     PuntoVentaModel puntoVenta,
     List<AuxPedidoModel> auxPedidos,
     List<FacturaModel> facturas,
+    List<DevolucionesModel> devoluciones,
   ) {
     Map<String, double> ventasPorAnio = {};
     int currentYear = DateTime.now().year;
@@ -121,7 +129,9 @@ class ReportePuntoVentasAgnoPunto extends StatelessWidget {
       var pedido = factura.pedido;
 
       // Filtrar facturas por punto de venta
-      if (puntoVenta.id == pedido.puntoVenta) {
+      if (puntoVenta.id == pedido.puntoVenta &&
+          devoluciones.any((devolucion) =>
+              devolucion.factura.pedido.id != factura.pedido.id)) {
         var anio = DateTime.parse(factura.fecha).year;
 
         // Considerar solo los últimos 3 años (incluyendo el año actual)

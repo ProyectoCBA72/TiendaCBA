@@ -997,8 +997,8 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                         alignment: Alignment.center,
                                         child: Text(
                                           _isInscrito
-                                              ? "Incrito"
-                                              : "Inscribirme",
+                                              ? "Inscrito"
+                                              : "Inscribirse",
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
@@ -1806,7 +1806,7 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
                                               child: Text(
                                                 _isInscrito
                                                     ? "Inscrito"
-                                                    : "Inscribirme",
+                                                    : "Inscribirse",
                                                 style: const TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
@@ -2324,7 +2324,7 @@ class _AnuncioScreenState extends State<AnuncioScreen> {
       builder: (context) {
         return AlertDialog(
           // Título del diálogo
-          title: const Text("¡Ya tiene Boleta!"),
+          title: const Text("¡Ya está inscrito!"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[

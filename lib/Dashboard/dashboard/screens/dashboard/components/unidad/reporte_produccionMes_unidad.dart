@@ -38,13 +38,17 @@ class ReporteProduccionMesUnidad extends StatelessWidget {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(
-                      child: Text('Error al cargar datos: ${snapshot.error}'));
+                      child: Text(
+                    'Error al cargar datos: ${snapshot.error}',
+                    textAlign: TextAlign.center,
+                  ));
                 } else {
                   // Construye el gráfico cuando los datos están disponibles
                   return SfCartesianChart(
                     tooltipBehavior: TooltipBehavior(enable: true),
                     legend: const Legend(
-                        isVisible: true), // Muestra la leyenda si no es un dispositivo móvil
+                        isVisible:
+                            true), // Muestra la leyenda si no es un dispositivo móvil
                     primaryXAxis: const CategoryAxis(
                         title: AxisTitle(text: 'Meses')), // Eje X para meses
                     primaryYAxis: const NumericAxis(

@@ -46,7 +46,9 @@ class ReporteProduccionAgnoUnidad extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   return Center(
                     child: Text(
-                        'Error al cargar datos: ${snapshot.error}'), // Muestra mensaje de error si falla la carga
+                      'Error al cargar datos: ${snapshot.error}',
+                      textAlign: TextAlign.center,
+                    ), // Muestra mensaje de error si falla la carga
                   );
                 } else {
                   List<ProduccionModel> producciones = snapshot.data ??

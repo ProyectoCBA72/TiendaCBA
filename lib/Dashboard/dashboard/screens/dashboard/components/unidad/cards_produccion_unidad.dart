@@ -86,9 +86,14 @@ class FileInfoCardGridView extends StatelessWidget {
             return const CircularProgressIndicator(); // Muestra un indicador de carga
           } else if (snapshotProduccion.hasError) {
             return Text(
-                'Error al cargar producciones: ${snapshotProduccion.error}');
+              'Error al cargar producciones: ${snapshotProduccion.error}',
+              textAlign: TextAlign.center,
+            );
           } else if (snapshotProduccion.data == null) {
-            return const Text('No se encontraron producciones');
+            return const Text(
+              'No se encontraron producciones',
+              textAlign: TextAlign.center,
+            );
           } else {
             // Variables para contabilizar las producciones
             int producciones = 0;
@@ -118,28 +123,28 @@ class FileInfoCardGridView extends StatelessWidget {
               ProduccionCardClase(
                 title: "Producciones",
                 svgSrc: "assets/icons/produccion.svg",
-                totalReservas: producciones.toString(),
+                totalProducciones: producciones.toString(),
                 color: primaryColor,
                 percentage: producciones,
               ),
               ProduccionCardClase(
                 title: "Despachados",
                 svgSrc: "assets/icons/check.svg",
-                totalReservas: produccionesDespachadas.toString(),
+                totalProducciones: produccionesDespachadas.toString(),
                 color: Colors.green,
                 percentage: produccionesDespachadas,
               ),
               ProduccionCardClase(
                 title: "Cancelados",
                 svgSrc: "assets/icons/cancel.svg",
-                totalReservas: produccionesCanceladas.toString(),
+                totalProducciones: produccionesCanceladas.toString(),
                 color: Colors.red,
                 percentage: produccionesCanceladas,
               ),
               ProduccionCardClase(
                 title: "Pendientes",
                 svgSrc: "assets/icons/pendiente.svg",
-                totalReservas: produccionesPendientes.toString(),
+                totalProducciones: produccionesPendientes.toString(),
                 color: const Color(0xFF007EE5),
                 percentage: produccionesPendientes,
               ),

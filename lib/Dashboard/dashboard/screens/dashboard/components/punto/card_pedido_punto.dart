@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/CardsPedidosClase.dart';
 import 'package:tienda_app/constantsDesign.dart';
 
-// Diseño de la tarjeta para mostrar el conteo de reservas en la parte superior del dashboard
+// Diseño de la tarjeta para mostrar el conteo de pedidos en la parte superior del dashboard
 
 class CardPedidoPunto extends StatelessWidget {
   const CardPedidoPunto({
@@ -70,7 +70,7 @@ class CardPedidoPunto extends StatelessWidget {
             color: info.color, // Color de la línea de progreso
             percentage: info.percentage, // Porcentaje de progreso
           ),
-          // Fila inferior con el total de reservas
+          // Fila inferior con el total de pedidos
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -82,12 +82,12 @@ class CardPedidoPunto extends StatelessWidget {
                     .bodySmall!
                     .copyWith(color: primaryColor), // Estilo del texto "Total:"
               ),
-              // Valor del total de reservas
+              // Valor del total de pedidos
               Text(
-                info.totalReservas!, // Valor del total de reservas
+                info.totalPedidos!, // Valor del total de pedidos
                 style: Theme.of(context).textTheme.bodySmall!.copyWith(
                     color:
-                        primaryColor), // Estilo del valor del total de reservas
+                        primaryColor), // Estilo del valor del total de pedidos
               ),
             ],
           )

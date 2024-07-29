@@ -89,10 +89,11 @@ class PuntoVentaProvider with ChangeNotifier {
 
       // Mostrar el modal de eliminación de productos en el pedido.
       showDialog(
+        // ignore: use_build_context_synchronously
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text('Cambiar punto de venta'),
+            title: const Text('¡Cambio de punto de venta!'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[

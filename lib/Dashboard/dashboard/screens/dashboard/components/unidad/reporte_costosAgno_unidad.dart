@@ -45,7 +45,10 @@ class ReporteCostoProduccionAgnoUnidad extends StatelessWidget {
                     // Mostrar un mensaje de error si la carga falla
                   } else if (snapshot.hasError) {
                     return Center(
-                      child: Text('Error al cargar datos: ${snapshot.error}'),
+                      child: Text(
+                        'Error al cargar datos: ${snapshot.error}',
+                        textAlign: TextAlign.center,
+                      ),
                     );
                   } else {
                     // Obtener los datos de las producciones y productos
@@ -59,9 +62,7 @@ class ReporteCostoProduccionAgnoUnidad extends StatelessWidget {
                     // Construir y mostrar la gráfica
                     return SfCartesianChart(
                       tooltipBehavior: TooltipBehavior(enable: true),
-                      legend: const Legend(
-                          isVisible:
-                              true),
+                      legend: const Legend(isVisible: true),
                       primaryXAxis: const NumericAxis(
                         title: AxisTitle(text: 'Año'),
                         interval: 1,

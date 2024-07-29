@@ -152,7 +152,10 @@ class CardsAnuncioPunto extends StatelessWidget {
               } else if (snapshot.hasError) {
                 // Muestra un mensaje de error si ocurre algún problema con la carga de datos
                 return Center(
-                  child: Text('Ocurrió un error: ${snapshot.error}'),
+                  child: Text(
+                    'Ocurrió un error: ${snapshot.error}',
+                    textAlign: TextAlign.center,
+                  ),
                 );
               } else {
                 // Obtiene la lista de todos los anuncios y sus imágenes
@@ -208,6 +211,7 @@ class CardsAnuncioPunto extends StatelessWidget {
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     );
                   }
@@ -220,4 +224,3 @@ class CardsAnuncioPunto extends StatelessWidget {
     );
   }
 }
-

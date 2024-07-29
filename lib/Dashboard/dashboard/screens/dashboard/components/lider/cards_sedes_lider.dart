@@ -136,10 +136,16 @@ class CardsSedeLider extends StatelessWidget {
                 );
               } else if (snapshot.hasError) {
                 // Mensaje de error si ocurre un problema al cargar datos
-                return Text('Error al cargar sedes: ${snapshot.error}');
+                return Text(
+                  'Error al cargar sedes: ${snapshot.error}',
+                  textAlign: TextAlign.center,
+                );
               } else if (snapshot.data == null) {
                 // Mensaje si no se encontraron datos de sedes
-                return const Text('No se encontraron sedes');
+                return const Text(
+                  'No se encontraron sedes',
+                  textAlign: TextAlign.center,
+                );
               } else {
                 // Procesamiento de datos y construcción de las tarjetas de sedes
                 List<SedeModel> sedes = snapshot.data![0];
@@ -169,4 +175,3 @@ class CardsSedeLider extends StatelessWidget {
     );
   }
 }
-

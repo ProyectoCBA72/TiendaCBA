@@ -79,32 +79,36 @@ class DashboardScreenUsuario extends StatelessWidget {
                                   // Muestra el mensaje de error si ocurre un problema al cargar los datos
                                 } else if (snapshotBoleta.hasError) {
                                   return Text(
-                                      'Error al cargar inscripciones: ${snapshotBoleta.error}');
+                                    'Error al cargar inscripciones: ${snapshotBoleta.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra un texto 'No se encontraron boletas' si no hay datos
                                 } else if (snapshotBoleta.data == null) {
                                   return const Text(
-                                      'No se encontraron inscripciones');
+                                    'No se encontraron inscripciones',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra las boletas del usuario
                                 } else {
                                   List<BoletaModel> boletaUsuario =
                                       []; // Lista para almacenar las boletas del usuario
-                                            
-                                  boletaUsuario = snapshotBoleta.data!
+
+                                  boletaUsuario.addAll(snapshotBoleta.data!
                                       .where((boleta) =>
                                           boleta.usuario ==
-                                          usuarioAutenticado.id)
-                                      .toList(); // Filtra las boletas del usuario
-                                            
+                                          usuarioAutenticado
+                                              .id)); // Filtra las boletas del usuario
+
                                   return EventosUsuario(
                                     boletas: boletaUsuario,
+                                    usuario: usuarioAutenticado,
                                   );
                                 }
                               }),
                           const SizedBox(height: defaultPadding),
                           // Tabla de los pedidos pendientes
                           FutureBuilder(
-                              future:
-                                  getAuxPedidos(), // Obtiene los pedidos
+                              future: getAuxPedidos(), // Obtiene los pedidos
                               builder: (context,
                                   AsyncSnapshot<List<AuxPedidoModel>>
                                       snapshotAuxiliar) {
@@ -115,35 +119,38 @@ class DashboardScreenUsuario extends StatelessWidget {
                                   // Muestra el mensaje de error si ocurre un problema al cargar los datos
                                 } else if (snapshotAuxiliar.hasError) {
                                   return Text(
-                                      'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                    'Error al cargar pedidos: ${snapshotAuxiliar.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra un texto 'No se encontraron pedidos' si no hay datos
                                 } else if (snapshotAuxiliar.data == null) {
                                   return const Text(
-                                      'No se encontraron pedidos');
+                                    'No se encontraron pedidos',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra los pedidos pendientes
                                 } else {
                                   List<AuxPedidoModel> pedidosPendientes =
                                       []; // Lista para almacenar los pedidos pendientes
-                                            
-                                  pedidosPendientes = snapshotAuxiliar.data!
-                                      .where((auxiliar) =>
+
+                                  pedidosPendientes.addAll(
+                                      snapshotAuxiliar.data!.where((auxiliar) =>
                                           auxiliar.pedido.estado ==
                                               "PENDIENTE" &&
-                                          auxiliar
-                                              .pedido.pedidoConfirmado &&
+                                          auxiliar.pedido.pedidoConfirmado &&
                                           auxiliar.pedido.usuario.id ==
-                                              usuarioAutenticado.id)
-                                      .toList(); // Filtra los pedidos pendientes del usuario
+                                              usuarioAutenticado
+                                                  .id)); // Filtra los pedidos pendientes del usuario
                                   return PendienteUsuario(
                                     auxPedido: pedidosPendientes,
+                                    usuario: usuarioAutenticado,
                                   );
                                 }
                               }),
                           const SizedBox(height: defaultPadding),
                           // Tabla de los pedidos entregados
                           FutureBuilder(
-                              future:
-                                  getAuxPedidos(), // Obtiene los pedidos
+                              future: getAuxPedidos(), // Obtiene los pedidos
                               builder: (context,
                                   AsyncSnapshot<List<AuxPedidoModel>>
                                       snapshotAuxiliar) {
@@ -154,34 +161,38 @@ class DashboardScreenUsuario extends StatelessWidget {
                                   // Muestra el mensaje de error si ocurre un problema al cargar los datos
                                 } else if (snapshotAuxiliar.hasError) {
                                   return Text(
-                                      'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                    'Error al cargar pedidos: ${snapshotAuxiliar.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra un texto 'No se encontraron pedidos' si no hay datos
                                 } else if (snapshotAuxiliar.data == null) {
                                   return const Text(
-                                      'No se encontraron pedidos');
+                                    'No se encontraron pedidos',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra los pedidos entregados
                                 } else {
                                   List<AuxPedidoModel> pedidosEntregados =
                                       []; // Lista para almacenar los pedidos entregados
-                                            
-                                  pedidosEntregados = snapshotAuxiliar.data!
-                                      .where((auxiliar) =>
+
+                                  pedidosEntregados.addAll(
+                                      snapshotAuxiliar.data!.where((auxiliar) =>
                                           auxiliar.pedido.estado ==
                                               "COMPLETADO" &&
                                           auxiliar.pedido.entregado &&
                                           auxiliar.pedido.usuario.id ==
-                                              usuarioAutenticado.id)
-                                      .toList(); // Filtra los pedidos entregados del usuario
+                                              usuarioAutenticado
+                                                  .id)); // Filtra los pedidos entregados del usuario
                                   return EntregadoUsuario(
                                     auxPedido: pedidosEntregados,
+                                    usuario: usuarioAutenticado,
                                   );
                                 }
                               }),
                           const SizedBox(height: defaultPadding),
                           // Tabla de los pedidos cancelados
                           FutureBuilder(
-                              future:
-                                  getAuxPedidos(), // Obtiene los pedidos
+                              future: getAuxPedidos(), // Obtiene los pedidos
                               builder: (context,
                                   AsyncSnapshot<List<AuxPedidoModel>>
                                       snapshotAuxiliar) {
@@ -192,25 +203,30 @@ class DashboardScreenUsuario extends StatelessWidget {
                                   // Muestra el mensaje de error si ocurre un problema al cargar los datos
                                 } else if (snapshotAuxiliar.hasError) {
                                   return Text(
-                                      'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                    'Error al cargar pedidos: ${snapshotAuxiliar.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra un texto 'No se encontraron pedidos' si no hay datos
                                 } else if (snapshotAuxiliar.data == null) {
                                   return const Text(
-                                      'No se encontraron pedidos');
+                                    'No se encontraron pedidos',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra los pedidos cancelados
                                 } else {
                                   List<AuxPedidoModel> pedidosCancelados =
                                       []; // Lista para almacenar los pedidos cancelados
-                                            
-                                  pedidosCancelados = snapshotAuxiliar.data!
-                                      .where((auxiliar) =>
+
+                                  pedidosCancelados.addAll(
+                                      snapshotAuxiliar.data!.where((auxiliar) =>
                                           auxiliar.pedido.estado ==
                                               "CANCELADO" &&
                                           auxiliar.pedido.usuario.id ==
-                                              usuarioAutenticado.id)
-                                      .toList(); // Filtra los pedidos cancelados del usuario
+                                              usuarioAutenticado
+                                                  .id)); // Filtra los pedidos cancelados del usuario
                                   return CanceladoUsuario(
                                     auxPedido: pedidosCancelados,
+                                    usuario: usuarioAutenticado,
                                   );
                                 }
                               }),
@@ -227,65 +243,67 @@ class DashboardScreenUsuario extends StatelessWidget {
                                   // Muestra el mensaje de error si ocurre un problema al cargar los datos
                                 } else if (snapshotFactura.hasError) {
                                   return Text(
-                                      'Error al cargar ventas: ${snapshotFactura.error}');
+                                    'Error al cargar ventas: ${snapshotFactura.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra un texto 'No se encontraron ventas' si no hay datos
                                 } else if (snapshotFactura.data == null) {
                                   return const Text(
-                                      'No se encontraron ventas');
+                                    'No se encontraron ventas',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra las ventas
                                 } else {
                                   return FutureBuilder(
                                       future:
                                           getAuxPedidos(), // Obtiene los pedidos
                                       builder: (context,
-                                          AsyncSnapshot<
-                                                  List<AuxPedidoModel>>
+                                          AsyncSnapshot<List<AuxPedidoModel>>
                                               snapshotAuxiliar) {
                                         // Muestra el indicador de carga mientras los datos se cargan
-                                        if (snapshotAuxiliar
-                                                .connectionState ==
+                                        if (snapshotAuxiliar.connectionState ==
                                             ConnectionState.waiting) {
                                           return const CircularProgressIndicator();
                                           // Muestra el mensaje de error si ocurre un problema al cargar los datos
-                                        } else if (snapshotAuxiliar
-                                            .hasError) {
+                                        } else if (snapshotAuxiliar.hasError) {
                                           return Text(
-                                              'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                            'Error al cargar pedidos: ${snapshotAuxiliar.error}',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Muestra un texto 'No se encontraron pedidos' si no hay datos
                                         } else if (snapshotAuxiliar.data ==
                                             null) {
                                           return const Text(
-                                              'No se encontraron pedidos');
+                                            'No se encontraron pedidos',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Muestra las ventas
                                         } else {
-                                          List<AuxPedidoModel>
-                                              pedidosFacturas =
+                                          List<AuxPedidoModel> pedidosFacturas =
                                               []; // Lista para almacenar las facturas
-                                            
+
                                           // Obtiene los pedidos correspondientes a las facturas del usuario
                                           for (var f = 0;
-                                              f <
-                                                  snapshotFactura
-                                                      .data!.length;
+                                              f < snapshotFactura.data!.length;
                                               f++) {
-                                            pedidosFacturas = snapshotAuxiliar
-                                                .data!
-                                                .where((pedido) =>
-                                                    snapshotFactura.data![f]
-                                                            .pedido.id ==
-                                                        pedido.pedido.id &&
-                                                    snapshotFactura
-                                                            .data![f]
-                                                            .pedido
-                                                            .usuario
-                                                            .id ==
-                                                        usuarioAutenticado
-                                                            .id)
-                                                .toList();
+                                            pedidosFacturas.addAll(
+                                                snapshotAuxiliar.data!.where(
+                                                    (pedido) =>
+                                                        snapshotFactura.data![f]
+                                                                .pedido.id ==
+                                                            pedido.pedido.id &&
+                                                        snapshotFactura
+                                                                .data![f]
+                                                                .pedido
+                                                                .usuario
+                                                                .id ==
+                                                            usuarioAutenticado
+                                                                .id));
                                           }
-                                            
+
                                           return FacturaUsuario(
                                             auxPedido: pedidosFacturas,
+                                            usuario: usuarioAutenticado,
                                           );
                                         }
                                       });
@@ -305,70 +323,72 @@ class DashboardScreenUsuario extends StatelessWidget {
                                   // Muestra el mensaje de error si ocurre un problema al cargar los datos
                                 } else if (snapshotDevolucion.hasError) {
                                   return Text(
-                                      'Error al cargar devoluciones: ${snapshotDevolucion.error}');
+                                    'Error al cargar devoluciones: ${snapshotDevolucion.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra un texto 'No se encontraron devoluciones' si no hay datos
-                                } else if (snapshotDevolucion.data ==
-                                    null) {
+                                } else if (snapshotDevolucion.data == null) {
                                   return const Text(
-                                      'No se encontraron devoluciones');
+                                    'No se encontraron devoluciones',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Muestra las devoluciones
                                 } else {
                                   return FutureBuilder(
                                       future:
                                           getAuxPedidos(), // Obtiene los pedidos
                                       builder: (context,
-                                          AsyncSnapshot<
-                                                  List<AuxPedidoModel>>
+                                          AsyncSnapshot<List<AuxPedidoModel>>
                                               snapshotAuxiliar) {
                                         // Muestra el indicador de carga mientras los datos se cargan
-                                        if (snapshotAuxiliar
-                                                .connectionState ==
+                                        if (snapshotAuxiliar.connectionState ==
                                             ConnectionState.waiting) {
                                           return const CircularProgressIndicator();
                                           // Muestra el mensaje de error si ocurre un problema al cargar los datos
-                                        } else if (snapshotAuxiliar
-                                            .hasError) {
+                                        } else if (snapshotAuxiliar.hasError) {
                                           return Text(
-                                              'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                            'Error al cargar pedidos: ${snapshotAuxiliar.error}',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Muestra un texto 'No se encontraron pedidos' si no hay datos
                                         } else if (snapshotAuxiliar.data ==
                                             null) {
                                           return const Text(
-                                              'No se encontraron pedidos');
+                                            'No se encontraron pedidos',
+                                            textAlign: TextAlign.center,
+                                          );
                                         } else {
                                           List<AuxPedidoModel>
                                               pedidosDevueltos =
                                               []; // Lista para almacenar las devoluciones
-                                            
+
                                           // Obtiene los pedidos correspondientes a las devoluciones del usuario
                                           for (var d = 0;
                                               d <
                                                   snapshotDevolucion
                                                       .data!.length;
                                               d++) {
-                                            pedidosDevueltos =
-                                                snapshotAuxiliar.data!
-                                                    .where((pedido) =>
-                                                        snapshotDevolucion
-                                                                .data![d]
-                                                                .factura
-                                                                .pedido
-                                                                .id ==
-                                                            pedido.pedido
-                                                                .id &&
-                                                        snapshotDevolucion
-                                                                .data![d]
-                                                                .factura
-                                                                .pedido
-                                                                .usuario
-                                                                .id ==
-                                                            usuarioAutenticado
-                                                                .id)
-                                                    .toList();
+                                            pedidosDevueltos.addAll(snapshotAuxiliar
+                                                .data!
+                                                .where((pedido) =>
+                                                    snapshotDevolucion
+                                                            .data![d]
+                                                            .factura
+                                                            .pedido
+                                                            .id ==
+                                                        pedido.pedido.id &&
+                                                    snapshotDevolucion
+                                                            .data![d]
+                                                            .factura
+                                                            .pedido
+                                                            .usuario
+                                                            .id ==
+                                                        usuarioAutenticado.id));
                                           }
-                                            
+
                                           return DevolucionUsuario(
                                             auxPedido: pedidosDevueltos,
+                                            usuario: usuarioAutenticado,
                                           );
                                         }
                                       });

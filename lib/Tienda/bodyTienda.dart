@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -70,8 +69,6 @@ class _BodyTiendaState extends State<BodyTienda> {
     return dataPuntosVenta;
   }
 
-
-
   // Antes de contruir el widget como tal verificamos que todos los datos esteb cargados, correctamente.
   @override
   Widget build(BuildContext context) {
@@ -88,8 +85,6 @@ class _BodyTiendaState extends State<BodyTienda> {
       },
     );
   }
-
-
 
   // Widget de la clase, separado con el fin de solucionar valores nulos en el desarrollo de los futuros
   // (se cargaba primero el widget y despues los valores => valor nulo inesperado)
@@ -116,120 +111,130 @@ class _BodyTiendaState extends State<BodyTienda> {
             length: categorias.length,
             child: Column(
               children: [
-                Row(
-                  children: [
-                    Flexible(
-                      flex: 5,
-                      child: Container(
+                Center(
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      elevation: 5,
+                      child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        // Contenedor que alberga la barra de pestañas.
-                        child: TabBar(
-                          indicatorColor: primaryColor,
-                          isScrollable: true,
-                          tabAlignment: TabAlignment.center,
-                          tabs: categorias
-                              .map(
-                                (categoria) => Container(
-                                  padding: const EdgeInsets.only(
-                                      left: 12, right: 12, bottom: 4, top: 4),
-                                  // Contenedor que alberga el ícono y el nombre de la categoría.
-                                  child: Column(
-                                    children: [
-                                      SvgPicture.network(
-                                        categoria.icono,
-                                        height: 24.0,
-                                        width: 24.0,
-                                        colorFilter: const ColorFilter.mode(
-                                            primaryColor, BlendMode.srcIn),
-                                        placeholderBuilder: (BuildContext
-                                                context) =>
-                                            const CircularProgressIndicator(),
-                                      ),
-                                      Text(
-                                        categoria.nombre,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                          color: primaryColor,
-                                        ),
-                                      )
-                                    ],
-                                  ),
+                            horizontal: 16.0, vertical: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Elija punto de venta',
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ),
+                            const SizedBox(width: 8.0),
+                            Expanded(
+                              child: DropdownButton<int>(
+                                dropdownColor: background1,
+                                isExpanded: true,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              )
-                              .toList(),
+                                value: _puntoInicial?.id,
+                                items: _dataPuntosVenta
+                                    .map((PuntoVentaModel item) {
+                                  final sedePunto = _sedes.firstWhere(
+                                      (sede) => sede.id == item.sede);
+
+                                  return DropdownMenuItem<int>(
+                                    value: item.id,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.nombre,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: primaryColor,
+                                          ),
+                                        ),
+                                        Text(
+                                          sedePunto.nombre,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            color: primaryColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (int? value) {
+                                  final puntoVenta = _dataPuntosVenta
+                                      .firstWhere((item) => item.id == value);
+                                  setState(() => _puntoInicial = puntoVenta);
+                                  Provider.of<PuntoVentaProvider>(context,
+                                          listen: false)
+                                      .updatePuntoVenta(puntoVenta, context);
+                                },
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    Flexible(
-                      flex: 2,
-                      child: Column(
-                        children: [
-                          const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Text(
-                                  'P. Venta',
-                                  overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  // Contenedor que alberga la barra de pestañas.
+                  child: TabBar(
+                    indicatorColor: primaryColor,
+                    isScrollable: true,
+                    tabAlignment: TabAlignment.center,
+                    tabs: categorias
+                        .map(
+                          (categoria) => Container(
+                            padding: const EdgeInsets.only(
+                                left: 12, right: 12, bottom: 4, top: 4),
+                            // Contenedor que alberga el ícono y el nombre de la categoría.
+                            child: Column(
+                              children: [
+                                SvgPicture.network(
+                                  categoria.icono,
+                                  height: 24.0,
+                                  width: 24.0,
+                                  colorFilter: const ColorFilter.mode(
+                                      primaryColor, BlendMode.srcIn),
+                                  placeholderBuilder: (BuildContext context) =>
+                                      const CircularProgressIndicator(),
                                 ),
-                              ),
-                              Icon(
-                                CupertinoIcons.location_solid,
-                                color: primaryColor,
-                              ),
-                            ],
-                          ),
-                          DropdownButton(
-                            isExpanded: true,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: primaryColor,
-                              fontWeight: FontWeight.bold,
+                                Text(
+                                  categoria.nombre,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    color: primaryColor,
+                                  ),
+                                )
+                              ],
                             ),
-                            value: _puntoInicial?.id,
-                            items: _dataPuntosVenta.map<DropdownMenuItem<int>>(
-                                (PuntoVentaModel item) {
-                              final sedePunto = _sedes
-                                  .where((sede) => sede.id == item.sede)
-                                  .first;
-
-                              return DropdownMenuItem<int>(
-                                value: item.id,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item.nombre,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      sedePunto.nombre,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(fontSize: 11),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (int? value) {
-                              final puntoVenta = _dataPuntosVenta
-                                  .firstWhere((item) => item.id == value);
-                              setState(() => _puntoInicial = puntoVenta);
-                              Provider.of<PuntoVentaProvider>(context,
-                                      listen: false)
-                                  .updatePuntoVenta(puntoVenta, context);
-                            },
-                          )
-                        ],
-                      ),
-                    )
-                  ],
+                          ),
+                        )
+                        .toList(),
+                  ),
                 ),
                 Expanded(
                   child: TabBarView(

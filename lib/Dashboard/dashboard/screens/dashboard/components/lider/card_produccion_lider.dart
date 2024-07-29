@@ -8,7 +8,7 @@ import 'package:tienda_app/constantsDesign.dart';
 /// Widget para mostrar una tarjeta de producción líder en el dashboard.
 ///
 /// Muestra información sobre el liderazgo de producción, incluyendo el ícono,
-/// el título, la línea de progreso y el total de reservas.
+/// el título, la línea de progreso y el total de producciones.
 class CardProduccionLider extends StatelessWidget {
   const CardProduccionLider({
     super.key,
@@ -77,7 +77,7 @@ class CardProduccionLider extends StatelessWidget {
                     color: primaryColor), // Estilo de texto con color primario
               ),
               Text(
-                info.totalReservas!, // Total de reservas dinámico
+                info.totalProducciones!, // Total de producciones dinámica
                 style: Theme.of(context).textTheme.bodySmall!.copyWith(
                     color: primaryColor), // Estilo de texto con color primario
               ),

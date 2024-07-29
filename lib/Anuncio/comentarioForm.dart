@@ -232,7 +232,7 @@ class _ComentarioState extends State<Comentario> {
                       ),
                     ]),
                 child: Text(
-                  widget.comentarioID == null ? "Enviar" : "Editar",
+                  widget.comentarioID == null ? "Enviar" : "Guardar",
                   style: const TextStyle(color: primaryColor),
                 ),
               ),

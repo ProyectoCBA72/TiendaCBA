@@ -8,6 +8,7 @@ import 'package:tienda_app/Models/devolucionesModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+
 class ReporteDevolucionesPuntoAgnoPunto extends StatelessWidget {
   final UsuarioModel usuario;
 
@@ -48,7 +49,10 @@ class ReporteDevolucionesPuntoAgnoPunto extends StatelessWidget {
                   );
                 } else if (snapshot.hasError) {
                   return Center(
-                    child: Text('Error al cargar datos: ${snapshot.error}'),
+                    child: Text(
+                      'Error al cargar datos: ${snapshot.error}',
+                      textAlign: TextAlign.center,
+                    ),
                   );
                 } else {
                   // Datos disponibles

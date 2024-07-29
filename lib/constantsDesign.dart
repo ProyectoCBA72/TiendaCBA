@@ -149,10 +149,10 @@ String twoDigits(int n) => n.toString().padLeft(2, '0');
 /// Si la fecha y hora no es válida, devuelve 'Fecha inválida'.
 String formatFechaHora(String fechaString) {
   try {
-    DateTime fecha = DateTime.parse(fechaString); // Parsea la fecha desde una cadena.
+    DateTime fecha =
+        DateTime.parse(fechaString); // Parsea la fecha desde una cadena.
     return '${twoDigits(fecha.day)}-${twoDigits(fecha.month)}-${fecha.year} ${twoDigits(fecha.hour)}:${twoDigits(fecha.minute)}';
   } catch (e) {
-    return 'Fecha inválida';
+    return '';
   }
 }
-

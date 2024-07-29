@@ -7,7 +7,7 @@ import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/provider.dart';
 import 'package:tienda_app/responsive.dart';
 
-// Vista donde se llaman las tarjetas superiores de conteo de reservas y se organizan para adaptarse a todos los dispositivos
+// Vista donde se llaman las tarjetas superiores de conteo de productos y se organizan para adaptarse a todos los dispositivos
 
 class CardsProductoPunto extends StatelessWidget {
   const CardsProductoPunto({
@@ -148,7 +148,10 @@ class CardsProductoPunto extends StatelessWidget {
                   } else if (snapshot.hasError) {
                     // Muestra un mensaje de error si ocurre algún problema con la carga de datos
                     return Center(
-                      child: Text('Error: ${snapshot.error}'),
+                      child: Text(
+                        'Error: ${snapshot.error}',
+                        textAlign: TextAlign.center,
+                      ),
                     );
                   } else {
                     // Obtiene la lista de productos y sus imágenes
@@ -194,6 +197,7 @@ class CardsProductoPunto extends StatelessWidget {
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       );
                     }
@@ -207,4 +211,3 @@ class CardsProductoPunto extends StatelessWidget {
     );
   }
 }
-

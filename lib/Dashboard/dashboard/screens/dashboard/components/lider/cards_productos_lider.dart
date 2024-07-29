@@ -141,7 +141,10 @@ class CardsProductoLider extends StatelessWidget {
                   } else if (snapshot.hasError) {
                     // Mensaje de error si ocurre un problema al cargar datos
                     return Center(
-                      child: Text('Error al cargar productos: ${snapshot.error}'),
+                      child: Text(
+                        'Error al cargar productos: ${snapshot.error}',
+                        textAlign: TextAlign.center,
+                      ),
                     );
                   } else {
                     // Procesamiento de datos y construcción de las tarjetas de productos
@@ -161,7 +164,8 @@ class CardsProductoLider extends StatelessWidget {
                         itemBuilder: (context, index) {
                           ProductoModel producto = productosLider[index];
                           List<String> images = allImages
-                              .where((imagen) => imagen.producto.id == producto.id)
+                              .where(
+                                  (imagen) => imagen.producto.id == producto.id)
                               .map((imagen) => imagen.imagen)
                               .toList();
                           return ProductoCardLider(
@@ -179,6 +183,7 @@ class CardsProductoLider extends StatelessWidget {
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       );
                     }
@@ -192,4 +197,3 @@ class CardsProductoLider extends StatelessWidget {
     );
   }
 }
-

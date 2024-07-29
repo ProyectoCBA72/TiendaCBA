@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names, use_full_hex_values_for_flutter_colors, use_build_context_synchronously, file_names, avoid_print
+// ignore_for_file: non_constant_identifier_names, use_full_hex_values_for_flutter_colors, use_build_context_synchronously, file_names, avoid_print, unnecessary_null_comparison
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -332,14 +332,13 @@ class _CarritoTablaState extends State<CarritoTabla> {
         )
         .first;
 
-
-    // en caso de que la lista no es vacia se prosigue, 
+    // en caso de que la lista no es vacia se prosigue,
     // Si la lista tiene solo un valor miramos si es exclusivo ese producto.
     if (auxPedidosDisponibles.isNotEmpty) {
       if (auxPedidosDisponibles.length == 1 &&
           producto != null &&
           producto.exclusivo) {
-            // SI el producto es exclusivo llevamos a la tienda y mostramos la modal.
+        // SI el producto es exclusivo llevamos a la tienda y mostramos la modal.
         if (!context.mounted) return;
         Navigator.pushReplacement(
           context,

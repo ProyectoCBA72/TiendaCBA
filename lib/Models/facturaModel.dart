@@ -28,6 +28,8 @@ class FacturaModel {
   /// La fecha en la que se realizó el pedido.
   final String fecha;
 
+  final int usuarioVendedor;
+
   /// El medio de pago utilizado para realizar el pedido.
   final MedioPagoModel medioPago;
 
@@ -46,6 +48,7 @@ class FacturaModel {
     required this.id,
     required this.fecha,
     required this.medioPago,
+    required this.usuarioVendedor,
     required this.pedido,
     required this.numero,
   });
@@ -99,6 +102,7 @@ Future<List<FacturaModel>> getFacturas() async {
           id: facturaData['id'] ?? 0,
           numero: facturaData['numero'] ?? 0,
           fecha: facturaData['fecha'] ?? "",
+          usuarioVendedor: facturaData['usuarioVendedor'] ?? 0,
           medioPago: MedioPagoModel(
             id: facturaData['medioPago']['id'] ?? 0,
             nombre: facturaData['medioPago']['nombre'] ?? "",
@@ -106,14 +110,14 @@ Future<List<FacturaModel>> getFacturas() async {
           ),
           pedido: PedidoModel(
             id: facturaData['pedido']['id'] ?? 0,
-            numeroPedido: facturaData['pedido']['cantidada'] ?? 0,
+            numeroPedido: facturaData['pedido']['numeroPedido'] ?? 0,
             fechaEncargo: facturaData['pedido']['fechaEncargo'] ?? "",
             fechaEntrega: facturaData['pedido']['fechaEntrega'] ?? "",
             grupal: facturaData['pedido']['grupal'] ?? false,
             estado: facturaData['pedido']['estado'] ?? "",
             entregado: facturaData['pedido']['entregado'] ?? false,
             puntoVenta: facturaData['pedido']['puntoVenta'] ?? 0,
-            pedidoConfirmado: facturaData['pedido']['pedidoConfirmado'],
+            pedidoConfirmado: facturaData['pedido']['pedidoConfirmado'] ?? false,
             usuario: UsuarioModel(
               id: facturaData['pedido']['usuario']['id'] ?? 0,
               nombres: facturaData['pedido']['usuario']['nombres'] ?? "",

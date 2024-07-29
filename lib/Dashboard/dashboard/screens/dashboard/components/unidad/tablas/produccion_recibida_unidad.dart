@@ -7,7 +7,10 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/inventarioModel.dart';
 import 'package:tienda_app/Models/produccionModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+import 'package:tienda_app/pdf/Unidad/pdfRecibidoUnidad.dart';
+import 'package:tienda_app/pdf/modalsPdf.dart';
 
 /// Esta clase representa un widget de estado que muestra una tabla de producciones recibidas de una unidad.
 ///
@@ -19,11 +22,14 @@ import 'package:tienda_app/constantsDesign.dart';
 class ProduccionRecibidaUnidad extends StatefulWidget {
   final List<ProduccionModel> producciones;
 
+  final UsuarioModel usuario;
+
   /// Constructor de la clase [ProduccionRecibidaUnidad].
   ///
   /// Recibe una lista de objetos [ProduccionModel] a través del parámetro [producciones].
   /// Este parámetro es obligatorio.
-  const ProduccionRecibidaUnidad({super.key, required this.producciones});
+  const ProduccionRecibidaUnidad(
+      {super.key, required this.producciones, required this.usuario});
 
   @override
   State<ProduccionRecibidaUnidad> createState() =>
@@ -48,6 +54,8 @@ class _ProduccionRecibidaUnidadState extends State<ProduccionRecibidaUnidad> {
   ///
   /// Este objeto se utiliza para obtener los datos y configurar la tabla.
   late ProduccionRecibidaUnidadDataGridSource _dataGridSource;
+
+  List<DataGridRow> registros = [];
 
   @override
 
@@ -154,6 +162,19 @@ class _ProduccionRecibidaUnidadState extends State<ProduccionRecibidaUnidad> {
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Cambia la firma del callback
+                onSelectionChanged: (List<DataGridRow> addedRows,
+                    List<DataGridRow> removedRows) {
+                  setState(() {
+                    // Añadir filas a la lista de registros seleccionados
+                    registros.addAll(addedRows);
+
+                    // Eliminar filas de la lista de registros seleccionados
+                    for (var row in removedRows) {
+                      registros.remove(row);
+                    }
+                  });
+                },
                 // Establece las columnas de la tabla
                 columns: <GridColumn>[
                   GridColumn(
@@ -240,11 +261,11 @@ class _ProduccionRecibidaUnidadState extends State<ProduccionRecibidaUnidad> {
                   GridColumn(
                     allowSorting: false,
                     allowFiltering: false,
-                    columnName: 'Ver',
+                    columnName: 'Punto Venta',
                     label: Container(
                       padding: const EdgeInsets.all(8.0),
                       alignment: Alignment.center,
-                      child: const Text(''),
+                      child: const Text('Punto Venta'),
                     ),
                   ),
                 ],
@@ -258,7 +279,17 @@ class _ProduccionRecibidaUnidadState extends State<ProduccionRecibidaUnidad> {
           Center(
             child: Column(
               children: [
-                _buildButton('Imprimir Reporte', () {}),
+                _buildButton('Imprimir Reporte', () {
+                  if (registros.isEmpty) {
+                    noHayPDFModal(context);
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PdfRecibidoUnidadScreen(
+                                usuario: widget.usuario, registro: registros)));
+                  }
+                }),
               ],
             ),
           ),
@@ -399,6 +430,20 @@ class ProduccionRecibidaUnidadDataGridSource extends DataGridSource {
     return fechaRecibido;
   }
 
+  String puntoVentaInventario(
+      int produccionId, List<InventarioModel> inventarios) {
+    String nombrePuntoVenta = "";
+
+    for (var inventario in inventarios) {
+      if (inventario.produccion == produccionId) {
+        nombrePuntoVenta = inventario.bodega.puntoVenta.nombre;
+        break;
+      }
+    }
+
+    return nombrePuntoVenta;
+  }
+
   // Definición de la fuente de datos
   ProduccionRecibidaUnidadDataGridSource(
       {required List<ProduccionModel> producciones,
@@ -428,14 +473,9 @@ class ProduccionRecibidaUnidadDataGridSource extends DataGridSource {
         DataGridCell<String>(
             columnName: 'Fecha Recibido',
             value: fechaInventarioRecibido(produccion.id, listaInventarios)),
-        DataGridCell<Widget>(
-            columnName: 'Ver',
-            value: ElevatedButton(
-              onPressed: () {},
-              style: const ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(primaryColor)),
-              child: const Text("Ver"),
-            )),
+        DataGridCell<String>(
+            columnName: 'Punto Venta',
+            value: puntoVentaInventario(produccion.id, inventarios)),
       ]);
     }).toList();
   }
@@ -453,7 +493,7 @@ class ProduccionRecibidaUnidadDataGridSource extends DataGridSource {
     return DataGridRowAdapter(cells: [
       Container(
         padding: const EdgeInsets.all(8.0),
-        alignment: Alignment.center,
+        alignment: Alignment.centerLeft,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(

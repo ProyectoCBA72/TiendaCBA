@@ -12,6 +12,7 @@ import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punt
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/reporte_punto_devolucionMes_punto.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/reporte_recibidoAgno_punto.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/reporte_recibidoMes_punto.dart';
+import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/reporte_vendedores_punto.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/reporte_ventasAgno_punto.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/reporte_ventasMes_punto.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/tablas/bodega_punto.dart';
@@ -153,8 +154,7 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                             const SizedBox(height: defaultPadding),
                           if (!Responsive.isMobile(context))
                             Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
                                   child: Text(
@@ -162,8 +162,7 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleLarge
-                                        ?.copyWith(
-                                            fontFamily: 'Calibri-Bold'),
+                                        ?.copyWith(fontFamily: 'Calibri-Bold'),
                                   ),
                                 ),
                               ],
@@ -172,17 +171,14 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                             const SizedBox(height: defaultPadding),
                           if (!Responsive.isMobile(context))
                             DefaultTabController(
-                                length: 8,
+                                length: 9,
                                 child: Column(
                                   children: [
                                     Container(
-                                      padding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 16,
-                                              vertical: 8),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 8),
                                       // Contenedor que alberga la barra de pestañas.
-                                      child:
-                                          Builder(builder: (context) {
+                                      child: Builder(builder: (context) {
                                         return Row(
                                           children: [
                                             // Botón de anterior pestaña.
@@ -192,31 +188,26 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                 color: primaryColor,
                                               ),
                                               onPressed: () =>
-                                                  _scrollToPreviousTab(
-                                                      context),
+                                                  _scrollToPreviousTab(context),
                                             ),
                                             Expanded(
                                               child: TabBar(
-                                                indicatorColor:
-                                                    primaryColor,
+                                                indicatorColor: primaryColor,
                                                 isScrollable: true,
                                                 tabAlignment:
                                                     TabAlignment.center,
                                                 onTap: (index) {
                                                   // Actualiza el índice seleccionado
                                                   setState(() {
-                                                    _selectedItem =
-                                                        index;
+                                                    _selectedItem = index;
                                                   });
                                                 },
                                                 tabs: [
                                                   Tooltip(
-                                                    message:
-                                                        "Productos más vendidos por año",
+                                                    message: "Ventas Diarias",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -224,27 +215,69 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                       // Contenedor que alberga el ícono y el nombre de la categoría.
                                                       child: Column(
                                                         children: [
-                                                          SvgPicture
-                                                              .asset(
-                                                            "assets/icons/productosVendidos.svg",
+                                                          SvgPicture.asset(
+                                                            "assets/icons/factura.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFF4682B4),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color
+                                                                        .fromARGB(
+                                                                            255,
+                                                                            180,
+                                                                            160,
+                                                                            70),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
-                                                            "Año",
-                                                            style:
-                                                                TextStyle(
+                                                            "Ventas",
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize:
-                                                                  14,
+                                                              fontSize: 14,
+                                                              color:
+                                                                  primaryColor,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Tooltip(
+                                                    message:
+                                                        "Productos más vendidos por año",
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 12,
+                                                              right: 12,
+                                                              bottom: 4,
+                                                              top: 4),
+                                                      // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                      child: Column(
+                                                        children: [
+                                                          SvgPicture.asset(
+                                                            "assets/icons/productosVendidos.svg",
+                                                            width: 24,
+                                                            height: 24,
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFF4682B4),
+                                                                    BlendMode
+                                                                        .srcIn),
+                                                          ),
+                                                          const Text(
+                                                            "Año",
+                                                            style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 14,
                                                               color:
                                                                   primaryColor,
                                                             ),
@@ -258,8 +291,7 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                         "Productos más vendidos por mes",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -267,27 +299,25 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                       // Contenedor que alberga el ícono y el nombre de la categoría.
                                                       child: Column(
                                                         children: [
-                                                          SvgPicture
-                                                              .asset(
+                                                          SvgPicture.asset(
                                                             "assets/icons/productosVendidos.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFF4682B4),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFF4682B4),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Mes",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize:
-                                                                  14,
+                                                              fontSize: 14,
                                                               color:
                                                                   primaryColor,
                                                             ),
@@ -301,8 +331,7 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                         "Balance de ventas por año",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -310,27 +339,25 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                       // Contenedor que alberga el ícono y el nombre de la categoría.
                                                       child: Column(
                                                         children: [
-                                                          SvgPicture
-                                                              .asset(
+                                                          SvgPicture.asset(
                                                             "assets/icons/ventas.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFF50C878),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFF50C878),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Año",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize:
-                                                                  14,
+                                                              fontSize: 14,
                                                               color:
                                                                   primaryColor,
                                                             ),
@@ -344,8 +371,7 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                         "Balance de ventas por mes",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -353,27 +379,25 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                       // Contenedor que alberga el ícono y el nombre de la categoría.
                                                       child: Column(
                                                         children: [
-                                                          SvgPicture
-                                                              .asset(
+                                                          SvgPicture.asset(
                                                             "assets/icons/ventas.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFF50C878),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFF50C878),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Mes",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize:
-                                                                  14,
+                                                              fontSize: 14,
                                                               color:
                                                                   primaryColor,
                                                             ),
@@ -387,8 +411,7 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                         "Devoluciones por año",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -396,27 +419,25 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                       // Contenedor que alberga el ícono y el nombre de la categoría.
                                                       child: Column(
                                                         children: [
-                                                          SvgPicture
-                                                              .asset(
+                                                          SvgPicture.asset(
                                                             "assets/icons/devoluciones.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFFF7F50),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFFF7F50),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Año",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize:
-                                                                  14,
+                                                              fontSize: 14,
                                                               color:
                                                                   primaryColor,
                                                             ),
@@ -430,8 +451,7 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                         "Devoluciones por mes",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -439,27 +459,25 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                       // Contenedor que alberga el ícono y el nombre de la categoría.
                                                       child: Column(
                                                         children: [
-                                                          SvgPicture
-                                                              .asset(
+                                                          SvgPicture.asset(
                                                             "assets/icons/devoluciones.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFFF7F50),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFFF7F50),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Mes",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize:
-                                                                  14,
+                                                              fontSize: 14,
                                                               color:
                                                                   primaryColor,
                                                             ),
@@ -473,8 +491,7 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                         "Producciones recibidas por año",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -482,27 +499,25 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                       // Contenedor que alberga el ícono y el nombre de la categoría.
                                                       child: Column(
                                                         children: [
-                                                          SvgPicture
-                                                              .asset(
+                                                          SvgPicture.asset(
                                                             "assets/icons/recibidas.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFBA55D3),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFBA55D3),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Año",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize:
-                                                                  14,
+                                                              fontSize: 14,
                                                               color:
                                                                   primaryColor,
                                                             ),
@@ -516,8 +531,7 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                         "Producciones recibidas por mes",
                                                     child: Container(
                                                       padding:
-                                                          const EdgeInsets
-                                                              .only(
+                                                          const EdgeInsets.only(
                                                               left: 12,
                                                               right: 12,
                                                               bottom: 4,
@@ -525,27 +539,25 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                       // Contenedor que alberga el ícono y el nombre de la categoría.
                                                       child: Column(
                                                         children: [
-                                                          SvgPicture
-                                                              .asset(
+                                                          SvgPicture.asset(
                                                             "assets/icons/recibidas.svg",
                                                             width: 24,
                                                             height: 24,
-                                                            colorFilter: const ColorFilter
-                                                                .mode(
-                                                                Color(
-                                                                    0xFFBA55D3),
-                                                                BlendMode
-                                                                    .srcIn),
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color(
+                                                                        0xFFBA55D3),
+                                                                    BlendMode
+                                                                        .srcIn),
                                                           ),
                                                           const Text(
                                                             "Mes",
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize:
-                                                                  14,
+                                                              fontSize: 14,
                                                               color:
                                                                   primaryColor,
                                                             ),
@@ -564,8 +576,7 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                 color: primaryColor,
                                               ),
                                               onPressed: () =>
-                                                  _scrollToNextTab(
-                                                      context),
+                                                  _scrollToNextTab(context),
                                             ),
                                           ],
                                         );
@@ -578,47 +589,47 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                           if (!Responsive.isMobile(context))
                             // Contenedor que alberga el contenido de la pestaña.
                             _selectedItem == 0
-                                ? ReporteProductosMasVendidosAgnoPunto(
-                                    usuario: usuarioAutenticado,
-                                  )
+                                ? ReporteVendedoresPunto(
+                                    usuario: usuarioAutenticado)
                                 : _selectedItem == 1
-                                    ? ReporteProductosMasVendidosMesPunto(
+                                    ? ReporteProductosMasVendidosAgnoPunto(
                                         usuario: usuarioAutenticado,
                                       )
                                     : _selectedItem == 2
-                                        ? ReportePuntoVentasAgnoPunto(
+                                        ? ReporteProductosMasVendidosMesPunto(
                                             usuario: usuarioAutenticado,
                                           )
                                         : _selectedItem == 3
-                                            ? ReportePuntoVentasMesPunto(
-                                                usuario:
-                                                    usuarioAutenticado,
+                                            ? ReportePuntoVentasAgnoPunto(
+                                                usuario: usuarioAutenticado,
                                               )
                                             : _selectedItem == 4
-                                                ? ReporteDevolucionesPuntoAgnoPunto(
-                                                    usuario:
-                                                        usuarioAutenticado,
+                                                ? ReportePuntoVentasMesPunto(
+                                                    usuario: usuarioAutenticado,
                                                   )
                                                 : _selectedItem == 5
-                                                    ? ReporteDevolucionesPuntoMesPunto(
+                                                    ? ReporteDevolucionesPuntoAgnoPunto(
                                                         usuario:
                                                             usuarioAutenticado,
                                                       )
                                                     : _selectedItem == 6
-                                                        ? ReporteRecibidoAgnoPunto(
+                                                        ? ReporteDevolucionesPuntoMesPunto(
                                                             usuario:
                                                                 usuarioAutenticado,
                                                           )
-                                                        : _selectedItem ==
-                                                                7
-                                                            ? ReporteRecibidoMesPunto(
+                                                        : _selectedItem == 7
+                                                            ? ReporteRecibidoAgnoPunto(
                                                                 usuario:
                                                                     usuarioAutenticado,
                                                               )
-                                                            : ReporteProductosMasVendidosAgnoPunto(
-                                                                usuario:
-                                                                    usuarioAutenticado,
-                                                              ),
+                                                            : _selectedItem == 8
+                                                                ? ReporteRecibidoMesPunto(
+                                                                    usuario:
+                                                                        usuarioAutenticado,
+                                                                  )
+                                                                : ReporteVendedoresPunto(
+                                                                    usuario:
+                                                                        usuarioAutenticado),
                           if (!Responsive.isMobile(context))
                             const SizedBox(height: defaultPadding),
                           const Divider(
@@ -641,8 +652,7 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                           const SizedBox(height: defaultPadding),
                           // Tabla de anuncios
                           FutureBuilder(
-                              future:
-                                  getBoletas(), // Obtener inscripciones
+                              future: getBoletas(), // Obtener inscripciones
                               builder: (context,
                                   AsyncSnapshot<List<BoletaModel>>
                                       snapshotBoleta) {
@@ -653,34 +663,36 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                   // Validar si hay un error
                                 } else if (snapshotBoleta.hasError) {
                                   return Text(
-                                      'Error al cargar inscripciones: ${snapshotBoleta.error}');
+                                    'Error al cargar inscripciones: ${snapshotBoleta.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Validar si hay datos
-                                } else if (snapshotBoleta.data ==
-                                    null) {
+                                } else if (snapshotBoleta.data == null) {
                                   return const Text(
-                                      'No se encontraron inscripciones');
+                                    'No se encontraron inscripciones',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Mostrar datos
                                 } else {
                                   List<BoletaModel> boletaPunto =
                                       []; // Lista de boletas
-                                          
-                                  boletaPunto = snapshotBoleta.data!
-                                      .where((boleta) =>
-                                          boleta.anuncio.usuario
-                                              .puntoVenta ==
-                                          usuarioAutenticado.puntoVenta)
-                                      .toList(); // Filtrar las boletas por el punto de venta
-                                          
+
+                                  boletaPunto.addAll(snapshotBoleta.data!.where(
+                                      (boleta) =>
+                                          boleta.anuncio.usuario.puntoVenta ==
+                                          usuarioAutenticado
+                                              .puntoVenta)); // Filtrar las boletas por el punto de venta
+
                                   return EventosPunto(
                                     boletas: boletaPunto,
+                                    usuario: usuarioAutenticado,
                                   );
                                 }
                               }),
                           const SizedBox(height: defaultPadding),
                           // Tabla de pedidos pendientes
                           FutureBuilder(
-                              future:
-                                  getPuntosVenta(), // Obtener puntos
+                              future: getPuntosVenta(), // Obtener puntos
                               builder: (context,
                                   AsyncSnapshot<List<PuntoVentaModel>>
                                       snapshotPunto) {
@@ -691,72 +703,72 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                   // Validar si hay un error
                                 } else if (snapshotPunto.hasError) {
                                   return Text(
-                                      'Error al cargar puntos: ${snapshotPunto.error}');
+                                    'Error al cargar puntos: ${snapshotPunto.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Validar si hay datos
                                 } else if (snapshotPunto.data == null) {
                                   return const Text(
-                                      'No se encontraron puntos');
+                                    'No se encontraron puntos',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Mostrar datos
                                 } else {
                                   return FutureBuilder(
                                       future:
                                           getAuxPedidos(), // Obtener pedidos
                                       builder: (context,
-                                          AsyncSnapshot<
-                                                  List<AuxPedidoModel>>
+                                          AsyncSnapshot<List<AuxPedidoModel>>
                                               snapshotAuxiliar) {
                                         // Validar estado de la petición
-                                        if (snapshotAuxiliar
-                                                .connectionState ==
+                                        if (snapshotAuxiliar.connectionState ==
                                             ConnectionState.waiting) {
                                           return const CircularProgressIndicator();
                                           // Validar si hay un error
-                                        } else if (snapshotAuxiliar
-                                            .hasError) {
+                                        } else if (snapshotAuxiliar.hasError) {
                                           return Text(
-                                              'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                            'Error al cargar pedidos: ${snapshotAuxiliar.error}',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Validar si hay datos
-                                        } else if (snapshotAuxiliar
-                                                .data ==
+                                        } else if (snapshotAuxiliar.data ==
                                             null) {
                                           return const Text(
-                                              'No se encontraron pedidos');
+                                            'No se encontraron pedidos',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Mostrar datos
                                         } else {
                                           List<AuxPedidoModel>
                                               pedidosPendientes =
                                               []; // Lista de pedidos
-                                          
+
                                           // Obtener pedidos pendientes del punto de venta
                                           for (var p = 0;
-                                              p <
-                                                  snapshotPunto
-                                                      .data!.length;
+                                              p < snapshotPunto.data!.length;
                                               p++) {
-                                            pedidosPendientes = snapshotAuxiliar
-                                                .data!
-                                                .where((auxiliar) =>
-                                                    auxiliar.pedido
-                                                            .estado ==
-                                                        "PENDIENTE" &&
-                                                    auxiliar.pedido
-                                                        .pedidoConfirmado &&
-                                                    auxiliar.pedido
-                                                            .puntoVenta ==
-                                                        snapshotPunto
-                                                            .data![p]
-                                                            .id &&
-                                                    usuarioAutenticado
-                                                            .puntoVenta ==
-                                                        snapshotPunto
-                                                            .data![p]
-                                                            .id)
-                                                .toList();
+                                            pedidosPendientes.addAll(
+                                                snapshotAuxiliar
+                                                    .data!
+                                                    .where((auxiliar) =>
+                                                        auxiliar.pedido
+                                                                .estado ==
+                                                            "PENDIENTE" &&
+                                                        auxiliar.pedido
+                                                            .pedidoConfirmado &&
+                                                        auxiliar.pedido
+                                                                .puntoVenta ==
+                                                            snapshotPunto
+                                                                .data![p].id &&
+                                                        usuarioAutenticado
+                                                                .puntoVenta ==
+                                                            snapshotPunto
+                                                                .data![p].id));
                                           }
-                                          
+
                                           return PendientePunto(
-                                            auxPedido:
-                                                pedidosPendientes,
+                                            auxPedido: pedidosPendientes,
+                                            usuario: usuarioAutenticado,
                                           );
                                         }
                                       });
@@ -765,8 +777,7 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                           const SizedBox(height: defaultPadding),
                           // Tabla de pedidos entregados
                           FutureBuilder(
-                              future:
-                                  getPuntosVenta(), // Obtener puntos
+                              future: getPuntosVenta(), // Obtener puntos
                               builder: (context,
                                   AsyncSnapshot<List<PuntoVentaModel>>
                                       snapshotPunto) {
@@ -777,72 +788,71 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                   // Validar si hay un error
                                 } else if (snapshotPunto.hasError) {
                                   return Text(
-                                      'Error al cargar puntos: ${snapshotPunto.error}');
+                                    'Error al cargar puntos: ${snapshotPunto.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Validar si hay datos
                                 } else if (snapshotPunto.data == null) {
                                   return const Text(
-                                      'No se encontraron puntos');
+                                    'No se encontraron puntos',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Mostrar datos
                                 } else {
                                   return FutureBuilder(
                                       future:
                                           getAuxPedidos(), // Obtener pedidos
                                       builder: (context,
-                                          AsyncSnapshot<
-                                                  List<AuxPedidoModel>>
+                                          AsyncSnapshot<List<AuxPedidoModel>>
                                               snapshotAuxiliar) {
                                         // Validar estado de la petición
-                                        if (snapshotAuxiliar
-                                                .connectionState ==
+                                        if (snapshotAuxiliar.connectionState ==
                                             ConnectionState.waiting) {
                                           return const CircularProgressIndicator();
                                           // Validar si hay un error
-                                        } else if (snapshotAuxiliar
-                                            .hasError) {
+                                        } else if (snapshotAuxiliar.hasError) {
                                           return Text(
-                                              'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                            'Error al cargar pedidos: ${snapshotAuxiliar.error}',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Validar si hay datos
-                                        } else if (snapshotAuxiliar
-                                                .data ==
+                                        } else if (snapshotAuxiliar.data ==
                                             null) {
                                           return const Text(
-                                              'No se encontraron pedidos');
+                                            'No se encontraron pedidos',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Mostrar datos
                                         } else {
                                           List<AuxPedidoModel>
                                               pedidosEntregados =
                                               []; // Lista de pedidos entregados
-                                          
+
                                           // Obtener pedidos entregados del punto de venta
                                           for (var p = 0;
-                                              p <
-                                                  snapshotPunto
-                                                      .data!.length;
+                                              p < snapshotPunto.data!.length;
                                               p++) {
-                                            pedidosEntregados = snapshotAuxiliar
-                                                .data!
-                                                .where((auxiliar) =>
-                                                    auxiliar.pedido
-                                                            .estado ==
-                                                        "COMPLETADO" &&
-                                                    auxiliar.pedido
-                                                        .entregado &&
-                                                    auxiliar.pedido
-                                                            .puntoVenta ==
-                                                        snapshotPunto
-                                                            .data![p]
-                                                            .id &&
-                                                    usuarioAutenticado
-                                                            .puntoVenta ==
-                                                        snapshotPunto
-                                                            .data![p]
-                                                            .id)
-                                                .toList();
+                                            pedidosEntregados.addAll(
+                                                snapshotAuxiliar.data!.where(
+                                                    (auxiliar) =>
+                                                        auxiliar.pedido
+                                                                .estado ==
+                                                            "COMPLETADO" &&
+                                                        auxiliar
+                                                            .pedido.entregado &&
+                                                        auxiliar.pedido
+                                                                .puntoVenta ==
+                                                            snapshotPunto
+                                                                .data![p].id &&
+                                                        usuarioAutenticado
+                                                                .puntoVenta ==
+                                                            snapshotPunto
+                                                                .data![p].id));
                                           }
-                                          
+
                                           return EntregadoPunto(
-                                            auxPedido:
-                                                pedidosEntregados,
+                                            auxPedido: pedidosEntregados,
+                                            usuario: usuarioAutenticado,
                                           );
                                         }
                                       });
@@ -851,8 +861,7 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                           const SizedBox(height: defaultPadding),
                           // Tabla de pedidos cancelados
                           FutureBuilder(
-                              future:
-                                  getPuntosVenta(), // Obtener puntos
+                              future: getPuntosVenta(), // Obtener puntos
                               builder: (context,
                                   AsyncSnapshot<List<PuntoVentaModel>>
                                       snapshotPunto) {
@@ -863,69 +872,68 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                   // Validar si hay un error
                                 } else if (snapshotPunto.hasError) {
                                   return Text(
-                                      'Error al cargar puntos: ${snapshotPunto.error}');
+                                    'Error al cargar puntos: ${snapshotPunto.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Validar si hay datos
                                 } else if (snapshotPunto.data == null) {
                                   return const Text(
-                                      'No se encontraron puntos');
+                                    'No se encontraron puntos',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Mostrar datos
                                 } else {
                                   return FutureBuilder(
                                       future:
                                           getAuxPedidos(), // Obtener pedidos
                                       builder: (context,
-                                          AsyncSnapshot<
-                                                  List<AuxPedidoModel>>
+                                          AsyncSnapshot<List<AuxPedidoModel>>
                                               snapshotAuxiliar) {
                                         // Validar estado de la petición
-                                        if (snapshotAuxiliar
-                                                .connectionState ==
+                                        if (snapshotAuxiliar.connectionState ==
                                             ConnectionState.waiting) {
                                           return const CircularProgressIndicator();
                                           // Validar si hay un error
-                                        } else if (snapshotAuxiliar
-                                            .hasError) {
+                                        } else if (snapshotAuxiliar.hasError) {
                                           return Text(
-                                              'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                            'Error al cargar pedidos: ${snapshotAuxiliar.error}',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Validar si hay datos
-                                        } else if (snapshotAuxiliar
-                                                .data ==
+                                        } else if (snapshotAuxiliar.data ==
                                             null) {
                                           return const Text(
-                                              'No se encontraron pedidos');
+                                            'No se encontraron pedidos',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Mostrar datos
                                         } else {
                                           List<AuxPedidoModel>
                                               pedidosCancelados =
                                               []; // Lista de pedidos cancelados
-                                          
+
                                           // Obtener pedidos cancelados del punto de venta
                                           for (var p = 0;
-                                              p <
-                                                  snapshotPunto
-                                                      .data!.length;
+                                              p < snapshotPunto.data!.length;
                                               p++) {
-                                            pedidosCancelados = snapshotAuxiliar
-                                                .data!
-                                                .where((auxiliar) =>
-                                                    auxiliar.pedido
-                                                            .estado ==
-                                                        "CANCELADO" &&
-                                                    auxiliar.pedido
-                                                            .puntoVenta ==
-                                                        snapshotPunto
-                                                            .data![p]
-                                                            .id &&
-                                                    usuarioAutenticado
-                                                            .puntoVenta ==
-                                                        snapshotPunto
-                                                            .data![p]
-                                                            .id)
-                                                .toList();
+                                            pedidosCancelados.addAll(
+                                                snapshotAuxiliar.data!.where(
+                                                    (auxiliar) =>
+                                                        auxiliar.pedido
+                                                                .estado ==
+                                                            "CANCELADO" &&
+                                                        auxiliar.pedido
+                                                                .puntoVenta ==
+                                                            snapshotPunto
+                                                                .data![p].id &&
+                                                        usuarioAutenticado
+                                                                .puntoVenta ==
+                                                            snapshotPunto
+                                                                .data![p].id));
                                           }
                                           return CanceladoPunto(
-                                            auxPedido:
-                                                pedidosCancelados,
+                                            auxPedido: pedidosCancelados,
+                                            usuario: usuarioAutenticado,
                                           );
                                         }
                                       });
@@ -934,8 +942,7 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                           const SizedBox(height: defaultPadding),
                           // Tabla de facturas
                           FutureBuilder(
-                              future:
-                                  getPuntosVenta(), // Obtener puntos
+                              future: getPuntosVenta(), // Obtener puntos
                               builder: (context,
                                   AsyncSnapshot<List<PuntoVentaModel>>
                                       snapshotPunto) {
@@ -946,36 +953,39 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                   // Validar si hay un error
                                 } else if (snapshotPunto.hasError) {
                                   return Text(
-                                      'Error al cargar puntos: ${snapshotPunto.error}');
+                                    'Error al cargar puntos: ${snapshotPunto.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Validar si hay datos
                                 } else if (snapshotPunto.data == null) {
                                   return const Text(
-                                      'No se encontraron puntos');
+                                    'No se encontraron puntos',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Mostrar datos
                                 } else {
                                   return FutureBuilder(
-                                      future:
-                                          getFacturas(), // Obtener facturas
+                                      future: getFacturas(), // Obtener facturas
                                       builder: (context,
-                                          AsyncSnapshot<
-                                                  List<FacturaModel>>
+                                          AsyncSnapshot<List<FacturaModel>>
                                               snapshotFactura) {
                                         // Validar estado de la petición
-                                        if (snapshotFactura
-                                                .connectionState ==
+                                        if (snapshotFactura.connectionState ==
                                             ConnectionState.waiting) {
                                           return const CircularProgressIndicator();
                                           // Validar si hay un error
-                                        } else if (snapshotFactura
-                                            .hasError) {
+                                        } else if (snapshotFactura.hasError) {
                                           return Text(
-                                              'Error al cargar ventas: ${snapshotFactura.error}');
+                                            'Error al cargar ventas: ${snapshotFactura.error}',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Validar si hay datos
-                                        } else if (snapshotFactura
-                                                .data ==
+                                        } else if (snapshotFactura.data ==
                                             null) {
                                           return const Text(
-                                              'No se encontraron ventas');
+                                            'No se encontraron ventas',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Mostrar datos
                                         } else {
                                           return FutureBuilder(
@@ -983,59 +993,56 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                   getAuxPedidos(), // Obtener pedidos
                                               builder: (context,
                                                   AsyncSnapshot<
-                                                          List<
-                                                              AuxPedidoModel>>
+                                                          List<AuxPedidoModel>>
                                                       snapshotAuxiliar) {
                                                 // Validar estado de la petición
                                                 if (snapshotAuxiliar
                                                         .connectionState ==
-                                                    ConnectionState
-                                                        .waiting) {
+                                                    ConnectionState.waiting) {
                                                   return const CircularProgressIndicator();
                                                   // Validar si hay un error
                                                 } else if (snapshotAuxiliar
                                                     .hasError) {
                                                   return Text(
-                                                      'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                                    'Error al cargar pedidos: ${snapshotAuxiliar.error}',
+                                                    textAlign: TextAlign.center,
+                                                  );
                                                   // Validar si hay datos
                                                 } else if (snapshotAuxiliar
                                                         .data ==
                                                     null) {
                                                   return const Text(
-                                                      'No se encontraron pedidos');
+                                                    'No se encontraron pedidos',
+                                                    textAlign: TextAlign.center,
+                                                  );
                                                   // Mostrar datos
                                                 } else {
                                                   List<AuxPedidoModel>
                                                       pedidosFacturas =
                                                       []; // Lista de pedidos
-                                          
+
                                                   // Obtener las facturas del punto de venta y la información relacionada
                                                   for (var p = 0;
                                                       p <
                                                           snapshotPunto
-                                                              .data!
-                                                              .length;
+                                                              .data!.length;
                                                       p++) {
                                                     for (var f = 0;
                                                         f <
                                                             snapshotFactura
-                                                                .data!
-                                                                .length;
+                                                                .data!.length;
                                                         f++) {
-                                                      pedidosFacturas = snapshotAuxiliar
+                                                      pedidosFacturas.addAll(snapshotAuxiliar
                                                           .data!
                                                           .where((pedido) =>
                                                               snapshotFactura
-                                                                      .data![
-                                                                          f]
+                                                                      .data![f]
                                                                       .pedido
                                                                       .id ==
-                                                                  pedido
-                                                                      .pedido
+                                                                  pedido.pedido
                                                                       .id &&
                                                               snapshotPunto
-                                                                      .data![
-                                                                          p]
+                                                                      .data![p]
                                                                       .id ==
                                                                   usuarioAutenticado
                                                                       .puntoVenta &&
@@ -1043,14 +1050,13 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                                       .puntoVenta ==
                                                                   snapshotPunto
                                                                       .data![p]
-                                                                      .id)
-                                                          .toList();
+                                                                      .id));
                                                     }
                                                   }
-                                          
+
                                                   return FacturaPunto(
-                                                    auxPedido:
-                                                        pedidosFacturas,
+                                                    auxPedido: pedidosFacturas,
+                                                    usuario: usuarioAutenticado,
                                                   );
                                                 }
                                               });
@@ -1061,50 +1067,50 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                           const SizedBox(height: defaultPadding),
                           // Tabla de devoluciones
                           FutureBuilder(
-                              future:
-                                  getDevoluciones(), // Obtener devoluciones
+                              future: getDevoluciones(), // Obtener devoluciones
                               builder: (context,
                                   AsyncSnapshot<List<DevolucionesModel>>
                                       snapshotDevolucion) {
                                 // Validar estado de la petición
-                                if (snapshotDevolucion
-                                        .connectionState ==
+                                if (snapshotDevolucion.connectionState ==
                                     ConnectionState.waiting) {
                                   return const CircularProgressIndicator();
                                   // Validar si hay un error
-                                } else if (snapshotDevolucion
-                                    .hasError) {
+                                } else if (snapshotDevolucion.hasError) {
                                   return Text(
-                                      'Error al cargar devoluciones: ${snapshotDevolucion.error}');
+                                    'Error al cargar devoluciones: ${snapshotDevolucion.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Validar si hay datos
-                                } else if (snapshotDevolucion.data ==
-                                    null) {
+                                } else if (snapshotDevolucion.data == null) {
                                   return const Text(
-                                      'No se encontraron devoluciones');
+                                    'No se encontraron devoluciones',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Mostrar datos
                                 } else {
                                   return FutureBuilder(
                                       future:
                                           getPuntosVenta(), // Obtener puntos
                                       builder: (context,
-                                          AsyncSnapshot<
-                                                  List<PuntoVentaModel>>
+                                          AsyncSnapshot<List<PuntoVentaModel>>
                                               snapshotPunto) {
                                         // Validar estado de la petición
-                                        if (snapshotPunto
-                                                .connectionState ==
+                                        if (snapshotPunto.connectionState ==
                                             ConnectionState.waiting) {
                                           return const CircularProgressIndicator();
                                           // Validar si hay un error
-                                        } else if (snapshotPunto
-                                            .hasError) {
+                                        } else if (snapshotPunto.hasError) {
                                           return Text(
-                                              'Error al cargar puntos: ${snapshotPunto.error}');
+                                            'Error al cargar puntos: ${snapshotPunto.error}',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Validar si hay datos
-                                        } else if (snapshotPunto.data ==
-                                            null) {
+                                        } else if (snapshotPunto.data == null) {
                                           return const Text(
-                                              'No se encontraron puntos');
+                                            'No se encontraron puntos',
+                                            textAlign: TextAlign.center,
+                                          );
                                           // Mostrar datos
                                         } else {
                                           return FutureBuilder(
@@ -1112,60 +1118,57 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                   getAuxPedidos(), // Obtener pedidos
                                               builder: (context,
                                                   AsyncSnapshot<
-                                                          List<
-                                                              AuxPedidoModel>>
+                                                          List<AuxPedidoModel>>
                                                       snapshotAuxiliar) {
                                                 // Validar estado de la petición
                                                 if (snapshotAuxiliar
                                                         .connectionState ==
-                                                    ConnectionState
-                                                        .waiting) {
+                                                    ConnectionState.waiting) {
                                                   return const CircularProgressIndicator();
                                                   // Validar si hay un error
                                                 } else if (snapshotAuxiliar
                                                     .hasError) {
                                                   return Text(
-                                                      'Error al cargar pedidos: ${snapshotAuxiliar.error}');
+                                                    'Error al cargar pedidos: ${snapshotAuxiliar.error}',
+                                                    textAlign: TextAlign.center,
+                                                  );
                                                   // Validar si hay datos
                                                 } else if (snapshotAuxiliar
                                                         .data ==
                                                     null) {
                                                   return const Text(
-                                                      'No se encontraron pedidos');
+                                                    'No se encontraron pedidos',
+                                                    textAlign: TextAlign.center,
+                                                  );
                                                   // Mostrar datos
                                                 } else {
                                                   List<AuxPedidoModel>
                                                       pedidosDevueltos =
                                                       []; // Lista de pedidos
-                                          
+
                                                   // Obtener las devoluciones del punto de venta y la información relacionada
                                                   for (var p = 0;
                                                       p <
                                                           snapshotPunto
-                                                              .data!
-                                                              .length;
+                                                              .data!.length;
                                                       p++) {
                                                     for (var d = 0;
                                                         d <
                                                             snapshotDevolucion
-                                                                .data!
-                                                                .length;
+                                                                .data!.length;
                                                         d++) {
-                                                      pedidosDevueltos = snapshotAuxiliar
+                                                      pedidosDevueltos.addAll(snapshotAuxiliar
                                                           .data!
                                                           .where((pedido) =>
                                                               snapshotDevolucion
-                                                                      .data![
-                                                                          d]
+                                                                      .data![d]
                                                                       .factura
                                                                       .pedido
                                                                       .id ==
-                                                                  pedido
-                                                                      .pedido
+                                                                  pedido.pedido
                                                                       .id &&
                                                               snapshotPunto
-                                                                      .data![
-                                                                          p]
+                                                                      .data![p]
                                                                       .id ==
                                                                   usuarioAutenticado
                                                                       .puntoVenta &&
@@ -1173,14 +1176,13 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                                       .puntoVenta ==
                                                                   snapshotPunto
                                                                       .data![p]
-                                                                      .id)
-                                                          .toList();
+                                                                      .id));
                                                     }
                                                   }
-                                          
+
                                                   return DevolucionPunto(
-                                                    auxPedido:
-                                                        pedidosDevueltos,
+                                                    auxPedido: pedidosDevueltos,
+                                                    usuario: usuarioAutenticado,
                                                   );
                                                 }
                                               });
@@ -1191,38 +1193,41 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                           const SizedBox(height: defaultPadding),
                           // Tabla de inventario
                           FutureBuilder(
-                              future:
-                                  getInventario(), // Obtener inventario
+                              future: getInventario(), // Obtener inventario
                               builder: (context,
                                   AsyncSnapshot<List<InventarioModel>>
                                       snapshotInventario) {
                                 // Validar estado de la petición
-                                if (snapshotInventario
-                                        .connectionState ==
+                                if (snapshotInventario.connectionState ==
                                     ConnectionState.waiting) {
                                   return const CircularProgressIndicator();
                                   // Validar si hay un error
-                                } else if (snapshotInventario
-                                    .hasError) {
+                                } else if (snapshotInventario.hasError) {
                                   return Text(
-                                      'Error al cargar inventarios: ${snapshotInventario.error}');
+                                    'Error al cargar inventarios: ${snapshotInventario.error}',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Validar si hay datos
-                                } else if (snapshotInventario.data ==
-                                    null) {
+                                } else if (snapshotInventario.data == null) {
                                   return const Text(
-                                      'No se encontraron inventarios');
+                                    'No se encontraron inventarios',
+                                    textAlign: TextAlign.center,
+                                  );
                                   // Mostrar datos
                                 } else {
-                                  final inventarioPunto = snapshotInventario
+                                  List<InventarioModel> inventarioPunto =
+                                      []; // Lista de inventario>
+
+                                  inventarioPunto.addAll(snapshotInventario
                                       .data!
                                       .where((inventario) =>
-                                          inventario
-                                              .bodega.puntoVenta.id ==
-                                          usuarioAutenticado.puntoVenta)
-                                      .toList(); // Filtrar inventario por punto de venta
-                                          
+                                          inventario.bodega.puntoVenta.id ==
+                                          usuarioAutenticado
+                                              .puntoVenta)); // Filtrar inventario por punto de venta
+
                                   return BodegaPunto(
                                     inventarioLista: inventarioPunto,
+                                    usuario: usuarioAutenticado,
                                   );
                                 }
                               }),

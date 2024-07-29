@@ -7,7 +7,10 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
 import 'package:tienda_app/Models/devolucionesModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+import 'package:tienda_app/pdf/Usuario/pdfDevolucionUsuario.dart';
+import 'package:tienda_app/pdf/modalsPdf.dart';
 
 /// Clase que representa la pantalla de devoluciones de un usuario.
 ///
@@ -21,10 +24,13 @@ class DevolucionUsuario extends StatefulWidget {
   /// La lista de pedidos del usuario a mostrar.
   final List<AuxPedidoModel> auxPedido;
 
+  final UsuarioModel usuario;
+
   /// Constructor de la clase DevolucionUsuario.
   ///
   /// Recibe una lista de pedidos del usuario y los almacena en el campo [auxPedido].
-  const DevolucionUsuario({super.key, required this.auxPedido});
+  const DevolucionUsuario(
+      {super.key, required this.auxPedido, required this.usuario});
 
   /// Devuelve el estado de la clase DevolucionUsuario.
   @override
@@ -47,10 +53,15 @@ class _DevolucionUsuarioState extends State<DevolucionUsuario> {
   /// Esta lista se utiliza para mostrar las devoluciones en la pantalla de devoluciones.
   List<DevolucionesModel> listaDevoluciones = [];
 
+  /// Lista de objetos [UsuarioModel] que representan los vendedores del punto de venta.
+  List<UsuarioModel> listaUsuarios = [];
+
   /// Fuente de datos para la grilla de devoluciones.
   ///
   /// Esta variable se utiliza para mostrar los datos de las devoluciones en la pantalla de devoluciones.
   late DevolucionUsuarioDataGridSource _dataGridSource;
+
+  List<DataGridRow> registros = [];
 
   @override
 
@@ -67,6 +78,7 @@ class _DevolucionUsuarioState extends State<DevolucionUsuario> {
       devoluciones: _devoluciones,
       listaProductos: listaProductos,
       listaDevoluciones: listaDevoluciones,
+      listaUsuarios: listaUsuarios,
     );
 
     // Actualiza la lista de devoluciones con los pedidos recibidos del widget
@@ -88,9 +100,13 @@ class _DevolucionUsuarioState extends State<DevolucionUsuario> {
     // Obtiene las devoluciones de la API
     List<DevolucionesModel> devolucionesCargadas = await getDevoluciones();
 
-    // Asigna los productos y las devoluciones a las variables correspondientes
+    // Obtiene los usuarios de la API
+    List<UsuarioModel> usuariosCargados = await getUsuarios();
+
+    // Asigna los productos, las devoluciones y los usuarios a las variables correspondientes
     listaProductos = productosCargados;
     listaDevoluciones = devolucionesCargadas;
+    listaUsuarios = usuariosCargados;
 
     if (mounted) {
       // Actualiza _dataGridSource en el siguiente frame de la interfaz de usuario
@@ -98,9 +114,11 @@ class _DevolucionUsuarioState extends State<DevolucionUsuario> {
         setState(() {
           // Inicializa _dataGridSource con los datos de las devoluciones, productos y pedidos
           _dataGridSource = DevolucionUsuarioDataGridSource(
-              devoluciones: _devoluciones,
-              listaProductos: listaProductos,
-              listaDevoluciones: listaDevoluciones);
+            devoluciones: _devoluciones,
+            listaProductos: listaProductos,
+            listaDevoluciones: listaDevoluciones,
+            listaUsuarios: listaUsuarios,
+          );
         });
       });
     }
@@ -157,6 +175,19 @@ class _DevolucionUsuarioState extends State<DevolucionUsuario> {
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Cambia la firma del callback
+                onSelectionChanged: (List<DataGridRow> addedRows,
+                    List<DataGridRow> removedRows) {
+                  setState(() {
+                    // Añadir filas a la lista de registros seleccionados
+                    registros.addAll(addedRows);
+
+                    // Eliminar filas de la lista de registros seleccionados
+                    for (var row in removedRows) {
+                      registros.remove(row);
+                    }
+                  });
+                },
                 // Columnas de la grilla
                 columns: <GridColumn>[
                   GridColumn(
@@ -216,6 +247,14 @@ class _DevolucionUsuarioState extends State<DevolucionUsuario> {
                     ),
                   ),
                   GridColumn(
+                    columnName: 'Vendedor',
+                    label: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      child: const Text('Vendedor'),
+                    ),
+                  ),
+                  GridColumn(
                     columnName: 'Fecha Devolución',
                     label: Container(
                       padding: const EdgeInsets.all(8.0),
@@ -242,7 +281,17 @@ class _DevolucionUsuarioState extends State<DevolucionUsuario> {
           Center(
             child: Column(
               children: [
-                _buildButton('Imprimir Reporte', () {}),
+                _buildButton('Imprimir Reporte', () {
+                  if (registros.isEmpty) {
+                    noHayPDFModal(context);
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PdfDevolucionUsuarioScreen(
+                                usuario: widget.usuario, registro: registros)));
+                  }
+                }),
               ],
             ),
           ),
@@ -544,11 +593,54 @@ class DevolucionUsuarioDataGridSource extends DataGridSource {
     return estadoDevolucion;
   }
 
+  /// Obtiene el nombre del vendedor de una devolución dado su número de pedido.
+  ///
+  /// El método recibe el número de pedido de la devolución y una lista de
+  /// usuarios y devoluciones. Recorre la lista de devoluciones buscando la
+  /// devolución que corresponda al número de pedido especificado. Si encuentra
+  /// una devolución que coincide con el número de pedido, busca el usuario
+  /// vendedor en la lista de usuarios y obtiene su nombre. Si no encuentra
+  /// ninguna devolución que coincida, devuelve una cadena vacía.
+  ///
+  /// Parámetros:
+  /// - numeroPedido: El número de pedido de la devolución a buscar.
+  /// - usuarios: La lista de usuarios en la que buscar el usuario vendedor.
+  /// - devoluciones: La lista de devoluciones en la que buscar la devolución.
+  ///
+  /// Retorna:
+  /// - Una cadena con el nombre del vendedor de la devolución encontrada, si se
+  ///   encuentra una devolución que coincida con el número de pedido.
+  /// - Una cadena vacía si no se encuentra ninguna devolución que coincida con
+  ///   el número de pedido.
+  String nombreVendedor(int numeroPedido, List<UsuarioModel> usuarios,
+      List<DevolucionesModel> devoluciones) {
+    // Inicializa una cadena vacía para almacenar el nombre del vendedor.
+    String vendedor = "";
+
+    // Recorre la lista de facturas buscando la factura correspondiente.
+    for (var devolucion in devoluciones) {
+      // Verifica si el número de pedido de la factura coincide con el buscado.
+      if (devolucion.factura.pedido.numeroPedido == numeroPedido) {
+        // Busca el usuario vendedor en la lista de usuarios.
+        var usuario = usuarios.firstWhere(
+            (usuario) => usuario.id == devolucion.factura.usuarioVendedor);
+        // Obtiene el nombre del usuario vendedor.
+        vendedor = "${usuario.nombres} ${usuario.apellidos}";
+        // Salta el bucle para evitar buscar más facturas.
+        break;
+      }
+    }
+
+    // Devuelve el nombre del vendedor de la factura encontrada o una cadena vacía.
+    return vendedor;
+  }
+
   // Lista de datos de pedido
   DevolucionUsuarioDataGridSource({
     required List<AuxPedidoModel> devoluciones,
     required List<ProductoModel> listaProductos,
     required List<DevolucionesModel> listaDevoluciones,
+    required List<UsuarioModel> listaUsuarios,
   }) {
     _devolucionData = devoluciones.map<DataGridRow>((devolucion) {
       return DataGridRow(cells: [
@@ -574,6 +666,10 @@ class DevolucionUsuarioDataGridSource extends DataGridSource {
             columnName: 'Medio Pago',
             value: medioVentaDevolucion(
                 devolucion.pedido.numeroPedido, listaDevoluciones)),
+        DataGridCell<String>(
+            columnName: 'Vendedor',
+            value: nombreVendedor(devolucion.pedido.numeroPedido, listaUsuarios,
+                listaDevoluciones)),
         DataGridCell<String>(
             columnName: 'Fecha Devolución',
             value: fechaDevolucion(
@@ -601,7 +697,7 @@ class DevolucionUsuarioDataGridSource extends DataGridSource {
     return DataGridRowAdapter(cells: [
       Container(
         padding: const EdgeInsets.all(8.0),
-        alignment: Alignment.center,
+        alignment: Alignment.centerLeft,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -629,7 +725,7 @@ class DevolucionUsuarioDataGridSource extends DataGridSource {
               ? row.getCells()[i].value
               : Text(i == 5
                   ? "\$${formatter.format(row.getCells()[i].value)}" // Formatea el valor a moneda
-                  : i == 4 || i == 7
+                  : i == 4 || i == 8
                       ? formatFechaHora(row
                           .getCells()[i]
                           .value

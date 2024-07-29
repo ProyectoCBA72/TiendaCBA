@@ -7,7 +7,10 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
 import 'package:tienda_app/Models/devolucionesModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+import 'package:tienda_app/pdf/Lider/pdfDevolucionLider.dart';
+import 'package:tienda_app/pdf/modalsPdf.dart';
 
 /// Widget de estado que representa la vista de devoluciones de un líder.
 ///
@@ -20,10 +23,13 @@ class DevolucionLider extends StatefulWidget {
   /// Esta lista es necesaria para mostrar las devoluciones del líder en la tabla.
   final List<AuxPedidoModel> auxPedido;
 
+  final UsuarioModel usuario;
+
   /// Constructor que recibe la lista de pedidos de devolución.
   ///
   /// El parámetro [auxPedido] es obligatorio y debe ser proporcionado.
-  const DevolucionLider({super.key, required this.auxPedido});
+  const DevolucionLider(
+      {super.key, required this.auxPedido, required this.usuario});
 
   /// Sobrecarga del método [createState].
   ///
@@ -53,6 +59,8 @@ class _DevolucionLiderState extends State<DevolucionLider> {
   ///
   /// Es un objeto [DevolucionLiderDataGridSource] que se utiliza para proporcionar los datos necesarios para la tabla de devoluciones.
   late DevolucionLiderDataGridSource _dataGridSource;
+
+  List<DataGridRow> registros = [];
 
   @override
 
@@ -159,6 +167,19 @@ class _DevolucionLiderState extends State<DevolucionLider> {
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Cambia la firma del callback
+                onSelectionChanged: (List<DataGridRow> addedRows,
+                    List<DataGridRow> removedRows) {
+                  setState(() {
+                    // Añadir filas a la lista de registros seleccionados
+                    registros.addAll(addedRows);
+
+                    // Eliminar filas de la lista de registros seleccionados
+                    for (var row in removedRows) {
+                      registros.remove(row);
+                    }
+                  });
+                },
                 // Columnas
                 columns: <GridColumn>[
                   GridColumn(
@@ -244,7 +265,17 @@ class _DevolucionLiderState extends State<DevolucionLider> {
           Center(
             child: Column(
               children: [
-                _buildButton('Imprimir Reporte', () {}),
+                _buildButton('Imprimir Reporte', () {
+                  if (registros.isEmpty) {
+                    noHayPDFModal(context);
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PdfDevolucionLiderScreen(
+                                usuario: widget.usuario, registro: registros)));
+                  }
+                }),
               ],
             ),
           ),
@@ -343,7 +374,6 @@ class DevolucionLiderDataGridSource extends DataGridSource {
         break;
       }
     }
-
     // Retornamos el número de venta de la devolución encontrada o una cadena vacía si
     // no se encontró ninguna devolución que coincida con el número de pedido
     return numeroVenta;
@@ -587,7 +617,7 @@ class DevolucionLiderDataGridSource extends DataGridSource {
     return DataGridRowAdapter(cells: [
       Container(
         padding: const EdgeInsets.all(8.0),
-        alignment: Alignment.center,
+        alignment: Alignment.centerLeft,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(

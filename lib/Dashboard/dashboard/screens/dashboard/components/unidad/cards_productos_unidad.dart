@@ -134,13 +134,16 @@ class CardsProductoUnidad extends StatelessWidget {
                     );
                   } else if (snapshot.hasError) {
                     return Center(
-                      child: Text('error: ${snapshot.error}'),
+                      child: Text(
+                        'error: ${snapshot.error}',
+                        textAlign: TextAlign.center,
+                      ),
                     );
                   } else {
                     // Obtener listas de productos e imágenes
                     List<ProductoModel> productos = snapshot.data![0];
                     List<ImagenProductoModel> allImages = snapshot.data![1];
-                    
+
                     // Filtrar productos por la unidad de producción del usuario autenticado
                     final List<ProductoModel> productosUnidad = productos
                         .where((producto) =>
@@ -155,14 +158,14 @@ class CardsProductoUnidad extends StatelessWidget {
                         itemCount: productosUnidad.length,
                         itemBuilder: (context, index) {
                           ProductoModel producto = productosUnidad[index];
-                          
+
                           // Obtener imágenes asociadas al producto actual
                           List<String> images = allImages
                               .where(
                                   (imagen) => imagen.producto.id == producto.id)
                               .map((imagen) => imagen.imagen)
                               .toList();
-                          
+
                           // Mostrar la tarjeta de producto individual
                           return ProductoCardUnidad(
                             images: images,
@@ -179,6 +182,7 @@ class CardsProductoUnidad extends StatelessWidget {
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       );
                     }

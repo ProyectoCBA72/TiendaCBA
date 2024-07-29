@@ -6,7 +6,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/inventarioModel.dart';
 import 'package:tienda_app/Models/produccionModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+import 'package:tienda_app/pdf/Punto/pdfBodegaPunto.dart';
+import 'package:tienda_app/pdf/modalsPdf.dart';
 import 'package:tienda_app/responsive.dart';
 
 /// Un widget de estado que representa la vista de la bodega de un punto de venta.
@@ -21,11 +24,14 @@ class BodegaPunto extends StatefulWidget {
   /// los inventarios de la bodega del punto de venta.
   final List<InventarioModel> inventarioLista;
 
+  final UsuarioModel usuario;
+
   /// Crea un nuevo widget de estado de la bodega de un punto de venta.
   ///
   /// Toma como parámetro obligatorio la lista de inventarios de la bodega
   /// del punto de venta.
-  const BodegaPunto({super.key, required this.inventarioLista});
+  const BodegaPunto(
+      {super.key, required this.inventarioLista, required this.usuario});
 
   @override
   State<BodegaPunto> createState() => _BodegaPuntoState();
@@ -49,6 +55,8 @@ class _BodegaPuntoState extends State<BodegaPunto> {
   /// Este objeto contiene la fuente de datos para el datagrid de la bodega
   /// del punto de venta, incluyendo los inventarios y las producciones.
   late BodegaPuntoDataGridSource _dataGridSource;
+
+  List<DataGridRow> registros = [];
 
   @override
 
@@ -144,6 +152,19 @@ class _BodegaPuntoState extends State<BodegaPunto> {
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Cambia la firma del callback
+                onSelectionChanged: (List<DataGridRow> addedRows,
+                    List<DataGridRow> removedRows) {
+                  setState(() {
+                    // Añadir filas a la lista de registros seleccionados
+                    registros.addAll(addedRows);
+
+                    // Eliminar filas de la lista de registros seleccionados
+                    for (var row in removedRows) {
+                      registros.remove(row);
+                    }
+                  });
+                },
                 // Cargar columnas
                 columns: <GridColumn>[
                   GridColumn(
@@ -222,7 +243,17 @@ class _BodegaPuntoState extends State<BodegaPunto> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildButton('Imprimir Reporte', () {}),
+                _buildButton('Imprimir Reporte', () {
+                  if (registros.isEmpty) {
+                    noHayPDFModal(context);
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PdfBodegaPuntoScreen(
+                                usuario: widget.usuario, registro: registros)));
+                  }
+                }),
                 const SizedBox(
                   width: defaultPadding,
                 ),
@@ -233,7 +264,18 @@ class _BodegaPuntoState extends State<BodegaPunto> {
             Center(
               child: Column(
                 children: [
-                  _buildButton('Imprimir Reporte', () {}),
+                  _buildButton('Imprimir Reporte', () {
+                    if (registros.isEmpty) {
+                      noHayPDFModal(context);
+                    } else {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PdfBodegaPuntoScreen(
+                                  usuario: widget.usuario,
+                                  registro: registros)));
+                    }
+                  }),
                   const SizedBox(
                     height: defaultPadding,
                   ),
@@ -466,7 +508,7 @@ class BodegaPuntoDataGridSource extends DataGridSource {
     return DataGridRowAdapter(cells: [
       Container(
         padding: const EdgeInsets.all(8.0),
-        alignment: Alignment.center,
+        alignment: Alignment.centerLeft,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(

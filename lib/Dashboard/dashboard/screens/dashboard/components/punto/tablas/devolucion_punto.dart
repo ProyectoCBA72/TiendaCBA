@@ -1,14 +1,25 @@
-// ignore_for_file: use_full_hex_values_for_flutter_colors
+// ignore_for_file: use_full_hex_values_for_flutter_colors, use_build_context_synchronously
+
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:tienda_app/Dashboard/controllers/MenuAppController.dart';
+import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/modalsDashboard.dart';
+import 'package:tienda_app/Dashboard/dashboard/screens/main/main_screen_usuario.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
 import 'package:tienda_app/Models/devolucionesModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+import 'package:tienda_app/pdf/Punto/pdfDevolucionPunto.dart';
+import 'package:tienda_app/pdf/modalsPdf.dart';
 import 'package:tienda_app/responsive.dart';
+import 'package:tienda_app/source.dart';
+import 'package:http/http.dart' as http;
 
 /// Un widget de estado que representa la vista de devoluciones de un punto de venta.
 ///
@@ -19,11 +30,14 @@ class DevolucionPunto extends StatefulWidget {
   /// Lista de objetos [AuxPedidoModel] que representan las devoluciones del punto de venta.
   final List<AuxPedidoModel> auxPedido;
 
+  final UsuarioModel usuario;
+
   /// Crea un nuevo widget de estado de devoluciones para un punto de venta.
   ///
   /// El parámetro [auxPedido] es una lista de objetos [AuxPedidoModel] que
   /// representan las devoluciones del punto de venta.
-  const DevolucionPunto({super.key, required this.auxPedido});
+  const DevolucionPunto(
+      {super.key, required this.auxPedido, required this.usuario});
 
   /// Crea un nuevo estado asociado al widget [DevolucionPunto].
   ///
@@ -42,8 +56,13 @@ class _DevolucionPuntoState extends State<DevolucionPunto> {
   /// Lista de objetos [DevolucionesModel] que representan las devoluciones del punto de venta.
   List<DevolucionesModel> listaDevoluciones = [];
 
+  /// Lista de objetos [UsuarioModel] que representan los vendedores del punto de venta.
+  List<UsuarioModel> listaUsuarios = [];
+
   /// Un [DataGridSource] que proporciona los datos para la tabla de devoluciones.
   late DevolucionPuntoDataGridSource _dataGridSource;
+
+  List<DataGridRow> registros = [];
 
   @override
 
@@ -60,7 +79,8 @@ class _DevolucionPuntoState extends State<DevolucionPunto> {
     _dataGridSource = DevolucionPuntoDataGridSource(
         devoluciones: _devoluciones,
         listaProductos: listaProductos,
-        listaDevoluciones: listaDevoluciones);
+        listaDevoluciones: listaDevoluciones,
+        listaUsuarios: listaUsuarios);
 
     // Copia la lista de devoluciones recibida en el constructor en el campo [_devoluciones].
     _devoluciones = widget.auxPedido;
@@ -85,6 +105,10 @@ class _DevolucionPuntoState extends State<DevolucionPunto> {
     List<DevolucionesModel> devolucionesCargadas = await getDevoluciones();
     listaDevoluciones = devolucionesCargadas;
 
+    // Obtiene los usuarios de la API y los asigna a la variable [listaUsuarios]
+    List<UsuarioModel> usuariosCargados = await getUsuarios();
+    listaUsuarios = usuariosCargados;
+
     if (mounted) {
       // Actualiza _dataGridSource en el siguiente frame de la interfaz de usuario
       SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -93,9 +117,142 @@ class _DevolucionPuntoState extends State<DevolucionPunto> {
           _dataGridSource = DevolucionPuntoDataGridSource(
               devoluciones: _devoluciones,
               listaProductos: listaProductos,
-              listaDevoluciones: listaDevoluciones);
+              listaDevoluciones: listaDevoluciones,
+              listaUsuarios: listaUsuarios);
         });
       });
+    }
+  }
+
+  /// Función asíncrona para cambiar el estado de una devolución.
+  ///
+  /// Esta función recibe una lista de [DataGridRow] que representan las devoluciones
+  /// que se desean cambiar de estado. Recorre la lista de devoluciones cargadas
+  /// desde la API y verifica si el número de factura de cada devolución coincide
+  /// con alguna de las devoluciones pasadas como argumento. Si el número de factura
+  /// coincide y la devolución no ha sido procesada previamente, se agrega a la lista
+  /// [devolucionEditar].
+  ///
+  /// Luego, se recorre la lista de devoluciones a editar y se llama a la API para
+  /// actualizar el estado de cada devolución a "procesada". Si la respuesta del
+  /// servidor es exitosa, se muestra un mensaje de éxito y se navega a la pantalla
+  /// principal de usuario. Si la respuesta indica un error, se muestra un mensaje de
+  /// error.
+  ///
+  /// Los parámetros son:
+  ///
+  /// * `devoluciones`: Lista de [DataGridRow] que representan las devoluciones
+  ///   que se desean cambiar de estado.
+  Future cambiarDevolucion(List<DataGridRow> devoluciones) async {
+    // Lista para almacenar las devoluciones a editar
+    List<DevolucionesModel> devolucionEditar = [];
+    String url;
+
+    // Obtiene las devoluciones cargadas desde la API
+    List<DevolucionesModel> devolucionesCargadas = await getDevoluciones();
+
+    // Utilizamos un Set para almacenar los números de factura ya procesados
+    Set<String> facturasProcesadas = {};
+
+    // Variable para controlar si el mensaje ya ha sido mostrado
+    bool mensajeMostrado = false;
+
+    // Verificación inicial para determinar si alguna devolución ya ha sido procesada
+    for (var dev in devoluciones) {
+      // Obtiene el número de factura de la fila actual
+      String numeroFactura = dev.getCells()[0].value;
+
+      // Verificamos si la devolución ya ha sido procesada
+      bool devolucionEstado = devolucionesCargadas.any((devolucion) =>
+          devolucion.estado == true &&
+          numeroFactura == devolucion.factura.numero.toString());
+
+      // Si la devolución ya ha sido procesada, mostramos un mensaje de error y salimos del ciclo
+      if (devolucionEstado) {
+        if (!mensajeMostrado) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'No se puede editar una devolución que ya ha sido procesada.'),
+            ),
+          );
+          // Marcamos que el mensaje ya ha sido mostrado
+          mensajeMostrado = true;
+        }
+
+        return;
+      } else {
+        // Si ninguna devolución ya ha sido procesada, continuar con la operación
+        for (var devolucion in devolucionesCargadas) {
+          if (!facturasProcesadas.contains(numeroFactura) &&
+              numeroFactura == devolucion.factura.numero.toString()) {
+            // Agrega la devolución a la lista de devoluciones a editar
+            devolucionEditar.add(devolucion);
+            // Agregamos el número de factura al Set
+            facturasProcesadas.add(numeroFactura);
+          }
+        }
+      }
+    }
+
+    // Variable para controlar el estado de las solicitudes
+    bool allSuccessful = true;
+
+    // Recorre la lista de devoluciones a editar
+    for (var editar in devolucionEditar) {
+      // Genera la URL de la solicitud PUT
+      url = "$sourceApi/api/devoluciones/${editar.id}/";
+
+      // Define los encabezados de la solicitud
+      final headers = {
+        'Content-Type': 'application/json',
+      };
+
+      // Define el cuerpo de la solicitud
+      final body = {
+        "fecha": editar.fecha.toString(),
+        "estado": true,
+        "factura": editar.factura.id
+      };
+
+      // Realiza la solicitud PUT
+      final response = await http.put(Uri.parse(url),
+          headers: headers, body: jsonEncode(body));
+
+      // Si la solicitud falla, marcamos allSuccessful como false
+      if (response.statusCode != 200) {
+        allSuccessful = false;
+
+        // Muestra un mensaje de error si la respuesta indica un error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al editar registros: ${response.statusCode}.'),
+          ),
+        );
+      }
+    }
+
+    // Si todas las solicitudes fueron exitosas
+    if (allSuccessful) {
+      // Muestra un mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Devoluciones actualizadas correctamente.'),
+        ),
+      );
+
+      // Navega a la pantalla principal de usuario
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (context) => MenuAppController()),
+            ],
+            child: const MainScreenUsuario(),
+          ),
+        ),
+      );
     }
   }
 
@@ -150,6 +307,19 @@ class _DevolucionPuntoState extends State<DevolucionPunto> {
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Cambia la firma del callback
+                onSelectionChanged: (List<DataGridRow> addedRows,
+                    List<DataGridRow> removedRows) {
+                  setState(() {
+                    // Añadir filas a la lista de registros seleccionados
+                    registros.addAll(addedRows);
+
+                    // Eliminar filas de la lista de registros seleccionados
+                    for (var row in removedRows) {
+                      registros.remove(row);
+                    }
+                  });
+                },
                 // Columnas de la tabla
                 columns: <GridColumn>[
                   GridColumn(
@@ -209,6 +379,14 @@ class _DevolucionPuntoState extends State<DevolucionPunto> {
                     ),
                   ),
                   GridColumn(
+                    columnName: 'Vendedor',
+                    label: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      child: const Text('Vendedor'),
+                    ),
+                  ),
+                  GridColumn(
                     columnName: 'Fecha Devolución',
                     label: Container(
                       padding: const EdgeInsets.all(8.0),
@@ -236,22 +414,55 @@ class _DevolucionPuntoState extends State<DevolucionPunto> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildButton('Imprimir Reporte', () {}),
+                _buildButton('Imprimir Reporte', () {
+                  if (registros.isEmpty) {
+                    noHayPDFModal(context);
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PdfDevolucionPuntoScreen(
+                                usuario: widget.usuario, registro: registros)));
+                  }
+                }),
                 const SizedBox(
                   width: defaultPadding,
                 ),
-                _buildButton('Cambiar Estado', () {}),
+                _buildButton('Cambiar Estado', () {
+                  if (registros.isEmpty) {
+                    operacionFallidaModal(context);
+                  } else {
+                    cambiarDevolucion(registros);
+                  }
+                }),
               ],
             ),
           if (Responsive.isMobile(context))
             Center(
               child: Column(
                 children: [
-                  _buildButton('Imprimir Reporte', () {}),
+                  _buildButton('Imprimir Reporte', () {
+                    if (registros.isEmpty) {
+                      noHayPDFModal(context);
+                    } else {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PdfDevolucionPuntoScreen(
+                                  usuario: widget.usuario,
+                                  registro: registros)));
+                    }
+                  }),
                   const SizedBox(
                     height: defaultPadding,
                   ),
-                  _buildButton('Cambiar Estado', () {}),
+                  _buildButton('Cambiar Estado', () {
+                    if (registros.isEmpty) {
+                      operacionFallidaModal(context);
+                    } else {
+                      cambiarDevolucion(registros);
+                    }
+                  }),
                 ],
               ),
             ),
@@ -535,11 +746,54 @@ class DevolucionPuntoDataGridSource extends DataGridSource {
     return estadoDevolucion;
   }
 
+  /// Obtiene el nombre del vendedor de una devolución dado su número de pedido.
+  ///
+  /// El método recibe el número de pedido de la devolución y una lista de
+  /// usuarios y devoluciones. Recorre la lista de devoluciones buscando la
+  /// devolución que corresponda al número de pedido especificado. Si encuentra
+  /// una devolución que coincide con el número de pedido, busca el usuario
+  /// vendedor en la lista de usuarios y obtiene su nombre. Si no encuentra
+  /// ninguna devolución que coincida, devuelve una cadena vacía.
+  ///
+  /// Parámetros:
+  /// - numeroPedido: El número de pedido de la devolución a buscar.
+  /// - usuarios: La lista de usuarios en la que buscar el usuario vendedor.
+  /// - devoluciones: La lista de devoluciones en la que buscar la devolución.
+  ///
+  /// Retorna:
+  /// - Una cadena con el nombre del vendedor de la devolución encontrada, si se
+  ///   encuentra una devolución que coincida con el número de pedido.
+  /// - Una cadena vacía si no se encuentra ninguna devolución que coincida con
+  ///   el número de pedido.
+  String nombreVendedor(int numeroPedido, List<UsuarioModel> usuarios,
+      List<DevolucionesModel> devoluciones) {
+    // Inicializa una cadena vacía para almacenar el nombre del vendedor.
+    String vendedor = "";
+
+    // Recorre la lista de facturas buscando la factura correspondiente.
+    for (var devolucion in devoluciones) {
+      // Verifica si el número de pedido de la factura coincide con el buscado.
+      if (devolucion.factura.pedido.numeroPedido == numeroPedido) {
+        // Busca el usuario vendedor en la lista de usuarios.
+        var usuario = usuarios.firstWhere(
+            (usuario) => usuario.id == devolucion.factura.usuarioVendedor);
+        // Obtiene el nombre del usuario vendedor.
+        vendedor = "${usuario.nombres} ${usuario.apellidos}";
+        // Salta el bucle para evitar buscar más facturas.
+        break;
+      }
+    }
+
+    // Devuelve el nombre del vendedor de la factura encontrada o una cadena vacía.
+    return vendedor;
+  }
+
   /// Crea un objeto de fuente de datos para la grilla de devoluciones.
   DevolucionPuntoDataGridSource({
     required List<AuxPedidoModel> devoluciones,
     required List<ProductoModel> listaProductos,
     required List<DevolucionesModel> listaDevoluciones,
+    required List<UsuarioModel> listaUsuarios,
   }) {
     _devolucionData = devoluciones.map<DataGridRow>((devolucion) {
       return DataGridRow(cells: [
@@ -565,6 +819,10 @@ class DevolucionPuntoDataGridSource extends DataGridSource {
             columnName: 'Medio Pago',
             value: medioVentaDevolucion(
                 devolucion.pedido.numeroPedido, listaDevoluciones)),
+        DataGridCell<String>(
+            columnName: 'Vendedor',
+            value: nombreVendedor(devolucion.pedido.numeroPedido, listaUsuarios,
+                listaDevoluciones)),
         DataGridCell<String>(
             columnName: 'Fecha Devolución',
             value: fechaDevolucion(
@@ -592,7 +850,7 @@ class DevolucionPuntoDataGridSource extends DataGridSource {
     return DataGridRowAdapter(cells: [
       Container(
         padding: const EdgeInsets.all(8.0),
-        alignment: Alignment.center,
+        alignment: Alignment.centerLeft,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -620,7 +878,7 @@ class DevolucionPuntoDataGridSource extends DataGridSource {
               ? row.getCells()[i].value
               : Text(i == 5
                   ? "\$${formatter.format(row.getCells()[i].value)}" // formato de moneda
-                  : i == 4 || i == 7
+                  : i == 4 || i == 8
                       ? formatFechaHora(row
                           .getCells()[i]
                           .value

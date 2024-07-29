@@ -7,7 +7,10 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
+import 'package:tienda_app/Models/usuarioModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
+import 'package:tienda_app/pdf/Usuario/pdfEntregadoUsuario.dart';
+import 'package:tienda_app/pdf/modalsPdf.dart';
 
 /// Esta clase representa un widget de estado que muestra una tabla de pedidos entregados de un usuario.
 ///
@@ -21,12 +24,15 @@ class EntregadoUsuario extends StatefulWidget {
   /// Lista de objetos [AuxPedidoModel] que representa los pedidos entregados del usuario.
   final List<AuxPedidoModel> auxPedido;
 
+  final UsuarioModel usuario;
+
   /// Construye un widget [EntregadoUsuario] con la lista de pedidos entregados del usuario.
   ///
   /// Los parámetros obligatorios son:
   ///
   /// - [auxPedido]: Lista de objetos [AuxPedidoModel] que representan los pedidos entregados del usuario.
-  const EntregadoUsuario({super.key, required this.auxPedido});
+  const EntregadoUsuario(
+      {super.key, required this.auxPedido, required this.usuario});
 
   /// Crea un estado [_EntregadoUsuarioState] para manejar los datos de la pantalla.
   @override
@@ -47,6 +53,8 @@ class _EntregadoUsuarioState extends State<EntregadoUsuario> {
   ///
   /// Se inicializa en el método [initState] y se utiliza para mostrar los datos de la tabla.
   late EntregadoUsuarioDataGridSource _dataGridSource;
+
+  List<DataGridRow> registros = [];
 
   @override
 
@@ -154,6 +162,19 @@ class _EntregadoUsuarioState extends State<EntregadoUsuario> {
                 showCheckboxColumn: true,
                 allowSorting: true,
                 allowFiltering: true,
+                // Cambia la firma del callback
+                onSelectionChanged: (List<DataGridRow> addedRows,
+                    List<DataGridRow> removedRows) {
+                  setState(() {
+                    // Añadir filas a la lista de registros seleccionados
+                    registros.addAll(addedRows);
+
+                    // Eliminar filas de la lista de registros seleccionados
+                    for (var row in removedRows) {
+                      registros.remove(row);
+                    }
+                  });
+                },
                 // Establece las columnas de la tabla
                 columns: <GridColumn>[
                   GridColumn(
@@ -241,7 +262,17 @@ class _EntregadoUsuarioState extends State<EntregadoUsuario> {
           Center(
             child: Column(
               children: [
-                _buildButton('Imprimir Reporte', () {}),
+                _buildButton('Imprimir Reporte', () {
+                  if (registros.isEmpty) {
+                    noHayPDFModal(context);
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PdfEntregadoUsuarioScreen(
+                                usuario: widget.usuario, registro: registros)));
+                  }
+                }),
               ],
             ),
           ),
@@ -405,7 +436,7 @@ class EntregadoUsuarioDataGridSource extends DataGridSource {
     return DataGridRowAdapter(cells: [
       Container(
         padding: const EdgeInsets.all(8.0),
-        alignment: Alignment.center,
+        alignment: Alignment.centerLeft,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(

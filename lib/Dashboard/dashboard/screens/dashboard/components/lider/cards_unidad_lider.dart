@@ -135,10 +135,16 @@ class CardsUnidadLider extends StatelessWidget {
                     );
                   } else if (snapshot.hasError) {
                     // Mensaje de error si ocurre un problema al cargar datos
-                    return Text('Error al cargar unidades: ${snapshot.error}');
+                    return Text(
+                      'Error al cargar unidades: ${snapshot.error}',
+                      textAlign: TextAlign.center,
+                    );
                   } else if (snapshot.data == null) {
                     // Mensaje si no se encontraron datos de unidades
-                    return const Text('No se encontraron unidades');
+                    return const Text(
+                      'No se encontraron unidades',
+                      textAlign: TextAlign.center,
+                    );
                   } else {
                     // Procesamiento de datos y construcción de las tarjetas de unidades
                     List<UnidadProduccionModel> unidadesProduccion =
@@ -167,6 +173,7 @@ class CardsUnidadLider extends StatelessWidget {
                         child: Text(
                           'No hay unidades de producción en esta sede',
                           style: TextStyle(fontSize: 20),
+                          textAlign: TextAlign.center,
                         ),
                       );
                     }
