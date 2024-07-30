@@ -86,17 +86,22 @@ class ReporteProductosMasVendidosAgnoPunto extends StatelessWidget {
                               devoluciones.any((devolucion) =>
                                   devolucion.factura.pedido.id !=
                                   factura.pedido.id)) {
-                            final producto = productos
-                                .firstWhere((p) => p.id == auxPedido.producto)
-                                .nombre;
-                            ventasPorProductoPorAgno.putIfAbsent(
-                                producto, () => {});
-                            ventasPorProductoPorAgno[producto]!
-                                .putIfAbsent(agno, () => 0);
+                            var producto = productos
+                                .where((p) => p.id == auxPedido.producto);
 
-                            ventasPorProductoPorAgno[producto]![agno] =
-                                ventasPorProductoPorAgno[producto]![agno]! +
-                                    auxPedido.cantidad.toDouble();
+                            var productoNombre = producto.firstOrNull?.nombre;
+
+                            if (productoNombre != null) {
+                              ventasPorProductoPorAgno.putIfAbsent(
+                                  productoNombre, () => {});
+                              ventasPorProductoPorAgno[productoNombre]!
+                                  .putIfAbsent(agno, () => 0);
+
+                              ventasPorProductoPorAgno[productoNombre]![agno] =
+                                  ventasPorProductoPorAgno[productoNombre]![
+                                          agno]! +
+                                      auxPedido.cantidad.toDouble();
+                            }
                           }
                         }
                       }
@@ -123,7 +128,8 @@ class ReporteProductosMasVendidosAgnoPunto extends StatelessWidget {
                     ),
                     primaryYAxis: const NumericAxis(
                       title: AxisTitle(text: 'Cantidad Vendida'),
-                      minimum: 0, // Asegúrate de que el mínimo sea 0 para mostrar correctamente las líneas
+                      minimum:
+                          0, // Asegúrate de que el mínimo sea 0 para mostrar correctamente las líneas
                     ),
                     series: <CartesianSeries>[
                       // Crear una serie por cada producto más vendido
@@ -138,8 +144,10 @@ class ReporteProductosMasVendidosAgnoPunto extends StatelessWidget {
                           yValueMapper:
                               (ProduccionVentaAgnoDataPunto data, _) =>
                                   data.cantidad,
-                          color: _getColor(), // Asignar color basado en la lista de colores
-                          width: 2, // Asegúrate de que el grosor de la línea sea adecuado
+                          color:
+                              _getColor(), // Asignar color basado en la lista de colores
+                          width:
+                              2, // Asegúrate de que el grosor de la línea sea adecuado
                           markerSettings: const MarkerSettings(
                             isVisible: true, // Mostrar marcadores en las líneas
                             shape: DataMarkerType.circle, // Forma del marcador

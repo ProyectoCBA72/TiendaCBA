@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:tienda_app/Models/bodegaModel.dart';
 import 'package:tienda_app/Models/inventarioModel.dart';
 import 'package:tienda_app/Models/produccionModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
@@ -20,7 +21,7 @@ class BodegaLider extends StatefulWidget {
   /// Lista de inventarios que representan la cantidad de productos en cada bodega.
   ///
   /// Esta lista se utiliza para inicializar la vista de la bodega.
-  final List<InventarioModel> inventarioLista;
+  final List<BodegaModel> inventarioLista;
 
   final UsuarioModel usuario;
 
@@ -37,15 +38,38 @@ class BodegaLider extends StatefulWidget {
 }
 
 class _BodegaLiderState extends State<BodegaLider> {
-  /// Lista de inventarios que representan la cantidad de productos en cada bodega.
+  /// La lista de inventarios de la bodega del punto de venta.
   ///
-  /// Esta lista se inicializa en el estado y se utiliza en la vista de la bodega.
-  List<InventarioModel> _bodegas = [];
+  /// Esta lista contiene objetos de tipo [BodegaModel] que representan
+  /// los inventarios de la bodega del punto de venta.
+  ///
+  /// **Campo privado**: Este campo es privado y es utilizado para almacenar
+  /// la lista de inventarios de la bodega del punto de venta.
+  ///
+  /// **Tipo**: Este campo es de tipo [List<BodegaModel>].
+  ///
+  /// **Inicialización**: Este campo se inicializa vacío.
+  ///
+  /// **Usos**: Este campo se utiliza para almacenar y acceder a los datos de las
+  /// bodegas del punto de venta. No se debe modificar directamente, ya que su
+  /// valor se carga en el método [initState].
+  ///
+  /// Esta lista contiene objetos de tipo [BodegaModel] que representan los
+  /// inventarios de la bodega del punto de venta. Este campo es privado y
+  /// representa la lista de inventarios de la bodega del punto de venta. Este
+  /// campo es de tipo [List<BodegaModel>] y se inicializa vacío. Este campo se
+  /// utiliza para almacenar y acceder a los datos de las bodegas del punto de
+  /// venta. No se debe modificar directamente, ya que su valor se carga en el
+  /// método [initState].
+  List<BodegaModel> _bodegas = [];
 
   /// Lista de producciones que contiene la información de los productos en cada bodega.
   ///
   /// Esta lista se inicializa en el estado y se utiliza en la vista de la bodega.
   List<ProduccionModel> listaProducciones = [];
+
+  /// La lista de inventarios de la bodega del punto de venta.
+  List<InventarioModel> listaInventarios = [];
 
   /// Origen de datos de la tabla de la bodega.
   ///
@@ -68,7 +92,9 @@ class _BodegaLiderState extends State<BodegaLider> {
 
     // Inicializa el origen de datos de la tabla de la bodega con los datos de entrada
     _dataGridSource = BodegaLiderDataGridSource(
-        bodegas: _bodegas, listaProducciones: listaProducciones);
+        bodegas: _bodegas,
+        listaProducciones: listaProducciones,
+        listaInventarios: listaInventarios);
 
     // Asigna la lista de bodegas recibida en el constructor a la variable local
     _bodegas = widget.inventarioLista;
@@ -86,8 +112,14 @@ class _BodegaLiderState extends State<BodegaLider> {
     // Obtener las producciones de la API
     List<ProduccionModel> produccionesCargadas = await getProducciones();
 
+    // Obtener los inventarios de la API
+    List<InventarioModel> inventariosCargados = await getInventario();
+
     // Asignar las producciones a la variable [_listaProducciones]
     listaProducciones = produccionesCargadas;
+
+    // Asignar los inventarios a la variable [_listaInventarios]
+    listaInventarios = inventariosCargados;
 
     if (mounted) {
       // Actualizar _dataGridSource en el siguiente frame de la interfaz de usuario
@@ -95,7 +127,9 @@ class _BodegaLiderState extends State<BodegaLider> {
         setState(() {
           // Inicializar _dataGridSource con los datos de las producciones y las bodegas
           _dataGridSource = BodegaLiderDataGridSource(
-              bodegas: _bodegas, listaProducciones: listaProducciones);
+              bodegas: _bodegas,
+              listaProducciones: listaProducciones,
+              listaInventarios: listaInventarios);
         });
       });
     }
@@ -337,34 +371,46 @@ class BodegaLiderDataGridSource extends DataGridSource {
   /// Si no encuentra ninguna producción que coincida, devuelve una cadena vacía.
   ///
   /// Parámetros:
-  /// - produccionId: El identificador de la producción a buscar.
+  /// - bodegaId: El identificador de la bodega a buscar.
   /// - producciones: La lista de producciones en la que buscar la producción.
+  /// - inventarios: La lista de inventarios en la que buscar el número de producción.
   ///
   /// Retorna:
   /// - Una cadena con el número de la producción, si se encuentra una producción que
-  ///   coincide con el identificador.
+  ///   coincide con el identificador de bodega.
   /// - Una cadena vacía si no se encuentra ninguna producción que coincida con el
-  ///   identificador.
-  String numeroProduccionInventario(
-      int produccionId, List<ProduccionModel> producciones) {
-    // Cadena para almacenar el número de la producción
-    String produccionNumero = "";
+  ///   identificador de bodega.
+  String numeroProduccionInventario(int bodegaId,
+      List<ProduccionModel> producciones, List<InventarioModel> inventarios) {
+    // Filtra los inventarios que corresponden a la bodega especificada
+    List<InventarioModel> inventariosBodega = inventarios
+        .where((inventario) => inventario.bodega.id == bodegaId)
+        .toList();
 
-    // Recorre la lista de producciones buscando la producción que corresponda al
-    // identificador especificado
-    for (var produccion in producciones) {
-      // Si el identificador de la producción coincide con el produccionId proporcionado
-      if (produccion.id == produccionId) {
-        // Obtiene el número de la producción y lo asigna a la variable produccionNumero
-        produccionNumero = produccion.numero.toString();
-        // Detiene el bucle for y devuelve el número de la producción
-        break;
-      }
+    // Si no hay inventarios para la bodega especificada, devuelve una cadena vacía
+    if (inventariosBodega.isEmpty) {
+      return "";
     }
 
-    // Devuelve el número de la producción o una cadena vacía si no se encuentra la
-    // producción asociada al identificador
-    return produccionNumero;
+    // Ordena los inventarios por fecha en orden descendente (del más reciente al más antiguo)
+    inventariosBodega.sort((a, b) => b.fecha.compareTo(a.fecha));
+
+    // Toma el inventario más reciente
+    InventarioModel inventarioReciente = inventariosBodega.first;
+
+    // Busca la producción asociada al inventario más reciente
+    var produccionReciente = producciones
+        .where((produccion) => produccion.id == inventarioReciente.produccion);
+
+    var produccionRecienteNumero =
+        produccionReciente.firstOrNull?.numero.toString();
+
+    if (produccionRecienteNumero != null) {
+      // Devuelve el número de producción o una cadena vacía si no se encuentra la producción
+      return produccionRecienteNumero.toString();
+    } else {
+      return "";
+    }
   }
 
   /// Obtiene el nombre de la unidad de producción asociada a una producción dada su
@@ -380,33 +426,47 @@ class BodegaLiderDataGridSource extends DataGridSource {
   /// Parámetros:
   /// - produccionId: El identificador de la producción a buscar.
   /// - producciones: La lista de producciones en la que buscar la producción.
+  /// - inventarios: La lista de inventarios en la que buscar la producción asociada a la bodega.
   ///
   /// Retorna:
   /// - Una cadena con el nombre de la unidad de producción, si se encuentra una
   ///   producción que coincide con el identificador.
   /// - Una cadena vacía si no se encuentra ninguna producción que coincida con el
   ///   identificador.
-  String unidadProduccionInventario(
-      int produccionId, List<ProduccionModel> producciones) {
-    // Cadena para almacenar el nombre de la unidad de producción
-    String produccionUnidad = "";
+  ///
+  /// NOTA: Este método recorre las listas de producciones e inventarios para buscar la producción
+  ///       y el inventario correspondientes a la bodega.
+  String unidadProduccionInventario(int bodegaId,
+      List<ProduccionModel> producciones, List<InventarioModel> inventarios) {
+    // Filtra los inventarios que corresponden a la producción especificada
+    List<InventarioModel> inventariosProduccion = inventarios
+        .where((inventario) => inventario.bodega.id == bodegaId)
+        .toList();
 
-    // Recorre la lista de producciones buscando la producción que corresponda al
-    // identificador especificado
-    for (var produccion in producciones) {
-      // Si el identificador de la producción coincide con el produccionId proporcionado
-      if (produccion.id == produccionId) {
-        // Obtiene el nombre de la unidad de producción asociada a la producción y lo
-        // asigna a la variable produccionUnidad
-        produccionUnidad = produccion.unidadProduccion.nombre;
-        // Detiene el bucle for y devuelve el nombre de la unidad de producción
-        break;
-      }
+    // Si no hay inventarios para la producción especificada, devuelve una cadena vacía
+    if (inventariosProduccion.isEmpty) {
+      return "";
     }
 
-    // Devuelve el nombre de la unidad de producción o una cadena vacía si no se encuentra la
-    // producción asociada al identificador
-    return produccionUnidad;
+    // Ordena los inventarios por fecha en orden descendente (del más reciente al más antiguo)
+    inventariosProduccion.sort((a, b) => b.fecha.compareTo(a.fecha));
+
+    // Toma el inventario más reciente
+    InventarioModel inventarioReciente = inventariosProduccion.first;
+
+    // Busca la producción asociada al inventario más reciente
+    var produccionReciente = producciones
+        .where((produccion) => produccion.id == inventarioReciente.produccion);
+
+    var produccionRecienteNombreUnidad =
+        produccionReciente.firstOrNull?.unidadProduccion.nombre;
+
+    if (produccionRecienteNombreUnidad != null) {
+      // Devuelve el nombre de la unidad de producción o una cadena vacía si no se encuentra la producción
+      return produccionRecienteNombreUnidad;
+    } else {
+      return "";
+    }
   }
 
   /// Obtiene la cantidad de producción asociada a un identificador de producción.
@@ -420,61 +480,122 @@ class BodegaLiderDataGridSource extends DataGridSource {
   /// Parámetros:
   /// - produccionId: El identificador de la producción a buscar.
   /// - producciones: La lista de producciones en la que buscar la producción.
+  /// - inventarios: La lista de inventarios en la que buscar la producción asociada a la bodega.
   ///
   /// Retorna:
   /// - Una cadena con la cantidad de producción, si se encuentra una producción que
   ///   coincide con el identificador.
   /// - Una cadena vacía si no se encuentra ninguna producción que coincida con el
   ///   identificador.
-  String cantidadProduccionInventario(
-      int produccionId, List<ProduccionModel> producciones) {
-    // Cadena para almacenar la cantidad de producción
-    String produccionCantidad = "";
+  ///
+  /// NOTA: Este método recorre las listas de producciones e inventarios para buscar la producción
+  ///       y el inventario correspondientes a la bodega.
+  String cantidadProduccionInventario(int bodegaId,
+      List<ProduccionModel> producciones, List<InventarioModel> inventarios) {
+    // Filtra los inventarios que corresponden a la producción especificada
+    List<InventarioModel> inventariosProduccion = inventarios
+        .where((inventario) => inventario.bodega.id == bodegaId)
+        .toList();
 
-    // Recorre la lista de producciones buscando la producción que corresponda al
-    // identificador especificado
-    for (var produccion in producciones) {
-      // Si el identificador de la producción coincide con el produccionId proporcionado
-      if (produccion.id == produccionId) {
-        // Obtiene la cantidad de producción y la asigna a la variable produccionCantidad
-        produccionCantidad = produccion.cantidad.toString();
-        // Detiene el bucle for y devuelve la cantidad de producción
-        break;
-      }
+    // Si no hay inventarios para la producción especificada, devuelve una cadena vacía
+    if (inventariosProduccion.isEmpty) {
+      return "";
     }
 
-    // Devuelve la cantidad de producción o una cadena vacía si no se encuentra la
-    // producción asociada al identificador
-    return produccionCantidad;
+    // Ordena los inventarios por fecha en orden descendente (del más reciente al más antiguo)
+    inventariosProduccion.sort((a, b) => b.fecha.compareTo(a.fecha));
+
+    // Toma el inventario más reciente
+    InventarioModel inventarioReciente = inventariosProduccion.first;
+
+    // Busca la producción asociada al inventario más reciente
+    var produccionReciente = producciones
+        .where((produccion) => produccion.id == inventarioReciente.produccion);
+
+    var produccionRecienteCantidad = produccionReciente.firstOrNull?.cantidad;
+
+    if (produccionRecienteCantidad != null) {
+      // Devuelve la cantidad de producción o una cadena vacía si no se encuentra la producción
+
+      return produccionRecienteCantidad.toString();
+    } else {
+      return "";
+    }
+  }
+
+  int stockInventario(int bodegaId, List<InventarioModel> inventarios) {
+    // Filtra los inventarios que corresponden a la bodega especificada
+    List<InventarioModel> inventariosBodega = inventarios
+        .where((inventario) => inventario.bodega.id == bodegaId)
+        .toList();
+
+    // Si no hay inventarios para la bodega especificada, devuelve 0
+    if (inventariosBodega.isEmpty) {
+      return 0;
+    }
+
+    // Ordena los inventarios por fecha en orden descendente (del más reciente al más antiguo)
+    inventariosBodega.sort((a, b) => b.fecha.compareTo(a.fecha));
+
+    // Toma el inventario más reciente
+    InventarioModel inventarioReciente = inventariosBodega.first;
+
+    // Devuelve la cantidad de stock del inventario más reciente
+    return inventarioReciente.stock;
+  }
+
+  String fechaInventario(int bodegaId, List<InventarioModel> inventarios) {
+    // Filtra los inventarios que corresponden a la bodega especificada
+    List<InventarioModel> inventariosBodega = inventarios
+        .where((inventario) => inventario.bodega.id == bodegaId)
+        .toList();
+
+    // Si no hay inventarios para la bodega especificada, devuelve una cadena vacía
+    if (inventariosBodega.isEmpty) {
+      return "";
+    }
+
+    // Ordena los inventarios por fecha en orden descendente (del más reciente al más antiguo)
+    inventariosBodega.sort((a, b) => b.fecha.compareTo(a.fecha));
+
+    // Toma el inventario más reciente
+    InventarioModel inventarioReciente = inventariosBodega.first;
+
+    // Devuelve la fecha del inventario más reciente
+    return inventarioReciente.fecha;
   }
 
   /// Crea una instancia de la clase `BodegaLiderDataGridSource`.
   BodegaLiderDataGridSource(
-      {required List<InventarioModel> bodegas,
-      required List<ProduccionModel> listaProducciones}) {
+      {required List<BodegaModel> bodegas,
+      required List<ProduccionModel> listaProducciones,
+      required List<InventarioModel> listaInventarios}) {
     _bodegaData = bodegas.map<DataGridRow>((bodega) {
       return DataGridRow(cells: [
         DataGridCell<String>(
-            columnName: 'Producto', value: bodega.bodega.producto.nombre),
+            columnName: 'Producto', value: bodega.producto.nombre),
         DataGridCell<String>(
             columnName: 'Número Producción',
             value: numeroProduccionInventario(
-                bodega.produccion, listaProducciones)),
+                bodega.id, listaProducciones, listaInventarios)),
         DataGridCell<String>(
             columnName: 'Unidad Producción',
             value: unidadProduccionInventario(
-                bodega.produccion, listaProducciones)),
+                bodega.id, listaProducciones, listaInventarios)),
         DataGridCell<String>(
             columnName: 'Cantidad Enviada',
             value: cantidadProduccionInventario(
-                bodega.produccion, listaProducciones)),
-        DataGridCell<int>(columnName: 'Cantidad Llegada', value: bodega.stock),
+                bodega.id, listaProducciones, listaInventarios)),
         DataGridCell<int>(
-            columnName: 'Cantidad Bodega', value: bodega.bodega.cantidad),
+            columnName: 'Cantidad Llegada',
+            value: stockInventario(bodega.id, listaInventarios)),
+        DataGridCell<int>(
+            columnName: 'Cantidad Bodega', value: bodega.cantidad),
         DataGridCell<String>(
-            columnName: 'Fecha Inventario', value: bodega.fecha),
+            columnName: 'Fecha Inventario',
+            value: fechaInventario(bodega.id, listaInventarios)),
         DataGridCell<String>(
-            columnName: 'Punto Venta', value: bodega.bodega.puntoVenta.nombre),
+            columnName: 'Punto Venta', value: bodega.puntoVenta.nombre),
       ]);
     }).toList();
   }

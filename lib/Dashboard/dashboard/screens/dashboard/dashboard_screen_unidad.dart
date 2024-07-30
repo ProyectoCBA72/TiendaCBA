@@ -8,8 +8,6 @@ import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/unid
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/unidad/cards_productos_unidad.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/unidad/reporte_costosAgno_unidad.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/unidad/reporte_costosMes_unidad.dart';
-import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/unidad/reporte_produccionAgno_unidad.dart';
-import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/unidad/reporte_produccionMes_unidad.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/unidad/reporte_recibidoAgno_unidad.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/unidad/reporte_recibidoMes_unidad.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/unidad/reporte_ventasAgno_unidad.dart';
@@ -163,7 +161,7 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                             const SizedBox(height: defaultPadding),
                           if (!Responsive.isMobile(context))
                             DefaultTabController(
-                                length: 8,
+                                length: 6,
                                 child: Column(
                                   children: [
                                     Container(
@@ -357,86 +355,6 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                   ),
                                                   Tooltip(
                                                     message:
-                                                        "Producciones despachadas por año",
-                                                    child: Container(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 12,
-                                                              right: 12,
-                                                              bottom: 4,
-                                                              top: 4),
-                                                      // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                      child: Column(
-                                                        children: [
-                                                          SvgPicture.asset(
-                                                            "assets/icons/produccion.svg",
-                                                            width: 24,
-                                                            height: 24,
-                                                            colorFilter:
-                                                                const ColorFilter
-                                                                    .mode(
-                                                                    Color(
-                                                                        0xFFB8860B),
-                                                                    BlendMode
-                                                                        .srcIn),
-                                                          ),
-                                                          const Text(
-                                                            "Año",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 14,
-                                                              color:
-                                                                  primaryColor,
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Tooltip(
-                                                    message:
-                                                        "Producciones despachadas por mes",
-                                                    child: Container(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 12,
-                                                              right: 12,
-                                                              bottom: 4,
-                                                              top: 4),
-                                                      // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                      child: Column(
-                                                        children: [
-                                                          SvgPicture.asset(
-                                                            "assets/icons/produccion.svg",
-                                                            width: 24,
-                                                            height: 24,
-                                                            colorFilter:
-                                                                const ColorFilter
-                                                                    .mode(
-                                                                    Color(
-                                                                        0xFFB8860B),
-                                                                    BlendMode
-                                                                        .srcIn),
-                                                          ),
-                                                          const Text(
-                                                            "Mes",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 14,
-                                                              color:
-                                                                  primaryColor,
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Tooltip(
-                                                    message:
                                                         "Producciones recibidas por año",
                                                     child: Container(
                                                       padding:
@@ -556,28 +474,18 @@ class _DashboardScreenUnidadState extends State<DashboardScreenUnidad> {
                                                 usuario: usuarioAutenticado,
                                               )
                                             : _selectedItem == 4
-                                                ? ReporteProduccionAgnoUnidad(
+                                                ? ReporteRecibidoAgnoUnidad(
                                                     usuario: usuarioAutenticado,
                                                   )
                                                 : _selectedItem == 5
-                                                    ? ReporteProduccionMesUnidad(
+                                                    ? ReporteRecibidoMesUnidad(
                                                         usuario:
                                                             usuarioAutenticado,
                                                       )
-                                                    : _selectedItem == 6
-                                                        ? ReporteRecibidoAgnoUnidad(
-                                                            usuario:
-                                                                usuarioAutenticado,
-                                                          )
-                                                        : _selectedItem == 7
-                                                            ? ReporteRecibidoMesUnidad(
-                                                                usuario:
-                                                                    usuarioAutenticado,
-                                                              )
-                                                            : ReporteCostoProduccionAgnoUnidad(
-                                                                usuario:
-                                                                    usuarioAutenticado,
-                                                              ),
+                                                    : ReporteCostoProduccionAgnoUnidad(
+                                                        usuario:
+                                                            usuarioAutenticado,
+                                                      ),
                           if (!Responsive.isMobile(context))
                             const SizedBox(height: defaultPadding),
                           const Divider(

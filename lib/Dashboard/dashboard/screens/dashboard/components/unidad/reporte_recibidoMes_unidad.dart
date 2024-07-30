@@ -107,14 +107,16 @@ class ReporteRecibidoMesUnidad extends StatelessWidget {
       // Verificar si el mes del inventario está dentro de los últimos cuatro meses
       if (pastMonths.contains(inventarioMonth)) {
         // Encontrar la producción correspondiente al inventario
-        final produccion = producciones.firstWhere((prod) =>
+        var produccion = producciones.where((prod) =>
             prod.id == inventario.produccion &&
-            prod.unidadProduccion.sede.id == usuario.sede &&
+            prod.unidadProduccion.id == usuario.unidadProduccion &&
             prod.estado == "RECIBIDO");
-        if (produccion != null) {
-          // Obtener el nombre de la unidad de producción
-          final unidadProduccion = produccion.unidadProduccion.nombre;
 
+        // Obtener el nombre de la unidad de producción
+        final unidadProduccion =
+            produccion.firstOrNull?.unidadProduccion.nombre;
+
+        if (unidadProduccion != null) {
           // Inicializar la entrada en el mapa si no existe
           if (!data.containsKey(unidadProduccion)) {
             data[unidadProduccion] = {for (var month in pastMonths) month: 0};

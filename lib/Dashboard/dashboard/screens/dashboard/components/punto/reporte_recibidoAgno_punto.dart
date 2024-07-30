@@ -104,14 +104,16 @@ class ReporteRecibidoAgnoPunto extends StatelessWidget {
       // Verificar si el año del inventario está dentro de los años de interés
       if (pastYears.contains(inventarioYear)) {
         // Encontrar la producción correspondiente al inventario
-        final produccion = producciones.firstWhere((prod) =>
+        var produccion = producciones.where((prod) =>
             prod.id == inventario.produccion &&
             inventario.bodega.puntoVenta.id == usuario.puntoVenta &&
             prod.estado == "RECIBIDO");
-        if (produccion != null) {
-          // Obtener el nombre de la unidad de producción
-          final unidadProduccion = produccion.unidadProduccion.nombre;
 
+        // Obtener el nombre de la unidad de producción
+        final unidadProduccion =
+            produccion.firstOrNull?.unidadProduccion.nombre;
+
+        if (unidadProduccion != null) {
           // Inicializar la entrada en el mapa si no existe
           if (!data.containsKey(unidadProduccion)) {
             data[unidadProduccion] = {

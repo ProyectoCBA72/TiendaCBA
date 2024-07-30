@@ -1,4 +1,4 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, unnecessary_null_comparison
 
 import 'dart:math';
 
@@ -86,16 +86,21 @@ class ReporteProductosMasVendidosAgnoLider extends StatelessWidget {
                               devoluciones.any((devolucion) =>
                                   devolucion.factura.pedido.id !=
                                   factura.pedido.id)) {
-                            final producto = productos
-                                .firstWhere((p) => p.id == auxPedido.producto)
-                                .nombre;
-                            ventasPorProductoPorAgno.putIfAbsent(
-                                producto, () => {});
-                            ventasPorProductoPorAgno[producto]!
-                                .putIfAbsent(agno, () => 0);
-                            ventasPorProductoPorAgno[producto]![agno] =
-                                ventasPorProductoPorAgno[producto]![agno]! +
-                                    auxPedido.cantidad.toDouble();
+                            var producto = productos
+                                .where((p) => p.id == auxPedido.producto);
+
+                            var productoNombre = producto.firstOrNull?.nombre;
+
+                            if (productoNombre != null) {
+                              ventasPorProductoPorAgno.putIfAbsent(
+                                  productoNombre, () => {});
+                              ventasPorProductoPorAgno[productoNombre]!
+                                  .putIfAbsent(agno, () => 0);
+                              ventasPorProductoPorAgno[productoNombre]![agno] =
+                                  ventasPorProductoPorAgno[productoNombre]![
+                                          agno]! +
+                                      auxPedido.cantidad.toDouble();
+                            }
                           }
                         }
                       }

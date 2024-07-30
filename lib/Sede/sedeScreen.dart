@@ -595,31 +595,33 @@ class _SedeScreenState extends State<SedeScreen> {
                                                         const SizedBox(
                                                           width: 15,
                                                         ),
-                                                        Column(
-                                                          children: [
-                                                            const Text(
-                                                              "Ubicación: ",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 16.0,
-                                                                fontFamily:
-                                                                    'Calibri-Bold',
+                                                        Flexible(
+                                                          child: Column(
+                                                            children: [
+                                                              const Text(
+                                                                "Ubicación: ",
+                                                                style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 16.0,
+                                                                  fontFamily:
+                                                                      'Calibri-Bold',
+                                                                ),
                                                               ),
-                                                            ),
-                                                            Text(
-                                                              pVenta.ubicacion,
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontSize: 16.0,
-                                                                color:
-                                                                    Colors.grey,
-                                                                fontFamily:
-                                                                    'Calibri-Bold',
+                                                              Text(
+                                                                pVenta.ubicacion,
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 16.0,
+                                                                  color:
+                                                                      Colors.grey,
+                                                                  fontFamily:
+                                                                      'Calibri-Bold',
+                                                                ),
                                                               ),
-                                                            ),
-                                                          ],
+                                                            ],
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
@@ -1488,31 +1490,33 @@ class _SedeScreenState extends State<SedeScreen> {
                                                         const SizedBox(
                                                           width: 15,
                                                         ),
-                                                        Column(
-                                                          children: [
-                                                            const Text(
-                                                              "Ubicación: ",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 16.0,
-                                                                fontFamily:
-                                                                    'Calibri-Bold',
+                                                        Flexible(
+                                                          child: Column(
+                                                            children: [
+                                                              const Text(
+                                                                "Ubicación: ",
+                                                                style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 16.0,
+                                                                  fontFamily:
+                                                                      'Calibri-Bold',
+                                                                ),
                                                               ),
-                                                            ),
-                                                            Text(
-                                                              pVenta.ubicacion,
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontSize: 16.0,
-                                                                color:
-                                                                    Colors.grey,
-                                                                fontFamily:
-                                                                    'Calibri-Bold',
+                                                              Text(
+                                                                pVenta.ubicacion,
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 16.0,
+                                                                  color:
+                                                                      Colors.grey,
+                                                                  fontFamily:
+                                                                      'Calibri-Bold',
+                                                                ),
                                                               ),
-                                                            ),
-                                                          ],
+                                                            ],
+                                                          ),
                                                         ),
                                                       ],
                                                     ),

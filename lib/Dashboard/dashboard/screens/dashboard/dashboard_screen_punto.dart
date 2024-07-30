@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/cards_anuncio_punto.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/cards_pedido_punto.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/cards_productos_punto.dart';
+import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/reporteProductoDiaPunto.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/reporte_puntoAgno_punto.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/reporte_puntoMes_punto.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/reporte_punto_devolucionAgno_punto.dart';
@@ -24,10 +25,10 @@ import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punt
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/tablas/pendiente_punto.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/visitado_details.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
+import 'package:tienda_app/Models/bodegaModel.dart';
 import 'package:tienda_app/Models/boletaModel.dart';
 import 'package:tienda_app/Models/devolucionesModel.dart';
 import 'package:tienda_app/Models/facturaModel.dart';
-import 'package:tienda_app/Models/inventarioModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/constantsDesign.dart';
 import 'package:tienda_app/provider.dart';
@@ -171,7 +172,7 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                             const SizedBox(height: defaultPadding),
                           if (!Responsive.isMobile(context))
                             DefaultTabController(
-                                length: 9,
+                                length: 10,
                                 child: Column(
                                   children: [
                                     Container(
@@ -204,7 +205,8 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                 },
                                                 tabs: [
                                                   Tooltip(
-                                                    message: "Ventas Diarias",
+                                                    message:
+                                                        "Ventas diarias vendedores",
                                                     child: Container(
                                                       padding:
                                                           const EdgeInsets.only(
@@ -232,7 +234,51 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                                                         .srcIn),
                                                           ),
                                                           const Text(
-                                                            "Ventas",
+                                                            "Vendedores",
+                                                            style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 14,
+                                                              color:
+                                                                  primaryColor,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Tooltip(
+                                                    message:
+                                                        "Ventas diarias productos",
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 12,
+                                                              right: 12,
+                                                              bottom: 4,
+                                                              top: 4),
+                                                      // Contenedor que alberga el ícono y el nombre de la categoría.
+                                                      child: Column(
+                                                        children: [
+                                                          SvgPicture.asset(
+                                                            "assets/icons/factura.svg",
+                                                            width: 24,
+                                                            height: 24,
+                                                            colorFilter:
+                                                                const ColorFilter
+                                                                    .mode(
+                                                                    Color
+                                                                        .fromARGB(
+                                                                            255,
+                                                                            180,
+                                                                            160,
+                                                                            70),
+                                                                    BlendMode
+                                                                        .srcIn),
+                                                          ),
+                                                          const Text(
+                                                            "Productos",
                                                             style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
@@ -592,44 +638,50 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                 ? ReporteVendedoresPunto(
                                     usuario: usuarioAutenticado)
                                 : _selectedItem == 1
-                                    ? ReporteProductosMasVendidosAgnoPunto(
+                                    ? ReporteProductoDiaPunto(
                                         usuario: usuarioAutenticado,
                                       )
                                     : _selectedItem == 2
-                                        ? ReporteProductosMasVendidosMesPunto(
+                                        ? ReporteProductosMasVendidosAgnoPunto(
                                             usuario: usuarioAutenticado,
                                           )
                                         : _selectedItem == 3
-                                            ? ReportePuntoVentasAgnoPunto(
+                                            ? ReporteProductosMasVendidosMesPunto(
                                                 usuario: usuarioAutenticado,
                                               )
                                             : _selectedItem == 4
-                                                ? ReportePuntoVentasMesPunto(
+                                                ? ReportePuntoVentasAgnoPunto(
                                                     usuario: usuarioAutenticado,
                                                   )
                                                 : _selectedItem == 5
-                                                    ? ReporteDevolucionesPuntoAgnoPunto(
+                                                    ? ReportePuntoVentasMesPunto(
                                                         usuario:
                                                             usuarioAutenticado,
                                                       )
                                                     : _selectedItem == 6
-                                                        ? ReporteDevolucionesPuntoMesPunto(
+                                                        ? ReporteDevolucionesPuntoAgnoPunto(
                                                             usuario:
                                                                 usuarioAutenticado,
                                                           )
                                                         : _selectedItem == 7
-                                                            ? ReporteRecibidoAgnoPunto(
+                                                            ? ReporteDevolucionesPuntoMesPunto(
                                                                 usuario:
                                                                     usuarioAutenticado,
                                                               )
                                                             : _selectedItem == 8
-                                                                ? ReporteRecibidoMesPunto(
+                                                                ? ReporteRecibidoAgnoPunto(
                                                                     usuario:
                                                                         usuarioAutenticado,
                                                                   )
-                                                                : ReporteVendedoresPunto(
-                                                                    usuario:
-                                                                        usuarioAutenticado),
+                                                                : _selectedItem ==
+                                                                        9
+                                                                    ? ReporteRecibidoMesPunto(
+                                                                        usuario:
+                                                                            usuarioAutenticado,
+                                                                      )
+                                                                    : ReporteVendedoresPunto(
+                                                                        usuario:
+                                                                            usuarioAutenticado),
                           if (!Responsive.isMobile(context))
                             const SizedBox(height: defaultPadding),
                           const Divider(
@@ -1193,9 +1245,9 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                           const SizedBox(height: defaultPadding),
                           // Tabla de inventario
                           FutureBuilder(
-                              future: getInventario(), // Obtener inventario
+                              future: getBodegas(), // Obtener inventario
                               builder: (context,
-                                  AsyncSnapshot<List<InventarioModel>>
+                                  AsyncSnapshot<List<BodegaModel>>
                                       snapshotInventario) {
                                 // Validar estado de la petición
                                 if (snapshotInventario.connectionState ==
@@ -1215,13 +1267,13 @@ class _DashboardScreenPuntoState extends State<DashboardScreenPunto> {
                                   );
                                   // Mostrar datos
                                 } else {
-                                  List<InventarioModel> inventarioPunto =
+                                  List<BodegaModel> inventarioPunto =
                                       []; // Lista de inventario>
 
                                   inventarioPunto.addAll(snapshotInventario
                                       .data!
                                       .where((inventario) =>
-                                          inventario.bodega.puntoVenta.id ==
+                                          inventario.puntoVenta.id ==
                                           usuarioAutenticado
                                               .puntoVenta)); // Filtrar inventario por punto de venta
 
