@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'package:provider/provider.dart';
+import 'package:tienda_app/Chatbot/chatBot.dart';
 import 'package:tienda_app/Home/anuncioCard.dart';
 import 'package:tienda_app/Home/logoSection.dart';
 import 'package:tienda_app/Home/misionSection.dart';
@@ -896,6 +897,19 @@ class _HomePageState extends State<HomePage>
                   ),
                 ),
               ),
+
+            Positioned(
+                bottom: 10,
+                right: 10,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ChatBot()),
+                    );
+                  },
+                  child: const Icon(Icons.support_agent),
+                )),
           ],
         ),
       );

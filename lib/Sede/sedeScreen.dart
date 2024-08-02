@@ -434,27 +434,26 @@ class _SedeScreenState extends State<SedeScreen> {
                                   height: 400,
                                   child: FlutterMap(
                                       options: MapOptions(
-                                          initialCenter:
-                                              LatLng(latitud, longitud),
-                                          initialZoom: 14,
-                                          interactionOptions:
-                                              const InteractionOptions(
-                                                  flags: InteractiveFlag
-                                                      .doubleTapZoom)),
+                                          center: LatLng(latitud, longitud),
+                                          zoom: 14,
+                                          interactiveFlags:
+                                              InteractiveFlag.doubleTapZoom),
                                       children: [
                                         openStreetMapTileLayer,
-                                        MarkerLayer(markers: [
-                                          Marker(
+                                        MarkerLayer(
+                                          markers: [
+                                            Marker(
                                               point: LatLng(latitud, longitud),
                                               width: 30,
                                               height: 30,
-                                              alignment: Alignment.center,
-                                              child: const Icon(
+                                              builder: (ctx) => const Icon(
                                                 Icons.location_pin,
                                                 size: 30,
                                                 color: primaryColor,
-                                              ))
-                                        ]),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ]),
                                 ),
                               ),
@@ -600,22 +599,26 @@ class _SedeScreenState extends State<SedeScreen> {
                                                             children: [
                                                               const Text(
                                                                 "Ubicación: ",
-                                                                style: TextStyle(
+                                                                style:
+                                                                    TextStyle(
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold,
-                                                                  fontSize: 16.0,
+                                                                  fontSize:
+                                                                      16.0,
                                                                   fontFamily:
                                                                       'Calibri-Bold',
                                                                 ),
                                                               ),
                                                               Text(
-                                                                pVenta.ubicacion,
+                                                                pVenta
+                                                                    .ubicacion,
                                                                 style:
                                                                     const TextStyle(
-                                                                  fontSize: 16.0,
-                                                                  color:
-                                                                      Colors.grey,
+                                                                  fontSize:
+                                                                      16.0,
+                                                                  color: Colors
+                                                                      .grey,
                                                                   fontFamily:
                                                                       'Calibri-Bold',
                                                                 ),
@@ -1329,27 +1332,26 @@ class _SedeScreenState extends State<SedeScreen> {
                                   height: 400,
                                   child: FlutterMap(
                                       options: MapOptions(
-                                          initialCenter:
-                                              LatLng(latitud, longitud),
-                                          initialZoom: 14,
-                                          interactionOptions:
-                                              const InteractionOptions(
-                                                  flags: InteractiveFlag
-                                                      .doubleTapZoom)),
+                                          center: LatLng(latitud, longitud),
+                                          zoom: 14,
+                                          interactiveFlags:
+                                              InteractiveFlag.doubleTapZoom),
                                       children: [
                                         openStreetMapTileLayer,
-                                        MarkerLayer(markers: [
-                                          Marker(
+                                        MarkerLayer(
+                                          markers: [
+                                            Marker(
                                               point: LatLng(latitud, longitud),
                                               width: 30,
                                               height: 30,
-                                              alignment: Alignment.center,
-                                              child: const Icon(
+                                              builder: (ctx) => const Icon(
                                                 Icons.location_pin,
                                                 size: 30,
                                                 color: primaryColor,
-                                              ))
-                                        ]),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ]),
                                 ),
                               ),
@@ -1495,22 +1497,26 @@ class _SedeScreenState extends State<SedeScreen> {
                                                             children: [
                                                               const Text(
                                                                 "Ubicación: ",
-                                                                style: TextStyle(
+                                                                style:
+                                                                    TextStyle(
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold,
-                                                                  fontSize: 16.0,
+                                                                  fontSize:
+                                                                      16.0,
                                                                   fontFamily:
                                                                       'Calibri-Bold',
                                                                 ),
                                                               ),
                                                               Text(
-                                                                pVenta.ubicacion,
+                                                                pVenta
+                                                                    .ubicacion,
                                                                 style:
                                                                     const TextStyle(
-                                                                  fontSize: 16.0,
-                                                                  color:
-                                                                      Colors.grey,
+                                                                  fontSize:
+                                                                      16.0,
+                                                                  color: Colors
+                                                                      .grey,
                                                                   fontFamily:
                                                                       'Calibri-Bold',
                                                                 ),

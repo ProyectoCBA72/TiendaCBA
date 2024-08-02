@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tienda_app/Chatbot/chatBot.dart';
 import 'package:tienda_app/Dashboard/controllers/MenuAppController.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/dashboard_screen_lider.dart';
 import 'package:tienda_app/responsive.dart';
@@ -39,6 +40,15 @@ class _MainScreenLiderState extends State<MainScreenLider> {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ChatBot()),
+          );
+        },
+        child: const Icon(Icons.support_agent),
       ),
     );
   }
