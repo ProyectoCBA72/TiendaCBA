@@ -23,9 +23,11 @@ class _ChatBotState extends State<ChatBot> {
 
   @override
   void initState() {
+    /*
     // Inicialización de DialogFlowtter desde un archivo JSON de autenticación
     DialogFlowtter.fromFile(path: "assets/chatbot/dialog_flow_auth.json")
         .then((instance) => dialogFlowtter = instance);
+    */
     super.initState();
   }
 
