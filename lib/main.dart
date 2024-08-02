@@ -27,11 +27,20 @@ class MyApp extends StatelessWidget {
     // Proporciona `AppState` como ChangeNotifierProvider a los widgets hijos
     return ChangeNotifierProvider<AppState>(
       create: (context) => appState,
-      child: MaterialApp(
-        theme: lightTheme, // Establece el tema de la aplicación
-        debugShowCheckedModeBanner: false, // Oculta el banner de modo debug
-        home:
-            const SplashScreen(), // Establece la pantalla de inicio como `SplashScreen`, que muestra una imagen de carga
+      // envolvemos el material en  un gesture detectos para gestionar la inactividad
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent, //sirve para que el gesture sirva en cada uno de los widgets que se crean despues 
+        // se llaman las funciones al momento de hacer los On...
+        onTap: () => appState.startInactivityTimer(),
+        // onPanDown es cada vez que el usuario desliza por la pantalla.
+        onPanDown: (_) => appState.startInactivityTimer(),
+        child: MaterialApp(
+          navigatorKey: navigatorKey,
+          theme: lightTheme, // Establece el tema de la aplicación
+          debugShowCheckedModeBanner: false, // Oculta el banner de modo debug
+          home: const SplashScreen(),
+          // Establece la pantalla de inicio como `SplashScreen`, que muestra una imagen de carga
+        ),
       ),
     );
   }

@@ -139,11 +139,12 @@ class _HomePageState extends State<HomePage>
         // Incrementar el índice de la imagen actual y reiniciarlo a 0 si se ha alcanzado el final
         _currentIndex = (_currentIndex + 1) % imageUrls.length;
       });
-
       // Reiniciar el ciclo de cambio de imágenes
       startImageSlideShow();
     });
   }
+
+  
 
   /// Realiza una solicitud asíncrona a las API para obtener datos necesarios para la pantalla de inicio.
   ///

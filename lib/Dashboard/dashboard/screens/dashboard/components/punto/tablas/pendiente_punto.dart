@@ -10,9 +10,11 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tienda_app/Dashboard/controllers/MenuAppController.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/modalsDashboard.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/metodoForm.dart';
+import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/punto/qrScannerScreen.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/main/main_screen_usuario.dart';
 import 'package:tienda_app/Home/homePage.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
+import 'package:tienda_app/Models/bodegaModel.dart';
 import 'package:tienda_app/Models/facturaModel.dart';
 import 'package:tienda_app/Models/pedidoModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
@@ -214,6 +216,7 @@ class _PendientePuntoState extends State<PendientePunto> {
 
     // Si todas las solicitudes fueron exitosas
     if (allSuccessful) {
+      await updateBodegas(pedidoCancelado);
       // Muestra un mensaje de éxito
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -233,6 +236,47 @@ class _PendientePuntoState extends State<PendientePunto> {
           ),
         ),
       );
+    }
+  }
+
+  Future updateBodegas(List<PedidoModel> pedidosCancelados) async {
+    final bodegasCargadas = await getBodegas();
+    final headers = {'Content-Type': 'application/json'};
+
+    for (var cancelado in pedidosCancelados) {
+      final productos = widget.auxPedido
+          .where((item) => item.pedido.id == cancelado.id)
+          .toList();
+
+      for (var item in productos) {
+        BodegaModel? bodega = bodegasCargadas
+            .where((bodegaLista) =>
+                bodegaLista.producto.id == item.producto &&
+                bodegaLista.puntoVenta.id == cancelado.puntoVenta)
+            .firstOrNull;
+
+        if (bodega == null) {
+          print('Bodega no encontrada para el producto ${item.producto}');
+          continue;
+        }
+
+        String url = "$sourceApi/api/bodegas/${bodega.id}/";
+        final body = jsonEncode({
+          'cantidad': bodega.cantidad - item.cantidad,
+          'producto': bodega.producto.id,
+          'puntoVenta': bodega.puntoVenta.id
+        });
+
+        final response = await http.put(
+          Uri.parse(url),
+          headers: headers,
+          body: body,
+        );
+
+        if (response.statusCode != 200) {
+          print('Error al actualizar bodega: ${response.statusCode}');
+        }
+      }
     }
   }
 
@@ -394,13 +438,13 @@ class _PendientePuntoState extends State<PendientePunto> {
         modalEliminarExclusivo();
       } else {
         // Elimina el producto ya que no es exclusivo
-        _eliminarProducto(producto.id);
+        _eliminarProducto(producto);
       }
     } else {
       // Si hay más de un producto en el pedido especificado
       if (contadorProductos > 1) {
         // Elimina el producto
-        _eliminarProducto(producto.id);
+        _eliminarProducto(producto);
       } else {
         // Muestra un modal indicando que la eliminación falló
         eliminacionFallidaModal(context);
@@ -469,9 +513,10 @@ class _PendientePuntoState extends State<PendientePunto> {
   ///
   /// @param id El ID del producto a eliminar.
 
-  Future<void> _eliminarProducto(int id) async {
+  Future<void> _eliminarProducto(AuxPedidoModel producto) async {
+    final bodegasCargadas = await getBodegas();
     try {
-      final url = Uri.parse('$sourceApi/api/aux-pedidos/$id/');
+      final url = Uri.parse('$sourceApi/api/aux-pedidos/$producto/');
       final response = await http.delete(
         url,
         headers: {
@@ -482,6 +527,52 @@ class _PendientePuntoState extends State<PendientePunto> {
       if (response.statusCode == 204) {
         print('Producto eliminado con éxito.');
         setState(() {});
+        final bodegaProducto = bodegasCargadas
+            .where((item) =>
+                item.producto.id == producto.producto &&
+                item.puntoVenta.id == producto.pedido.puntoVenta)
+            .firstOrNull;
+
+        if (bodegaProducto == null) {
+          print('Bodega null paara el producto ${producto.producto}');
+        }
+
+        if (bodegaProducto != null) {
+          String url = "$sourceApi/api/bodegas/${bodegaProducto.id}/";
+          final cantidadFinal = bodegaProducto.cantidad + producto.cantidad;
+
+          final body = jsonEncode({
+            'cantidad': cantidadFinal,
+            'producto': bodegaProducto.producto.id,
+            'puntoVenta': bodegaProducto.puntoVenta.id
+          });
+
+          final responseUpdate = await http.put(
+            Uri.parse(url),
+            headers: {'Content-Type': 'application/json'},
+            body: body,
+          );
+
+          if (responseUpdate.statusCode != 200) {
+            print(
+                'Error al actualizar la bodega: ${responseUpdate.statusCode}');
+          }
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MultiProvider(
+                providers: [
+                  ChangeNotifierProvider(
+                      create: (context) => MenuAppController()),
+                ],
+                child: const MainScreenUsuario(),
+              ),
+            ),
+          );
+        } else {
+          print('Bodega no encontrada para el producto ${producto.producto}');
+        }
       } else {
         print('Error al eliminar el producto: ${response.body}');
       }
@@ -876,6 +967,17 @@ class _PendientePuntoState extends State<PendientePunto> {
                   } else {
                     entregarPedido(registros);
                   }
+                }),
+                const SizedBox(
+                  width: defaultPadding,
+                ),
+                _buildButton('Escanear Codigo QR', () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => QrScannerScreen(
+                                auxPendientes: widget.auxPedido,
+                              )));
                 }),
               ],
             ),

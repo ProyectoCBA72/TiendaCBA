@@ -235,6 +235,7 @@ class _CarritoTablaState extends State<CarritoTabla> {
       );
 
       if (response.statusCode == 200) {
+        print(response.body);
         updateBodegas();
 
         Navigator.pushReplacement(
@@ -282,7 +283,9 @@ class _CarritoTablaState extends State<CarritoTabla> {
     for (var item in widget.auxPedido) {
       // VAriable de la bodega, (nunca va a ser nula, que la cantidad sea 0 si...)
       final BodegaModel? bodega = bodegas
-          .where((bodega) => bodega.producto.id == item.producto)
+          .where((bodega) =>
+              bodega.producto.id == item.producto &&
+              bodega.puntoVenta.id == item.pedido.puntoVenta)
           .firstOrNull;
 
       // Construir el cuerpo de la solicitud
@@ -293,7 +296,7 @@ class _CarritoTablaState extends State<CarritoTabla> {
       final body = jsonEncode({
         'cantidad': bodega.cantidad - item.cantidad,
         'producto': item.producto,
-        'puntoVenta': widget.puntoVenta.id
+        'puntoVenta': bodega.puntoVenta.id
       });
 
       // Enviar la solicitud PUT a la API

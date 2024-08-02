@@ -11,6 +11,7 @@ import 'package:tienda_app/Dashboard/controllers/MenuAppController.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/modalsDashboard.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/main/main_screen_usuario.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
+import 'package:tienda_app/Models/bodegaModel.dart';
 import 'package:tienda_app/Models/pedidoModel.dart';
 import 'package:tienda_app/Models/productoModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
@@ -141,48 +142,30 @@ class _PendienteUsuarioState extends State<PendienteUsuario> {
   /// a la pantalla principal de usuario. Si alguna solicitud falla, muestra un
   /// mensaje de error.
   Future cancelarPedido(List<DataGridRow> pedidos) async {
-    // Lista para almacenar las devoluciones a editar
     List<PedidoModel> pedidoCancelado = [];
     String url;
 
-    // Obtiene las devoluciones cargadas desde la API
     List<PedidoModel> pedidosCargados = await getPedidos();
-
-    // Utilizamos un Set para almacenar los números de factura ya procesados
     Set<String> pedidosProcesados = {};
 
-    // Verificación inicial para determinar si alguna devolución ya ha sido procesada
     for (var ped in pedidos) {
-      // Obtiene el número de factura de la fila actual
       String numeroPedido = ped.getCells()[0].value;
 
-      // Si ninguna devolución ya ha sido procesada, continuar con la operación
       for (var pedido in pedidosCargados) {
         if (!pedidosProcesados.contains(numeroPedido) &&
             numeroPedido == pedido.numeroPedido.toString()) {
-          // Agrega la devolución a la lista de devoluciones a editar
           pedidoCancelado.add(pedido);
-          // Agregamos el número de factura al Set
           pedidosProcesados.add(numeroPedido);
         }
       }
     }
 
-    // Variable para controlar el estado de las solicitudes
     bool allSuccessful = true;
 
-    // Recorre la lista de devoluciones a editar
     for (var cancelado in pedidoCancelado) {
-      // Genera la URL de la solicitud PUT
       url = "$sourceApi/api/pedidos/${cancelado.id}/";
-
-      // Define los encabezados de la solicitud
-      final headers = {
-        'Content-Type': 'application/json',
-      };
-
-      // Define el cuerpo de la solicitud
-      final body = {
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
         "numeroPedido": cancelado.numeroPedido,
         "fechaEncargo": cancelado.fechaEncargo,
         "fechaEntrega": cancelado.fechaEntrega,
@@ -192,35 +175,30 @@ class _PendienteUsuarioState extends State<PendienteUsuario> {
         "puntoVenta": cancelado.puntoVenta,
         "pedidoConfirmado": cancelado.pedidoConfirmado,
         "usuario": cancelado.usuario.id
-      };
+      });
 
-      // Realiza la solicitud PUT
-      final response = await http.put(Uri.parse(url),
-          headers: headers, body: jsonEncode(body));
+      final response =
+          await http.put(Uri.parse(url), headers: headers, body: body);
 
-      // Si la solicitud falla, marcamos allSuccessful como false
       if (response.statusCode != 200) {
         allSuccessful = false;
-
-        // Muestra un mensaje de error si la respuesta indica un error
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al editar registros: ${response.statusCode}.'),
           ),
         );
+        // Opcional: Salir del loop si una solicitud falla
+        break;
       }
     }
 
-    // Si todas las solicitudes fueron exitosas
     if (allSuccessful) {
-      // Muestra un mensaje de éxito
+      await updateBodegas(pedidoCancelado);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Pedidos actualizados correctamente.'),
         ),
       );
-
-      // Navega a la pantalla principal de usuario
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -235,51 +213,115 @@ class _PendienteUsuarioState extends State<PendienteUsuario> {
     }
   }
 
+  Future updateBodegas(List<PedidoModel> pedidosCancelados) async {
+    final bodegasCargadas = await getBodegas();
+    final headers = {'Content-Type': 'application/json'};
+
+    for (var cancelado in pedidosCancelados) {
+      final productos = widget.auxPedido
+          .where((item) => item.pedido.id == cancelado.id)
+          .toList();
+
+      for (var item in productos) {
+        BodegaModel? bodega = bodegasCargadas
+            .where((bodegaLista) =>
+                bodegaLista.producto.id == item.producto &&
+                bodegaLista.puntoVenta.id == cancelado.puntoVenta)
+            .firstOrNull;
+
+        if (bodega == null) {
+          print('Bodega no encontrada para el producto ${item.producto}');
+          continue;
+        }
+
+        String url = "$sourceApi/api/bodegas/${bodega.id}/";
+        final body = jsonEncode({
+          'cantidad': bodega.cantidad - item.cantidad,
+          'producto': bodega.producto.id,
+          'puntoVenta': bodega.puntoVenta.id
+        });
+
+        final response = await http.put(
+          Uri.parse(url),
+          headers: headers,
+          body: body,
+        );
+
+        if (response.statusCode != 200) {
+          print('Error al actualizar bodega: ${response.statusCode}');
+        }
+      }
+    }
+  }
+
   Future<void> _removeProducto(AuxPedidoModel producto) async {
-    // Obtén los pedidos auxiliares cargados desde la API
     List<AuxPedidoModel> auxPedidosCargados = await getAuxPedidos();
 
-    // Contar cuántos productos hay en el pedido especificado
-    int contadorProductos = auxPedidosCargados
+    final bodegasCargadas = await getBodegas();
+    List<AuxPedidoModel> productosPedido = auxPedidosCargados
         .where((aux) => aux.pedido.numeroPedido == producto.pedido.numeroPedido)
-        .length;
+        .toList();
 
-    if (contadorProductos > 1) {
-      // Construir la URL para eliminar el aux pedido especificado
+    if (productosPedido.length > 1) {
       final url = Uri.parse('$sourceApi/api/aux-pedidos/${producto.id}/');
-
-      // Realizar la solicitud DELETE al API
       final response = await http.delete(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
       );
 
-      // Verificar el estado de la respuesta de la solicitud
       if (response.statusCode == 204) {
-        // Si la respuesta es exitosa (código 204), mostrar un mensaje de éxito
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Producto eliminado con éxito.'),
           ),
         );
+        final bodegaProducto = bodegasCargadas
+            .where((item) =>
+                item.producto.id == producto.producto &&
+                item.puntoVenta.id == producto.pedido.puntoVenta)
+            .firstOrNull;
 
-        // Navegar a la pantalla principal de usuario
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MultiProvider(
-              providers: [
-                ChangeNotifierProvider(
-                    create: (context) => MenuAppController()),
-              ],
-              child: const MainScreenUsuario(),
+        if (bodegaProducto == null) {
+          print('Bodega null paara el producto ${producto.producto}');
+        }
+
+        if (bodegaProducto != null) {
+          String url = "$sourceApi/api/bodegas/${bodegaProducto.id}/";
+          final cantidadFinal = bodegaProducto.cantidad + producto.cantidad;
+
+          final body = jsonEncode({
+            'cantidad': cantidadFinal,
+            'producto': bodegaProducto.producto.id,
+            'puntoVenta': bodegaProducto.puntoVenta.id
+          });
+
+          final responseUpdate = await http.put(
+            Uri.parse(url),
+            headers: {'Content-Type': 'application/json'},
+            body: body,
+          );
+
+          if (responseUpdate.statusCode != 200) {
+            print(
+                'Error al actualizar la bodega: ${responseUpdate.statusCode}');
+          }
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MultiProvider(
+                providers: [
+                  ChangeNotifierProvider(
+                      create: (context) => MenuAppController()),
+                ],
+                child: const MainScreenUsuario(),
+              ),
             ),
-          ),
-        );
+          );
+        } else {
+          print('Bodega no encontrada para el producto ${producto.producto}');
+        }
       } else {
-        // Si la respuesta no es exitosa, mostrar un mensaje de error
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al eliminar el producto: ${response.body}.'),
@@ -287,7 +329,6 @@ class _PendienteUsuarioState extends State<PendienteUsuario> {
         );
       }
     } else {
-      // Si el contador de productos es 1 o menos, llamar a la función de modal para manejo de error
       eliminacionFallidaModal(context);
     }
   }

@@ -96,27 +96,29 @@ class _CardPuntoLiderState extends State<CardPuntoLider> {
                   const SizedBox(
                     width: 15, // Espacio entre el icono y el texto
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment
-                        .start, // Alineación horizontal dentro de la columna
-                    children: [
-                      const Text(
-                        "Ubicacion: ", // Etiqueta de ubicación
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16.0,
-                          fontFamily: 'Calibri-Bold',
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment
+                          .start, // Alineación horizontal dentro de la columna
+                      children: [
+                        const Text(
+                          "Ubicacioón: ", // Etiqueta de ubicación
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.0,
+                            fontFamily: 'Calibri-Bold',
+                          ),
                         ),
-                      ),
-                      Text(
-                        puntoVenta.ubicacion, // Valor de la ubicación
-                        style: const TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.grey,
-                          fontFamily: 'Calibri-Bold',
+                        Text(
+                          puntoVenta.ubicacion, // Valor de la ubicación
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            color: Colors.grey,
+                            fontFamily: 'Calibri-Bold',
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
