@@ -1,3 +1,5 @@
+// ignore_for_file: file_names, use_build_context_synchronously, avoid_print
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -89,7 +91,6 @@ class PuntoVentaProvider with ChangeNotifier {
 
       // Mostrar el modal de eliminación de productos en el pedido.
       showDialog(
-        // ignore: use_build_context_synchronously
         context: context,
         builder: (context) {
           return AlertDialog(

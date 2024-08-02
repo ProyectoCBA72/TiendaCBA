@@ -104,7 +104,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
             if (result) {
               setState(() {
                 Provider.of<AppState>(context, listen: false)
-                    .setUsuarioAutenticado(usuarioEncontrado, context);
+                    .setUsuarioAutenticado(usuarioEncontrado);
               });
               // emailService.djangoLoginNow(usuarioEncontrado.correoElectronico);
               Navigator.pushReplacement(

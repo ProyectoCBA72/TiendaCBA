@@ -1,5 +1,5 @@
 // Importaciones necesarias para Flutter.
-// ignore_for_file: no_logic_in_create_state
+// ignore_for_file: no_logic_in_create_state, file_names
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

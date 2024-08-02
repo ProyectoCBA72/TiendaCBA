@@ -115,8 +115,7 @@ class ReporteCostoProduccionAgnoUnidad extends StatelessWidget {
       List<ProduccionModel> productions,
       List<ProductoModel> products,
       UsuarioModel usuario) {
-    Map<String, List<ProduccionCostoDataAgnoUnidad>> productionDataByProduct =
-        {};
+    Map<String, Map<int, double>> productionDataByProduct = {};
 
     int currentYear = DateTime.now().year;
 
@@ -132,31 +131,42 @@ class ReporteCostoProduccionAgnoUnidad extends StatelessWidget {
         if (year < currentYear - 2) continue;
 
         // Encontrar el producto correspondiente a la producción actual
-        ProductoModel? product =
-            products.firstWhere((product) => product.id == production.producto);
-        if (product == null) continue;
+        var product =
+            products.where((product) => product.id == production.producto);
 
-        // Agrupar los datos por nombre del producto
-        if (!productionDataByProduct.containsKey(product.nombre)) {
-          productionDataByProduct[product.nombre] = [];
+        var productName = product.firstOrNull?.nombre;
+
+        if (productName != null) {
+          // Inicializar la entrada si no existe
+          if (!productionDataByProduct.containsKey(productName)) {
+            productionDataByProduct[productName] = {};
+          }
+
+          // Sumar los costos de producción por año
+          if (!productionDataByProduct[productName]!.containsKey(year)) {
+            productionDataByProduct[productName]![year] = 0;
+          }
+          productionDataByProduct[productName]![year] =
+              productionDataByProduct[productName]![year]! +
+                  production.costoProduccion;
         }
-
-        productionDataByProduct[product.nombre]!.add(
-            ProduccionCostoDataAgnoUnidad(
-                year.toDouble(), production.costoProduccion.toDouble()));
       }
     }
 
     // Ordenar los productos por costo total de producción y seleccionar los 7 más caros
-    List<MapEntry<String, List<ProduccionCostoDataAgnoUnidad>>> sortedProducts =
+    List<MapEntry<String, Map<int, double>>> sortedProducts =
         productionDataByProduct.entries.toList()
-          ..sort((a, b) => b.value
-              .fold(0, (sum, item) => sum + item.costo.toInt())
-              .compareTo(a.value.fold(0, (sum, item) => sum + item.costo)));
+          ..sort((a, b) => b.value.values
+              .fold(0, (sum, item) => sum + item.toInt())
+              .compareTo(
+                  a.value.values.fold(0, (sum, item) => sum + item.toInt())));
 
     // Mapear los datos ordenados a la estructura utilizada por la gráfica
     return sortedProducts.take(7).map((entry) {
-      return ProduccionCostoDataAgnoUnidadGroup(entry.key, entry.value);
+      List<ProduccionCostoDataAgnoUnidad> datos = entry.value.entries
+          .map((e) => ProduccionCostoDataAgnoUnidad(e.key.toDouble(), e.value))
+          .toList();
+      return ProduccionCostoDataAgnoUnidadGroup(entry.key, datos);
     }).toList();
   }
 }

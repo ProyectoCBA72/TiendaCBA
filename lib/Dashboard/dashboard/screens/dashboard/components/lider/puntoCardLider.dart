@@ -32,6 +32,7 @@ class _CardPuntoLiderState extends State<CardPuntoLider> {
   Widget build(BuildContext context) {
     final puntoVenta = widget
         .puntoVenta; // Se obtiene el punto de venta desde el widget padre.
+
     return Container(
       width: 250, // Ancho de la tarjeta
       margin: const EdgeInsets.symmetric(
@@ -96,13 +97,13 @@ class _CardPuntoLiderState extends State<CardPuntoLider> {
                   const SizedBox(
                     width: 15, // Espacio entre el icono y el texto
                   ),
-                  Expanded(
+                  Flexible(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment
                           .start, // Alineación horizontal dentro de la columna
                       children: [
                         const Text(
-                          "Ubicacioón: ", // Etiqueta de ubicación
+                          "Ubicación: ", // Etiqueta de ubicación
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16.0,

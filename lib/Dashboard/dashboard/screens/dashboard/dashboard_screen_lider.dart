@@ -14,8 +14,6 @@ import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lide
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lider/cards_unidad_lider.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lider/reporte_costosAgno_lider.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lider/reporte_costosMes_lider.dart';
-import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lider/reporte_produccionAgno_lider.dart';
-import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lider/reporte_produccionMes_lider.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lider/reporte_puntoMes_lider.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lider/reporte_punto_devolucionAgno_lider.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lider/reporte_puntoAgno_lider.dart';
@@ -34,10 +32,10 @@ import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lide
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/lider/tablas/usuario_lider.dart';
 import 'package:tienda_app/Dashboard/dashboard/screens/dashboard/components/visitado_details.dart';
 import 'package:tienda_app/Models/auxPedidoModel.dart';
+import 'package:tienda_app/Models/bodegaModel.dart';
 import 'package:tienda_app/Models/boletaModel.dart';
 import 'package:tienda_app/Models/devolucionesModel.dart';
 import 'package:tienda_app/Models/facturaModel.dart';
-import 'package:tienda_app/Models/inventarioModel.dart';
 import 'package:tienda_app/Models/produccionModel.dart';
 import 'package:tienda_app/Models/puntoVentaModel.dart';
 import 'package:tienda_app/Models/usuarioModel.dart';
@@ -196,7 +194,7 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                             const SizedBox(height: defaultPadding),
                           if (!Responsive.isMobile(context))
                             DefaultTabController(
-                                length: 12,
+                                length: 10,
                                 child: Column(
                                   children: [
                                     Container(
@@ -550,86 +548,6 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                   ),
                                                   Tooltip(
                                                     message:
-                                                        "Producciones despachadas por año",
-                                                    child: Container(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 12,
-                                                              right: 12,
-                                                              bottom: 4,
-                                                              top: 4),
-                                                      // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                      child: Column(
-                                                        children: [
-                                                          SvgPicture.asset(
-                                                            "assets/icons/produccion.svg",
-                                                            width: 24,
-                                                            height: 24,
-                                                            colorFilter:
-                                                                const ColorFilter
-                                                                    .mode(
-                                                                    Color(
-                                                                        0xFFB8860B),
-                                                                    BlendMode
-                                                                        .srcIn),
-                                                          ),
-                                                          const Text(
-                                                            "Año",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 14,
-                                                              color:
-                                                                  primaryColor,
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Tooltip(
-                                                    message:
-                                                        "Producciones despachadas por mes",
-                                                    child: Container(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 12,
-                                                              right: 12,
-                                                              bottom: 4,
-                                                              top: 4),
-                                                      // Contenedor que alberga el ícono y el nombre de la categoría.
-                                                      child: Column(
-                                                        children: [
-                                                          SvgPicture.asset(
-                                                            "assets/icons/produccion.svg",
-                                                            width: 24,
-                                                            height: 24,
-                                                            colorFilter:
-                                                                const ColorFilter
-                                                                    .mode(
-                                                                    Color(
-                                                                        0xFFB8860B),
-                                                                    BlendMode
-                                                                        .srcIn),
-                                                          ),
-                                                          const Text(
-                                                            "Mes",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 14,
-                                                              color:
-                                                                  primaryColor,
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Tooltip(
-                                                    message:
                                                         "Producciones recibidas por año",
                                                     child: Container(
                                                       padding:
@@ -766,30 +684,20 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                                                     usuarioAutenticado,
                                                               )
                                                             : _selectedItem == 8
-                                                                ? ReporteProduccionAgnoLider(
+                                                                ? ReporteRecibidoAgnoLider(
                                                                     usuario:
                                                                         usuarioAutenticado,
                                                                   )
                                                                 : _selectedItem ==
                                                                         9
-                                                                    ? ReporteProduccionMesLider(
+                                                                    ? ReporteRecibidoMesLider(
                                                                         usuario:
                                                                             usuarioAutenticado,
                                                                       )
-                                                                    : _selectedItem ==
-                                                                            10
-                                                                        ? ReporteRecibidoAgnoLider(
-                                                                            usuario:
-                                                                                usuarioAutenticado,
-                                                                          )
-                                                                        : _selectedItem ==
-                                                                                11
-                                                                            ? ReporteRecibidoMesLider(
-                                                                                usuario: usuarioAutenticado,
-                                                                              )
-                                                                            : ReporteCostoProduccionAgnoLider(
-                                                                                usuario: usuarioAutenticado,
-                                                                              ),
+                                                                    : ReporteCostoProduccionAgnoLider(
+                                                                        usuario:
+                                                                            usuarioAutenticado,
+                                                                      ),
                           if (!Responsive.isMobile(context))
                             const SizedBox(height: defaultPadding),
                           const Divider(
@@ -1326,10 +1234,9 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                           const SizedBox(height: defaultPadding),
                           // Tabla de inventarios
                           FutureBuilder(
-                              future:
-                                  getInventario(), // Obtiene los inventarios
+                              future: getBodegas(), // Obtiene los inventarios
                               builder: (context,
-                                  AsyncSnapshot<List<InventarioModel>>
+                                  AsyncSnapshot<List<BodegaModel>>
                                       snapshotInventario) {
                                 // Muestra un CircularProgressIndicator mientras se obtienen los inventarios
                                 if (snapshotInventario.connectionState ==
@@ -1349,11 +1256,11 @@ class _DashboardScreenLiderState extends State<DashboardScreenLider> {
                                   );
                                   // Muestra el contenido de los inventarios
                                 } else {
-                                  List<InventarioModel> inventarioSede = [];
+                                  List<BodegaModel> inventarioSede = [];
 
                                   inventarioSede.addAll(snapshotInventario.data!
                                       .where((inventario) =>
-                                          inventario.bodega.puntoVenta.sede ==
+                                          inventario.puntoVenta.sede ==
                                           usuarioAutenticado
                                               .sede)); // Filtra los inventarios por la sede de usuario
 

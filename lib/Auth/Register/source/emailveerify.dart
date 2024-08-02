@@ -220,7 +220,7 @@ class _VerificationScreenRegisterState
           setState(() {
             // Setear el usuario autenticado en el estado global
             Provider.of<AppState>(context, listen: false)
-                .setUsuarioAutenticado(usuarioEncontrado, context);
+                .setUsuarioAutenticado(usuarioEncontrado);
             _timer.cancel();
           });
         }

@@ -1,7 +1,6 @@
-// ignore_for_file: file_names, unnecessary_null_comparison
+// ignore_for_file: file_names
 
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -37,12 +36,10 @@ class ReporteCostoProduccionAgnoLider extends StatelessWidget {
             child: FutureBuilder(
                 future: Future.wait([getProducciones(), getProductos()]),
                 builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
-                  // Mostrar un indicador de carga mientras se esperan los datos
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
-                    // Mostrar un mensaje de error si la carga falla
                   } else if (snapshot.hasError) {
                     return Center(
                       child: Text(
@@ -51,15 +48,12 @@ class ReporteCostoProduccionAgnoLider extends StatelessWidget {
                       ),
                     );
                   } else {
-                    // Obtener los datos de las producciones y productos
                     List<ProduccionModel> allProductions = snapshot.data![0];
                     List<ProductoModel> allProducts = snapshot.data![1];
 
-                    // Calcular los datos para los 7 productos con mayor costo de producción
                     var data = _calculateTopProductions(
                         allProductions, allProducts, usuario);
 
-                    // Construir y mostrar la gráfica
                     return SfCartesianChart(
                       tooltipBehavior: TooltipBehavior(enable: true),
                       legend: const Legend(isVisible: true),
@@ -68,25 +62,17 @@ class ReporteCostoProduccionAgnoLider extends StatelessWidget {
                         interval: 1,
                       ),
                       primaryYAxis: NumericAxis(
-                        title:
-                            const AxisTitle(text: 'Costo de Producción (COP)'),
-                        numberFormat:
-                            NumberFormat.currency(locale: 'es_CO', symbol: ''),
+                        title: const AxisTitle(text: 'Costo de Producción (COP)'),
+                        numberFormat: NumberFormat.currency(locale: 'es_CO', symbol: ''),
                       ),
                       series: data.asMap().entries.map((entry) {
-                        ProduccionCostoDataAgnoLiderGroup productData =
-                            entry.value;
-                        return ColumnSeries<ProduccionCostoDataAgnoLider,
-                            double>(
+                        ProduccionCostoDataAgnoLiderGroup productData = entry.value;
+                        return ColumnSeries<ProduccionCostoDataAgnoLider, double>(
                           name: productData.nombre,
                           dataSource: productData.datos,
-                          xValueMapper:
-                              (ProduccionCostoDataAgnoLider data, _) =>
-                                  data.anio,
-                          yValueMapper:
-                              (ProduccionCostoDataAgnoLider data, _) =>
-                                  data.costo,
-                          color: _getColor(), // Asignar color
+                          xValueMapper: (ProduccionCostoDataAgnoLider data, _) => data.anio,
+                          yValueMapper: (ProduccionCostoDataAgnoLider data, _) => data.costo,
+                          color: _getColor(),
                         );
                       }).toList(),
                     );
@@ -98,70 +84,64 @@ class ReporteCostoProduccionAgnoLider extends StatelessWidget {
     );
   }
 
-  // Función para obtener el color de la serie (aleatorio)
   Color _getColor() {
     final random = Random();
-    final hue = random.nextDouble() * 360; // Generar tono aleatorio
-    final saturation =
-        random.nextDouble() * (0.5 - 0.2) + 0.2; // Saturation entre 0.2 y 0.5
-    final value =
-        random.nextDouble() * (0.9 - 0.5) + 0.5; // Value entre 0.5 y 0.9
+    final hue = random.nextDouble() * 360;
+    final saturation = random.nextDouble() * (0.5 - 0.2) + 0.2;
+    final value = random.nextDouble() * (0.9 - 0.5) + 0.5;
 
     return HSVColor.fromAHSV(1.0, hue, saturation, value).toColor();
   }
 
-  // Función para calcular los datos de los 7 productos con mayor costo de producción
   List<ProduccionCostoDataAgnoLiderGroup> _calculateTopProductions(
       List<ProduccionModel> productions,
       List<ProductoModel> products,
       UsuarioModel usuario) {
-    Map<String, List<ProduccionCostoDataAgnoLider>> productionDataByProduct =
-        {};
+    Map<String, Map<int, double>> productionDataByProduct = {};
 
     int currentYear = DateTime.now().year;
 
-    // Recorrer todas las producciones
     for (var production in productions) {
-      // Verificar si la fecha de producción no está vacía y la sede coincide con la del usuario
       if (production.fechaProduccion.isNotEmpty &&
           production.unidadProduccion.sede.id == usuario.sede) {
         DateTime productionDate = DateTime.parse(production.fechaProduccion);
         int year = productionDate.year;
 
-        // Filtrar los datos para los últimos tres años
         if (year < currentYear - 2) continue;
 
-        // Encontrar el producto correspondiente a la producción actual
-        ProductoModel? product =
-            products.firstWhere((product) => product.id == production.producto);
-        if (product == null) continue;
+        var product =
+            products.where((product) => product.id == production.producto);
 
-        // Agrupar los datos por nombre del producto
-        if (!productionDataByProduct.containsKey(product.nombre)) {
-          productionDataByProduct[product.nombre] = [];
+        var productName = product.firstOrNull?.nombre;
+
+        if (productName != null) {
+          if (!productionDataByProduct.containsKey(productName)) {
+            productionDataByProduct[productName] = {};
+          }
+
+          if (!productionDataByProduct[productName]!.containsKey(year)) {
+            productionDataByProduct[productName]![year] = 0;
+          }
+
+          productionDataByProduct[productName]![year] =
+              (productionDataByProduct[productName]![year] ?? 0) + production.costoProduccion.toDouble();
         }
-
-        productionDataByProduct[product.nombre]!.add(
-            ProduccionCostoDataAgnoLider(
-                year.toDouble(), production.costoProduccion.toDouble()));
       }
     }
 
-    // Ordenar los productos por costo total de producción y seleccionar los 7 más caros
-    List<MapEntry<String, List<ProduccionCostoDataAgnoLider>>> sortedProducts =
-        productionDataByProduct.entries.toList()
-          ..sort((a, b) => b.value
-              .fold(0, (sum, item) => sum + item.costo.toInt())
-              .compareTo(a.value.fold(0, (sum, item) => sum + item.costo)));
+    List<MapEntry<String, Map<int, double>>> sortedProducts = productionDataByProduct.entries.toList()
+      ..sort((a, b) => b.value.values.reduce((sum, item) => sum + item)
+          .compareTo(a.value.values.reduce((sum, item) => sum + item)));
 
-    // Mapear los datos ordenados a la estructura utilizada por la gráfica
     return sortedProducts.take(7).map((entry) {
-      return ProduccionCostoDataAgnoLiderGroup(entry.key, entry.value);
+      List<ProduccionCostoDataAgnoLider> datos = entry.value.entries
+          .map((e) => ProduccionCostoDataAgnoLider(e.key.toDouble(), e.value))
+          .toList();
+      return ProduccionCostoDataAgnoLiderGroup(entry.key, datos);
     }).toList();
   }
 }
 
-// Clase para representar los datos de costo de producción por año
 class ProduccionCostoDataAgnoLider {
   ProduccionCostoDataAgnoLider(this.anio, this.costo);
 
@@ -169,7 +149,6 @@ class ProduccionCostoDataAgnoLider {
   final double costo;
 }
 
-// Clase para agrupar los datos de costo de producción por producto
 class ProduccionCostoDataAgnoLiderGroup {
   ProduccionCostoDataAgnoLiderGroup(this.nombre, this.datos);
 

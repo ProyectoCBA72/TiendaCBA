@@ -115,7 +115,7 @@ class ReporteCostoProduccionMesLider extends StatelessWidget {
       List<ProduccionModel> productions,
       List<ProductoModel> products,
       UsuarioModel usuario) {
-    Map<String, List<ProduccionCostoDataMesLider>> productionDataByProduct = {};
+    Map<String, ProduccionCostoDataMesLiderGroup> productionDataByProduct = {};
 
     DateTime now = DateTime.now();
     int currentMonth = now.month;
@@ -133,26 +133,43 @@ class ReporteCostoProduccionMesLider extends StatelessWidget {
         }
 
         // Encontrar el producto correspondiente a la producción actual
-        ProductoModel? product =
-            products.firstWhere((product) => product.id == production.producto);
-        if (product == null) continue;
+        var product =
+            products.where((product) => product.id == production.producto);
 
-        // Agrupar los datos por nombre del producto
-        if (!productionDataByProduct.containsKey(product.nombre)) {
-          productionDataByProduct[product.nombre] = [];
+        var productName = product.firstOrNull?.nombre;
+
+        if (productName != null) {
+          // Obtener el nombre del mes
+          String month = _getNombreMes(productionDate);
+          // Crear una clave única para el producto y mes
+          String key = "$productName-$month";
+
+          // Sumar los costos de producción sin que se repitan los productos
+          if (!productionDataByProduct.containsKey(key)) {
+            productionDataByProduct[key] = ProduccionCostoDataMesLiderGroup(
+                productName, [ProduccionCostoDataMesLider(month, 0.0)]);
+          }
+
+          productionDataByProduct[key]!.datos[0].costo +=
+              production.costoProduccion.toDouble();
         }
-
-        // Obtener el nombre del mes
-        String month = _getNombreMes(productionDate);
-        productionDataByProduct[product.nombre]!.add(
-            ProduccionCostoDataMesLider(
-                month, production.costoProduccion.toDouble()));
       }
+    }
+
+    // Agrupar los datos por nombre del producto
+    Map<String, List<ProduccionCostoDataMesLider>> groupedDataByProduct = {};
+
+    for (var entry in productionDataByProduct.entries) {
+      var productName = entry.value.nombre;
+      if (!groupedDataByProduct.containsKey(productName)) {
+        groupedDataByProduct[productName] = [];
+      }
+      groupedDataByProduct[productName]!.add(entry.value.datos[0]);
     }
 
     // Ordenar los productos por costo total de producción y seleccionar los 7 más caros
     List<MapEntry<String, List<ProduccionCostoDataMesLider>>> sortedProducts =
-        productionDataByProduct.entries.toList()
+        groupedDataByProduct.entries.toList()
           ..sort((a, b) => b.value
               .fold(0, (sum, item) => sum + item.costo.toInt())
               .compareTo(a.value.fold(0, (sum, item) => sum + item.costo)));
@@ -201,7 +218,7 @@ class ProduccionCostoDataMesLider {
   ProduccionCostoDataMesLider(this.mes, this.costo);
 
   final String mes;
-  final double costo;
+  double costo;
 }
 
 // Clase para agrupar los datos de costo de producción por producto

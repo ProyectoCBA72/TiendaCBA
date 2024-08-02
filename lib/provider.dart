@@ -36,8 +36,7 @@ class AppState extends ChangeNotifier {
   /// Método para establecer el usuario autenticado y guardar su estado en `SharedPreferences`.
   /// Si el usuario es nulo, elimina su estado de `SharedPreferences`.
   /// Notifica a los oyentes del cambio de estado.
-  void setUsuarioAutenticado(
-      UsuarioModel? usuario, BuildContext context) async {
+  void setUsuarioAutenticado(UsuarioModel? usuario) async {
     _usuarioAutenticado = usuario;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (usuario != null) {
@@ -118,8 +117,7 @@ class AppState extends ChangeNotifier {
                 child: _buildButton("Aceptar", () {
                   Navigator.pop(context);
                   navigatorKey.currentState!.pushReplacement(
-                    MaterialPageRoute(
-                        builder: (context) => const HomePage()),
+                    MaterialPageRoute(builder: (context) => const HomePage()),
                   );
                   // Cierra el diálogo cuando se hace clic en el botón de aceptar
                 }),

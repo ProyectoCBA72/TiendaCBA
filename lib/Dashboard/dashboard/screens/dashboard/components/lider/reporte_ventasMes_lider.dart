@@ -1,4 +1,4 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, unnecessary_null_comparison
 
 import 'dart:math';
 
@@ -94,16 +94,20 @@ class ReporteProductosMasVendidosMesLider extends StatelessWidget {
                             devoluciones.any((devolucion) =>
                                 devolucion.factura.pedido.id !=
                                 factura.pedido.id)) {
-                          final producto = productos
-                              .firstWhere((p) => p.id == auxPedido.producto)
-                              .nombre;
-                          ventasPorProductoPorMes.putIfAbsent(
-                              producto, () => {});
-                          ventasPorProductoPorMes[producto]!
-                              .putIfAbsent(mes, () => 0);
-                          ventasPorProductoPorMes[producto]![mes] =
-                              ventasPorProductoPorMes[producto]![mes]! +
-                                  auxPedido.cantidad.toDouble();
+                          var producto = productos
+                              .where((p) => p.id == auxPedido.producto);
+
+                          var productoNombre = producto.firstOrNull?.nombre;
+
+                          if (productoNombre != null) {
+                            ventasPorProductoPorMes.putIfAbsent(
+                                productoNombre, () => {});
+                            ventasPorProductoPorMes[productoNombre]!
+                                .putIfAbsent(mes, () => 0);
+                            ventasPorProductoPorMes[productoNombre]![mes] =
+                                ventasPorProductoPorMes[productoNombre]![mes]! +
+                                    auxPedido.cantidad.toDouble();
+                          }
                         }
                       }
                     }

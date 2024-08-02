@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:tienda_app/Auth/authScreen.dart';
 import 'package:tienda_app/Buscador/searchDelegate.dart';
 import 'package:tienda_app/Carrito/carritoScreen.dart';
+import 'package:tienda_app/Chatbot/chatBot.dart';
 import 'package:tienda_app/Home/homePage.dart';
 import 'package:tienda_app/Home/profileCard.dart';
 import 'package:tienda_app/Models/bodegaModel.dart';
@@ -452,6 +453,19 @@ class _TiendaScreenState extends State<TiendaScreen> {
                   },
                 ),
               ),
+              Positioned(
+                  bottom: 10,
+                  right: 10,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ChatBot()),
+                      );
+                    },
+                    child: const Icon(Icons.support_agent),
+                  )),
             ],
           ),
         );

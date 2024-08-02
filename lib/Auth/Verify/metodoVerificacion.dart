@@ -143,7 +143,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
       // Cancelamos el temporizador y mostramos la siguiente página
       setState(() {
         Provider.of<AppState>(context, listen: false)
-            .setUsuarioAutenticado(widget.usuario, context);
+            .setUsuarioAutenticado(widget.usuario);
         _timer.cancel();
       });
 

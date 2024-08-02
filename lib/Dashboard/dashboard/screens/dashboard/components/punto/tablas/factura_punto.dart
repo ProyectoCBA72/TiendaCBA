@@ -686,7 +686,7 @@ class FacturaPuntoDataGridSource extends DataGridSource {
       // Verifica si el número de pedido de la factura coincide con el buscado.
       if (factura.pedido.numeroPedido == numeroPedido) {
         // Busca el usuario vendedor en la lista de usuarios.
-        var usuario = usuarios
+        UsuarioModel? usuario = usuarios
             .firstWhere((usuario) => usuario.id == factura.usuarioVendedor);
         // Obtiene el nombre del usuario vendedor.
         vendedor = "${usuario.nombres} ${usuario.apellidos}";

@@ -235,7 +235,6 @@ class _CarritoTablaState extends State<CarritoTabla> {
       );
 
       if (response.statusCode == 200) {
-        print(response.body);
         updateBodegas();
 
         Navigator.pushReplacement(
